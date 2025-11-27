@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1764283732119,
+      "tag": "0000_organic_silk_fever",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1764283832183,
+      "tag": "0001_red_kitty_pryde",
+      "breakpoints": true
+    }
+  ]
+}

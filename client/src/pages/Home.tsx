@@ -1,3 +1,4 @@
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,10 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  // The userAuth hooks provides authentication state
+  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
+  let { user, loading, error, isAuthenticated, logout } = useAuth();
+
   const scrollToPrompt = () => {
     document.getElementById('prompt-section')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -31,7 +36,12 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={scrollToPrompt}>View Prompt</Button>
-            <Button onClick={scrollToPrompt}>Get Started</Button>
+            <Button variant="ghost" asChild>
+              <a href="/pricing">Pricing</a>
+            </Button>
+            <Button asChild>
+              <a href="/pricing">Get Started</a>
+            </Button>
           </div>
         </div>
       </nav>
