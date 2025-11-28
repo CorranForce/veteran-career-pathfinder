@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import EmailCaptureForm from "@/components/EmailCaptureForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -343,6 +344,52 @@ export default function Home() {
                 Copy Full Prompt <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Email Capture Section */}
+      <section className="py-20 bg-gradient-to-br from-secondary/50 to-background">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto">
+            <Card className="border-2 shadow-xl">
+              <CardContent className="p-8 md:p-12">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="space-y-4">
+                    <Badge className="bg-accent text-accent-foreground">Free Resource</Badge>
+                    <h2 className="text-3xl font-bold">Get Your Free Career Transition Checklist</h2>
+                    <p className="text-muted-foreground">
+                      Join our mailing list and receive a free guide with actionable steps to kickstart your civilian career. 
+                      Plus, get exclusive tips and resources delivered to your inbox.
+                    </p>
+                    <div className="flex flex-col gap-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-accent" />
+                        <span>Military-to-civilian skill translation tips</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-accent" />
+                        <span>Weekly career transition strategies</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-accent" />
+                        <span>Exclusive veteran success stories</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <EmailCaptureForm 
+                      source="homepage-cta"
+                      placeholder="your.email@example.com"
+                      buttonText="Send Me the Checklist"
+                    />
+                    <p className="text-xs text-muted-foreground text-center">
+                      We respect your privacy. Unsubscribe anytime.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

@@ -235,3 +235,17 @@
 - [ ] Test payment flow end-to-end
 - [ ] Configure Stripe products in dashboard
 - [ ] Test webhook delivery
+
+
+## Email Capture Feature
+
+- [x] Create database schema for email subscribers
+- [x] Push database schema changes
+- [x] Create email capture form component
+- [x] Add email validation
+- [x] Create tRPC procedure for email subscription
+- [x] Add email capture section to homepage (above pricing CTA)
+- [x] Add success/error toast notifications
+- [x] Test email capture flow
+- [x] Add duplicate email handling
+- [ ] Create admin view to export email list (future enhancement)

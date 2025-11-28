@@ -15,6 +15,13 @@
       "when": 1764283832183,
       "tag": "0001_red_kitty_pryde",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1764343636875,
+      "tag": "0002_outstanding_steel_serpent",
+      "breakpoints": true
     }
   ]
 }
