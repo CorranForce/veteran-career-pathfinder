@@ -23,6 +23,18 @@ export const emailRouter = router({
           status: "active",
         });
 
+        // Send welcome email with checklist
+        try {
+          const { sendWelcomeEmail } = await import("../services/email");
+          await sendWelcomeEmail({ 
+            to: input.email.toLowerCase().trim(), 
+            name: input.name?.trim() 
+          });
+        } catch (emailError) {
+          // Log email error but don't fail the subscription
+          console.error("[Email] Failed to send welcome email:", emailError);
+        }
+
         return {
           success: true,
           message: "Successfully subscribed to the mailing list!",
