@@ -249,3 +249,17 @@
 - [x] Test email capture flow
 - [x] Add duplicate email handling
 - [ ] Create admin view to export email list (future enhancement)
+
+
+## Admin Dashboard Feature
+
+- [x] Create admin dashboard page component
+- [x] Add authentication check for admin access
+- [x] Create subscriber analytics cards (total, daily, weekly, monthly)
+- [x] Build subscriber list table with sorting and filtering
+- [x] Add CSV export functionality
+- [x] Create tRPC procedures for subscriber analytics
+- [x] Add route to App.tsx for admin dashboard
+- [x] Style dashboard with charts/graphs for visual analytics
+- [x] Test CSV export with sample data
+- [ ] Add pagination for large subscriber lists (future enhancement)
