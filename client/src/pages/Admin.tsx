@@ -13,6 +13,7 @@ export default function Admin() {
   
   const { data: subscribers, isLoading: subsLoading } = trpc.email.getAll.useQuery();
   const { data: analytics, isLoading: analyticsLoading } = trpc.email.getAnalytics.useQuery();
+  const { data: engagement, isLoading: engagementLoading } = trpc.email.getEngagement.useQuery();
 
   const handleExportCSV = () => {
     if (!subscribers || subscribers.length === 0) {
@@ -49,7 +50,7 @@ export default function Admin() {
     toast.success("Subscriber list exported successfully!");
   };
 
-  if (authLoading || subsLoading || analyticsLoading) {
+  if (authLoading || subsLoading || analyticsLoading || engagementLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -161,6 +162,59 @@ export default function Admin() {
             </CardContent>
           </Card>
         )}
+
+        {/* Email Engagement Metrics */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Email Engagement</CardTitle>
+            <CardDescription>Track how subscribers interact with your emails</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Open Rate</p>
+                <p className="text-3xl font-bold">{engagement?.openRate || 0}%</p>
+                <p className="text-xs text-muted-foreground">
+                  {engagement?.uniqueOpens || 0} of {engagement?.totalSent || 0} emails opened
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Click Rate</p>
+                <p className="text-3xl font-bold">{engagement?.clickRate || 0}%</p>
+                <p className="text-xs text-muted-foreground">
+                  {engagement?.uniqueClicks || 0} emails with clicks
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Click-to-Open Rate</p>
+                <p className="text-3xl font-bold">{engagement?.clickToOpenRate || 0}%</p>
+                <p className="text-xs text-muted-foreground">
+                  {engagement?.clicks || 0} total clicks
+                </p>
+              </div>
+            </div>
+            {engagement && engagement.recentEvents && engagement.recentEvents.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-medium mb-3">Recent Activity</h4>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {engagement.recentEvents.slice(0, 10).map((event, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-sm border-b pb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={event.eventType === "open" ? "default" : "secondary"}>
+                          {event.eventType}
+                        </Badge>
+                        <span className="text-muted-foreground">{event.email}</span>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(event.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Subscriber List */}
         <Card>

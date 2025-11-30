@@ -69,3 +69,23 @@ export const subscribers = mysqlTable("subscribers", {
 
 export type Subscriber = typeof subscribers.$inferSelect;
 export type InsertSubscriber = typeof subscribers.$inferInsert;
+
+/**
+ * Email events table - tracks SendGrid webhook events (opens, clicks, bounces)
+ */
+export const emailEvents = mysqlTable("email_events", {
+  id: int("id").autoincrement().primaryKey(),
+  subscriberId: int("subscriberId"),
+  email: varchar("email", { length: 320 }).notNull(),
+  eventType: varchar("eventType", { length: 50 }).notNull(), // open, click, bounce, delivered, etc.
+  timestamp: timestamp("timestamp").notNull(),
+  url: text("url"), // For click events
+  userAgent: text("userAgent"),
+  ip: varchar("ip", { length: 45 }),
+  sgEventId: varchar("sgEventId", { length: 255 }), // SendGrid event ID
+  sgMessageId: varchar("sgMessageId", { length: 255 }), // SendGrid message ID
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type EmailEvent = typeof emailEvents.$inferSelect;
+export type InsertEmailEvent = typeof emailEvents.$inferInsert;

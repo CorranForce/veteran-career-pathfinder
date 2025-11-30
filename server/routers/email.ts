@@ -96,4 +96,56 @@ export const emailRouter = router({
       bySource,
     };
   }),
+
+  /**
+   * Get email engagement analytics
+   */
+  getEngagement: publicProcedure.query(async () => {
+    const db = await import("../db").then((m) => m.getDb());
+    if (!db) return null;
+
+    const { emailEvents } = await import("../../drizzle/schema");
+    const { sql } = await import("drizzle-orm");
+
+    // Get all events
+    const allEvents = await db.select().from(emailEvents);
+
+    // Calculate metrics
+    const totalSent = new Set(allEvents.map(e => e.sgMessageId)).size || 1; // Unique messages
+    const opens = allEvents.filter(e => e.eventType === "open").length;
+    const clicks = allEvents.filter(e => e.eventType === "click").length;
+    const uniqueOpens = new Set(
+      allEvents.filter(e => e.eventType === "open").map(e => e.sgMessageId)
+    ).size;
+    const uniqueClicks = new Set(
+      allEvents.filter(e => e.eventType === "click").map(e => e.sgMessageId)
+    ).size;
+
+    // Calculate rates
+    const openRate = totalSent > 0 ? (uniqueOpens / totalSent) * 100 : 0;
+    const clickRate = totalSent > 0 ? (uniqueClicks / totalSent) * 100 : 0;
+    const clickToOpenRate = uniqueOpens > 0 ? (uniqueClicks / uniqueOpens) * 100 : 0;
+
+    // Get recent events for timeline
+    const recentEvents = allEvents
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 50);
+
+    return {
+      totalSent,
+      opens,
+      clicks,
+      uniqueOpens,
+      uniqueClicks,
+      openRate: Math.round(openRate * 10) / 10,
+      clickRate: Math.round(clickRate * 10) / 10,
+      clickToOpenRate: Math.round(clickToOpenRate * 10) / 10,
+      recentEvents: recentEvents.map(e => ({
+        eventType: e.eventType,
+        email: e.email,
+        timestamp: e.timestamp,
+        url: e.url,
+      })),
+    };
+  }),
 });

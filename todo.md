@@ -277,3 +277,17 @@
 - [x] Test email delivery with real SendGrid account
 - [x] Create vitest test to validate SendGrid credentials
 - [ ] Add email logs/tracking to admin dashboard (future enhancement)
+
+
+## Email Engagement Tracking
+
+- [x] Enable SendGrid click tracking and open tracking settings
+- [x] Create database schema for email events (opens, clicks, bounces)
+- [x] Set up SendGrid webhook endpoint for event notifications
+- [x] Create webhook handler to process email events
+- [x] Add email events to database when webhook receives them
+- [x] Create tRPC procedures to fetch email engagement analytics
+- [x] Add engagement metrics to admin dashboard (open rate, click rate)
+- [x] Add recent activity timeline to engagement section
+- [ ] Configure SendGrid webhook URL in SendGrid dashboard (user action required)
+- [ ] Test webhook delivery with real email events

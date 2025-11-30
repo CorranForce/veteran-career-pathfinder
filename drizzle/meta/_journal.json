@@ -22,6 +22,13 @@
       "when": 1764343636875,
       "tag": "0002_outstanding_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1764509557055,
+      "tag": "0003_right_brood",
+      "breakpoints": true
     }
   ]
 }

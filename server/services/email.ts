@@ -39,6 +39,15 @@ export async function sendWelcomeEmail({ to, name }: SendWelcomeEmailParams): Pr
       subject: "Your Career Transition Checklist is Here! 🎯",
       html: getWelcomeEmailTemplate(firstName),
       text: getWelcomeEmailText(firstName),
+      trackingSettings: {
+        clickTracking: {
+          enable: true,
+          enableText: true,
+        },
+        openTracking: {
+          enable: true,
+        },
+      },
     };
 
     await sgMail.send(msg);
