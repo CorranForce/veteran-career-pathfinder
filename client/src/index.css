@@ -179,3 +179,14 @@
     }
   }
 }
+
+/* Hide Made with Manus badge */
+[data-manus-badge],
+.manus-badge,
+a[href*="manus.im"][target="_blank"],
+div[style*="position: fixed"][style*="bottom"],
+#manus-badge {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
