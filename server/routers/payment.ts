@@ -3,6 +3,7 @@ import { protectedProcedure, router } from "../_core/trpc";
 import { stripe } from "../stripe";
 import { PRODUCTS } from "../products";
 import { createPurchase, getUserPurchases, hasUserPurchased, updateUserStripeCustomerId } from "../db";
+import { getUserDownloads } from "../services/purchaseFulfillment";
 
 export const paymentRouter = router({
   /**
@@ -94,5 +95,21 @@ export const paymentRouter = router({
     )
     .query(async ({ ctx, input }) => {
       return await hasUserPurchased(ctx.user.id, input.productType);
+    }),
+
+  /**
+   * Get user's downloadable digital assets from purchases
+   */
+  getUserDownloads: protectedProcedure
+    .input(
+      z.object({
+        userId: z.number(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      if (ctx.user.id !== input.userId) {
+        throw new Error("Unauthorized");
+      }
+      return await getUserDownloads(ctx.user.id);
     }),
 });

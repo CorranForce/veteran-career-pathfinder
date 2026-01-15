@@ -288,3 +288,173 @@ export async function sendDripEmail(
     return false;
   }
 }
+
+
+export interface SendPurchaseConfirmationEmailParams {
+  email: string;
+  name: string;
+  productType: string;
+  promptPdfUrl: string | null;
+  resumeTemplatePdfUrl: string | null;
+}
+
+/**
+ * Send purchase confirmation email with download links for digital assets
+ */
+export async function sendPurchaseConfirmationEmail({
+  email,
+  name,
+  productType,
+  promptPdfUrl,
+  resumeTemplatePdfUrl,
+}: SendPurchaseConfirmationEmailParams): Promise<boolean> {
+  if (!ENV.sendgridApiKey) {
+    console.warn("[Email Service] Cannot send email: SendGrid not configured");
+    return false;
+  }
+
+  if (!ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send email: FROM email not configured");
+    return false;
+  }
+
+  try {
+    const firstName = name?.split(" ")[0] || "Veteran";
+
+    const msg = {
+      to: email,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject: "🎖️ Your Pathfinder Resources Are Ready!",
+      html: getPurchaseConfirmationTemplate(firstName, productType, promptPdfUrl, resumeTemplatePdfUrl),
+      text: getPurchaseConfirmationText(firstName, productType, promptPdfUrl, resumeTemplatePdfUrl),
+      trackingSettings: {
+        clickTracking: {
+          enable: true,
+          enableText: true,
+        },
+        openTracking: {
+          enable: true,
+        },
+      },
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Purchase confirmation email sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error("[Email Service] Failed to send purchase confirmation email:", error);
+    return false;
+  }
+}
+
+function getPurchaseConfirmationTemplate(
+  firstName: string,
+  productType: string,
+  promptPdfUrl: string | null,
+  resumeTemplatePdfUrl: string | null
+): string {
+  const isPro = productType === "pro_subscription";
+
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #002a4d; border-bottom: 3px solid #d4a574; padding-bottom: 10px;">
+            Welcome to Pathfinder, ${firstName}! 🎖️
+          </h1>
+
+          <p>Your purchase is confirmed and your resources are ready to download.</p>
+
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2 style="color: #002a4d; margin-top: 0;">Your Downloads</h2>
+
+            ${
+              promptPdfUrl
+                ? `
+              <div style="margin-bottom: 15px;">
+                <a href="${promptPdfUrl}" style="display: inline-block; background-color: #002a4d; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+                  📄 Download Optimized Prompt PDF
+                </a>
+                <p style="margin-top: 8px; font-size: 14px; color: #666;">
+                  The complete AI prompt optimized for your military-to-civilian career transition
+                </p>
+              </div>
+            `
+                : ""
+            }
+
+            ${
+              resumeTemplatePdfUrl
+                ? `
+              <div style="margin-bottom: 15px;">
+                <a href="${resumeTemplatePdfUrl}" style="display: inline-block; background-color: #d4a574; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: bold;">
+                  📋 Download Resume Translation Template
+                </a>
+                <p style="margin-top: 8px; font-size: 14px; color: #666;">
+                  Translate your military experience into civilian language
+                </p>
+              </div>
+            `
+                : ""
+            }
+          </div>
+
+          <div style="background-color: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #002a4d;">
+            <h3 style="color: #002a4d; margin-top: 0;">Next Steps</h3>
+            <ol style="color: #333;">
+              <li>Download your resources above</li>
+              <li>Use the prompt with your favorite AI tool (ChatGPT, Claude, Gemini, etc.)</li>
+              <li>Follow the 30-day action plan for your career transition</li>
+              ${isPro ? "<li>Join our private veteran community for ongoing support</li>" : ""}
+            </ol>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Questions? Reply to this email or visit our support page at pathfinder.manus.space
+          </p>
+
+          <p style="color: #999; font-size: 12px; border-top: 1px solid #ddd; padding-top: 20px; margin-top: 40px;">
+            Pathfinder - Empowering Veterans to Translate Their Service Into Successful Civilian Careers
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+function getPurchaseConfirmationText(
+  firstName: string,
+  productType: string,
+  promptPdfUrl: string | null,
+  resumeTemplatePdfUrl: string | null
+): string {
+  const isPro = productType === "pro_subscription";
+
+  let text = `Welcome to Pathfinder, ${firstName}!\n\n`;
+  text += `Your purchase is confirmed and your resources are ready to download.\n\n`;
+  text += `YOUR DOWNLOADS:\n`;
+
+  if (promptPdfUrl) {
+    text += `- Optimized Prompt PDF: ${promptPdfUrl}\n`;
+  }
+
+  if (resumeTemplatePdfUrl) {
+    text += `- Resume Translation Template: ${resumeTemplatePdfUrl}\n`;
+  }
+
+  text += `\nNEXT STEPS:\n`;
+  text += `1. Download your resources\n`;
+  text += `2. Use the prompt with your favorite AI tool\n`;
+  text += `3. Follow the 30-day action plan\n`;
+
+  if (isPro) {
+    text += `4. Join our private veteran community\n`;
+  }
+
+  text += `\nQuestions? Reply to this email or visit pathfinder.manus.space\n`;
+
+  return text;
+}

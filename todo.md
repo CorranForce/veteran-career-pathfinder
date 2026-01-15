@@ -325,3 +325,68 @@
 - [x] Implement segment-specific email templates
 - [x] Add segment analytics to admin dashboard
 - [ ] Test segmentation accuracy and targeting (pending manual testing)
+
+
+## Pricing Tier Feature Verification
+
+### FREE TIER ($0)
+- [x] Basic prompt overview (visible on homepage)
+- [x] Limited career path examples (shown in hero section)
+- [x] General transition guidance (displayed in problem statement)
+
+### PREMIUM TIER ($29 one-time)
+- [x] Full optimized AI prompt (configured in products.ts)
+- [x] 3-4 detailed career paths with salary data (in pricing page)
+- [x] Skills gap analysis & certification roadmap (in pricing page)
+- [x] 30-day action plan with weekly milestones (in pricing page)
+- [x] Bonus: Resume translation templates (in pricing page)
+- [x] Lifetime access & updates (in pricing page)
+- [ ] Actual prompt delivery after purchase (needs implementation)
+- [ ] Resume templates download (needs implementation)
+
+### PRO TIER ($9.99/month)
+- [x] Everything in Premium (stated in pricing page)
+- [x] Monthly live career transition webinars (in pricing page)
+- [x] Private veteran community access (in pricing page)
+- [x] Q&A sessions with career experts (in pricing page)
+- [x] Job posting board & networking (in pricing page)
+- [x] Cancel anytime, no commitment (in pricing page)
+- [ ] Webinar scheduling system (needs implementation)
+- [ ] Private community forum/access (needs implementation)
+- [ ] Job board functionality (needs implementation)
+- [ ] Expert Q&A system (needs implementation)
+
+
+## Critical Gaps Implementation
+
+### Phase 1: Post-Purchase Delivery & Resume Templates
+- [x] Create prompt PDF generation service
+- [x] Create resume templates in PDF format
+- [x] Add post-purchase email with download links
+- [x] Create downloads page for purchased customers
+- [x] Add purchase verification to downloads
+- [ ] Test end-to-end delivery flow
+
+### Phase 2: Private Community Forum
+- [ ] Design community forum database schema
+- [ ] Create forum discussion threads system
+- [ ] Implement Pro member access control
+- [ ] Build forum UI components
+- [ ] Add moderation tools for admin
+- [ ] Test community access restrictions
+
+### Phase 3: Webinar & Job Board
+- [ ] Integrate Zoom API for webinar scheduling
+- [ ] Create webinar calendar UI
+- [ ] Build job board database schema
+- [ ] Implement job posting form
+- [ ] Create job listing page for Pro members
+- [ ] Add job search/filter functionality
+
+### Phase 4: Expert Q&A System
+- [ ] Create Q&A database schema
+- [ ] Build question submission form
+- [ ] Create expert answer interface
+- [ ] Implement Q&A listing page
+- [ ] Add voting/rating system for answers
+- [ ] Test Q&A workflow

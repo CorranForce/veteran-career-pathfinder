@@ -46,6 +46,11 @@ export const purchases = mysqlTable("purchases", {
   // Purchase status
   status: mysqlEnum("status", ["pending", "completed", "failed", "cancelled"]).default("pending").notNull(),
   
+  // Digital asset URLs (for post-purchase delivery)
+  promptPdfUrl: text("promptPdfUrl"),
+  resumeTemplatePdfUrl: text("resumeTemplatePdfUrl"),
+  fulfilledAt: timestamp("fulfilledAt"),
+  
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
