@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, date } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -155,3 +155,45 @@ export const subscriberSegments = mysqlTable("subscriber_segments", {
 
 export type SubscriberSegment = typeof subscriberSegments.$inferSelect;
 export type InsertSubscriberSegment = typeof subscriberSegments.$inferInsert;
+
+/**
+ * User profiles for displaying career highlights and LinkedIn info
+ */
+export const userProfiles = mysqlTable("userProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  bio: text("bio"),
+  linkedinUrl: varchar("linkedinUrl", { length: 500 }),
+  linkedinUsername: varchar("linkedinUsername", { length: 255 }),
+  profileImageUrl: text("profileImageUrl"),
+  currentRole: varchar("currentRole", { length: 255 }),
+  targetRole: varchar("targetRole", { length: 255 }),
+  yearsOfExperience: int("yearsOfExperience"),
+  militaryBranch: varchar("militaryBranch", { length: 100 }),
+  militaryRank: varchar("militaryRank", { length: 100 }),
+  profileVisibility: mysqlEnum("profileVisibility", ["public", "private", "members_only"]).default("members_only").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = typeof userProfiles.$inferInsert;
+
+/**
+ * Career highlights for user profiles
+ */
+export const careerHighlights = mysqlTable("careerHighlights", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["achievement", "certification", "promotion", "project", "award", "skill"]).notNull(),
+  date: date("date"),
+  imageUrl: text("imageUrl"),
+  order: int("order").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CareerHighlight = typeof careerHighlights.$inferSelect;
+export type InsertCareerHighlight = typeof careerHighlights.$inferInsert;

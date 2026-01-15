@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -206,4 +206,118 @@ export async function getSubscriberByEmail(email: string) {
 
   const result = await db.select().from(subscribers).where(eq(subscribers.email, email)).limit(1);
   return result.length > 0 ? result[0] : undefined;
+}
+
+// Profile operations
+export async function getUserProfile(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userId))
+      .limit(1);
+
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to get user profile:", error);
+    return null;
+  }
+}
+
+export async function createOrUpdateUserProfile(userId: number, profile: Partial<InsertUserProfile>) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const existing = await getUserProfile(userId);
+
+    if (existing) {
+      await db
+        .update(userProfiles)
+        .set({
+          ...profile,
+          updatedAt: new Date(),
+        })
+        .where(eq(userProfiles.userId, userId));
+    } else {
+      await db.insert(userProfiles).values({
+        userId,
+        ...profile,
+      });
+    }
+
+    return await getUserProfile(userId);
+  } catch (error) {
+    console.error("[Database] Failed to create/update user profile:", error);
+    return null;
+  }
+}
+
+export async function getCareerHighlights(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    return await db
+      .select()
+      .from(careerHighlights)
+      .where(eq(careerHighlights.userId, userId))
+      .orderBy(careerHighlights.order);
+  } catch (error) {
+    console.error("[Database] Failed to get career highlights:", error);
+    return [];
+  }
+}
+
+export async function addCareerHighlight(userId: number, highlight: Omit<InsertCareerHighlight, "userId">) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const result = await db.insert(careerHighlights).values({
+      userId,
+      ...highlight,
+    });
+
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to add career highlight:", error);
+    return null;
+  }
+}
+
+export async function updateCareerHighlight(highlightId: number, highlight: Partial<InsertCareerHighlight>) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    await db
+      .update(careerHighlights)
+      .set({
+        ...highlight,
+        updatedAt: new Date(),
+      })
+      .where(eq(careerHighlights.id, highlightId));
+
+    return await db.select().from(careerHighlights).where(eq(careerHighlights.id, highlightId)).limit(1);
+  } catch (error) {
+    console.error("[Database] Failed to update career highlight:", error);
+    return null;
+  }
+}
+
+export async function deleteCareerHighlight(highlightId: number) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    await db.delete(careerHighlights).where(eq(careerHighlights.id, highlightId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete career highlight:", error);
+    return false;
+  }
 }

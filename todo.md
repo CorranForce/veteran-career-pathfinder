@@ -390,3 +390,19 @@
 - [ ] Implement Q&A listing page
 - [ ] Add voting/rating system for answers
 - [ ] Test Q&A workflow
+
+
+## User Profile System
+
+- [x] Create database schema for user profiles
+- [x] Add career highlights table to database
+- [x] Create profile API procedures (get, update, delete)
+- [x] Build profile edit page component
+- [x] Add LinkedIn URL validation and preview
+- [ ] Create public profile view page (next phase)
+- [ ] Add profile completeness indicator (future enhancement)
+- [ ] Implement profile picture upload to S3 (future enhancement)
+- [x] Add career highlights CRUD operations
+- [ ] Create profile search/discovery feature (future enhancement)
+- [ ] Add profile sharing functionality (future enhancement)
+- [ ] Test end-to-end profile system (pending)
