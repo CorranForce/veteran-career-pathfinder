@@ -89,3 +89,64 @@ export const emailEvents = mysqlTable("email_events", {
 
 export type EmailEvent = typeof emailEvents.$inferSelect;
 export type InsertEmailEvent = typeof emailEvents.$inferInsert;
+
+/**
+ * Drip campaigns table - defines email sequences sent after signup
+ */
+export const dripCampaigns = mysqlTable("drip_campaigns", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(), // e.g., "Day 7 Career Tips"
+  subject: text("subject").notNull(),
+  htmlContent: text("htmlContent").notNull(),
+  textContent: text("textContent").notNull(),
+  dayOffset: int("dayOffset").notNull(), // Days after signup to send (7, 14, 30)
+  isActive: mysqlEnum("isActive", ["true", "false"]).default("true").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DripCampaign = typeof dripCampaigns.$inferSelect;
+export type InsertDripCampaign = typeof dripCampaigns.$inferInsert;
+
+/**
+ * Drip campaign sends - tracks which subscribers have received which drip emails
+ */
+export const dripSends = mysqlTable("drip_sends", {
+  id: int("id").autoincrement().primaryKey(),
+  subscriberId: int("subscriberId").notNull(),
+  campaignId: int("campaignId").notNull(),
+  sentAt: timestamp("sentAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type DripSend = typeof dripSends.$inferSelect;
+export type InsertDripSend = typeof dripSends.$inferInsert;
+
+/**
+ * A/B test variants table - stores different subject line variants
+ */
+export const abTestVariants = mysqlTable("ab_test_variants", {
+  id: int("id").autoincrement().primaryKey(),
+  campaignId: int("campaignId").notNull(),
+  variantName: varchar("variantName", { length: 100 }).notNull(), // e.g., "Variant A", "Variant B"
+  subject: text("subject").notNull(),
+  weight: int("weight").default(50).notNull(), // Percentage of traffic (0-100)
+  isWinner: mysqlEnum("isWinner", ["true", "false"]).default("false").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ABTestVariant = typeof abTestVariants.$inferSelect;
+export type InsertABTestVariant = typeof abTestVariants.$inferInsert;
+
+/**
+ * Subscriber segments table - tags for segmentation (active, inactive, highly engaged)
+ */
+export const subscriberSegments = mysqlTable("subscriber_segments", {
+  id: int("id").autoincrement().primaryKey(),
+  subscriberId: int("subscriberId").notNull(),
+  segment: mysqlEnum("segment", ["active", "inactive", "highly_engaged", "cold_lead"]).notNull(),
+  lastUpdated: timestamp("lastUpdated").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SubscriberSegment = typeof subscriberSegments.$inferSelect;
+export type InsertSubscriberSegment = typeof subscriberSegments.$inferInsert;

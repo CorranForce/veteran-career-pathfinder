@@ -237,3 +237,54 @@ You're receiving this email because you subscribed to Pathfinder career transiti
 Questions? Reply to this email - we're here to help.
   `.trim();
 }
+
+
+/**
+ * Send drip campaign email to subscriber
+ */
+export async function sendDripEmail(
+  to: string,
+  name: string,
+  subject: string,
+  htmlContent: string,
+  textContent: string
+): Promise<boolean> {
+  if (!ENV.sendgridApiKey) {
+    console.warn("[Email Service] Cannot send email: SendGrid not configured");
+    return false;
+  }
+
+  if (!ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send email: FROM email not configured");
+    return false;
+  }
+
+  try {
+    const msg = {
+      to,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject,
+      html: htmlContent,
+      text: textContent,
+      trackingSettings: {
+        clickTracking: {
+          enable: true,
+          enableText: true,
+        },
+        openTracking: {
+          enable: true,
+        },
+      },
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Drip email sent successfully to ${to}`);
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to send drip email:", error.response?.body || error.message);
+    return false;
+  }
+}

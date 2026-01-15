@@ -291,3 +291,37 @@
 - [x] Add recent activity timeline to engagement section
 - [ ] Configure SendGrid webhook URL in SendGrid dashboard (user action required)
 - [ ] Test webhook delivery with real email events
+
+
+## Email Drip Sequences
+
+- [x] Create database schema for drip campaigns and email templates
+- [x] Create drip campaign scheduler (runs daily to check due emails)
+- [x] Implement email sending logic for scheduled drip emails
+- [x] Create Day 7 follow-up email template (career tips)
+- [x] Create Day 14 follow-up email template (premium promo)
+- [x] Create Day 30 follow-up email template (pro subscription promo)
+- [x] Add drip campaign management to admin dashboard
+- [ ] Test drip sequence delivery timing (pending manual testing)
+
+## A/B Testing for Subject Lines
+
+- [x] Create database schema for A/B test variants
+- [x] Implement subject line variant assignment logic
+- [x] Create A/B test tracking in email events
+- [x] Calculate open rate per variant
+- [x] Add A/B test results to admin dashboard
+- [x] Create variant management UI in admin
+- [x] Implement winner selection logic (highest open rate)
+- [ ] Test A/B testing with multiple variants (pending manual testing)
+
+## Subscriber Segmentation
+
+- [x] Create database schema for subscriber segments and tags
+- [x] Implement engagement level calculation (active/inactive/highly engaged)
+- [x] Create automatic segmentation job (runs daily)
+- [x] Add segment-based filtering to admin dashboard
+- [x] Create targeted campaign UI for segments
+- [x] Implement segment-specific email templates
+- [x] Add segment analytics to admin dashboard
+- [ ] Test segmentation accuracy and targeting (pending manual testing)
