@@ -116,17 +116,17 @@ export default function ProfileEdit() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between h-16">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             <a href="/" className="font-bold text-xl">
               Pathfinder
             </a>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex" asChild>
               <a href="/profile">View Profile</a>
             </Button>
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" size="sm" asChild>
               <a href="/">Home</a>
             </Button>
           </div>
@@ -134,8 +134,8 @@ export default function ProfileEdit() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 py-12">
-        <div className="container mx-auto max-w-4xl">
+      <main className="flex-1 py-8 sm:py-12">
+        <div className="container mx-auto max-w-4xl px-4">
           <div className="space-y-8">
             {/* Header */}
             <div className="space-y-2">

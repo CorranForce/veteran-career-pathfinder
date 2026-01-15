@@ -43,25 +43,25 @@ export default function Downloads() {
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between h-16">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             <FileDown className="h-6 w-6 text-primary" />
             <a href="/" className="font-bold text-xl">
               Pathfinder
             </a>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="sm" asChild>
               <a href="/">Home</a>
             </Button>
-            <Button variant="outline">Profile</Button>
+            <Button variant="outline" size="sm">Profile</Button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 py-20">
-        <div className="container mx-auto max-w-4xl">
+      <main className="flex-1 py-12 sm:py-20">
+        <div className="container mx-auto max-w-4xl px-4">
           <div className="space-y-8">
             <div className="text-center space-y-4">
               <h1 className="text-4xl font-bold">Your Downloads</h1>

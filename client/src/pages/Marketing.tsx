@@ -25,19 +25,24 @@ export default function Marketing() {
   const { data: upsellCandidates } = trpc.marketing.getUpsellCandidates.useQuery();
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
-        <div>
-          <h1 className="text-4xl font-bold">Marketing Automation</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage drip campaigns, A/B tests, and subscriber segments
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-4xl font-bold">Marketing Automation</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">
+              Manage drip campaigns, A/B tests, and subscriber segments
+            </p>
+          </div>
+          <Button variant="outline" size="sm" asChild>
+            <a href="/admin">Back to Admin</a>
+          </Button>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="drip" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
             <TabsTrigger value="drip">Drip Campaigns</TabsTrigger>
             <TabsTrigger value="ab">A/B Testing</TabsTrigger>
             <TabsTrigger value="segments">Segments</TabsTrigger>

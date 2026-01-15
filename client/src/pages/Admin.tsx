@@ -75,9 +75,9 @@ export default function Admin() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b bg-card">
-        <div className="container mx-auto py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="container mx-auto py-4 px-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/">
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -85,18 +85,18 @@ export default function Admin() {
                 </Link>
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-                <p className="text-sm text-muted-foreground">Manage subscribers and view analytics</p>
+                <h1 className="text-xl sm:text-2xl font-bold">Admin Dashboard</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">Manage subscribers and view analytics</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Logged in as {user?.name || user?.email}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground truncate max-w-[200px]">Logged in as {user?.name || user?.email}</span>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto py-8 space-y-8">
+      <main className="container mx-auto py-6 sm:py-8 px-4 space-y-6 sm:space-y-8">
         {/* Analytics Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
@@ -238,8 +238,8 @@ export default function Admin() {
                 No subscribers yet. Share your email capture form to start building your list!
               </div>
             ) : (
-              <div className="border rounded-lg">
-                <Table>
+              <div className="border rounded-lg overflow-x-auto">
+                <Table className="min-w-[600px]">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Email</TableHead>

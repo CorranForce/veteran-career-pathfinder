@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Loader2, Shield, Users, Zap } from "lucide-react";
+import { CheckCircle2, Loader2, Shield, Users, Zap, Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { getLoginUrl } from "@/const";
 
@@ -36,12 +37,13 @@ export default function Pricing() {
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between h-16">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
             <a href="/" className="font-bold text-xl">Pathfinder</a>
           </div>
-          <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" asChild>
               <a href="/">Home</a>
             </Button>
@@ -53,6 +55,28 @@ export default function Pricing() {
               </Button>
             )}
           </div>
+          {/* Mobile Navigation */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px]">
+              <div className="flex flex-col gap-4 mt-8">
+                <Button variant="ghost" className="justify-start" asChild>
+                  <a href="/">Home</a>
+                </Button>
+                {isAuthenticated ? (
+                  <Button variant="outline" className="justify-start">Dashboard</Button>
+                ) : (
+                  <Button className="justify-start" asChild>
+                    <a href={getLoginUrl()}>Sign In</a>
+                  </Button>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </nav>
 
@@ -68,9 +92,9 @@ export default function Pricing() {
       </section>
 
       {/* Pricing Tiers */}
-      <section className="py-20">
-        <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <section className="py-12 md:py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             {/* Free Tier */}
             <Card className="border-2 relative">
               <CardHeader>
@@ -104,7 +128,7 @@ export default function Pricing() {
             </Card>
 
             {/* Premium Tier */}
-            <Card className="border-2 border-primary shadow-xl relative scale-105">
+            <Card className="border-2 border-primary shadow-xl relative md:scale-105 order-first md:order-none">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-primary text-primary-foreground px-4 py-1">Most Popular</Badge>
               </div>

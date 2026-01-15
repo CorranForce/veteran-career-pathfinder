@@ -16,6 +16,7 @@ import {
   Compass,
   MapPin
 } from "lucide-react";
+import MobileNav from "@/components/MobileNav";
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -30,12 +31,13 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between h-16">
+        <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             <Compass className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">Pathfinder</span>
           </div>
-          <div className="flex items-center gap-4">
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" onClick={scrollToPrompt}>View Prompt</Button>
             <Button variant="ghost" asChild>
               <a href="/pricing">Pricing</a>
@@ -44,6 +46,8 @@ export default function Home() {
               <a href="/pricing">Get Started</a>
             </Button>
           </div>
+          {/* Mobile Navigation */}
+          <MobileNav onScrollToPrompt={scrollToPrompt} />
         </div>
       </nav>
 
