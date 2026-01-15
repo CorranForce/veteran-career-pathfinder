@@ -17,6 +17,7 @@ import {
   MapPin
 } from "lucide-react";
 import MobileNav from "@/components/MobileNav";
+import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -351,6 +352,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials Section */}
+      <Testimonials />
 
       {/* Email Capture Section */}
       <section className="py-20 bg-gradient-to-br from-secondary/50 to-background">
