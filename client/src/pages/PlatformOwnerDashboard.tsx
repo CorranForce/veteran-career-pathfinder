@@ -53,6 +53,12 @@ export default function PlatformOwnerDashboard() {
     { enabled: isAuthenticated && user?.role === "platform_owner" }
   );
 
+  // Fetch revenue analytics
+  const { data: revenueAnalytics, isLoading: revenueLoading } = trpc.admin.getRevenueAnalytics.useQuery(
+    undefined,
+    { enabled: isAuthenticated && user?.role === "platform_owner" }
+  );
+
   // Change user role mutation
   const changeRole = trpc.admin.changeUserRole.useMutation({
     onSuccess: () => {
@@ -202,6 +208,118 @@ export default function PlatformOwnerDashboard() {
 
         {/* Activity Feed */}
         <ActivityFeed />
+
+        {/* Revenue Analytics Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Revenue Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Overview</CardTitle>
+              <CardDescription>Detailed revenue metrics and trends</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {revenueLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Revenue</p>
+                      <p className="text-2xl font-bold">
+                        ${((revenueAnalytics?.totalRevenue || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">This Month</p>
+                      <p className="text-2xl font-bold">
+                        ${((revenueAnalytics?.monthlyRevenue || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Total Purchases</p>
+                      <p className="text-2xl font-bold">{revenueAnalytics?.totalPurchases || 0}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Avg Order Value</p>
+                      <p className="text-2xl font-bold">
+                        ${((revenueAnalytics?.avgOrderValue || 0) / 100).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Revenue by Month Chart */}
+                  {revenueAnalytics?.revenueByMonth && revenueAnalytics.revenueByMonth.length > 0 && (
+                    <div className="mt-6">
+                      <p className="text-sm font-medium mb-4">Revenue Trend (Last 12 Months)</p>
+                      <div className="space-y-2">
+                        {revenueAnalytics.revenueByMonth.map((item: any) => (
+                          <div key={item.month} className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground w-20">{item.month}</span>
+                            <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
+                              <div
+                                className="bg-primary h-full flex items-center justify-end pr-2"
+                                style={{
+                                  width: `${Math.min((item.revenue / (revenueAnalytics.totalRevenue || 1)) * 100 * 12, 100)}%`,
+                                }}
+                              >
+                                <span className="text-xs text-primary-foreground font-medium">
+                                  ${(item.revenue / 100).toFixed(0)}
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-xs text-muted-foreground w-12 text-right">
+                              {item.count} sales
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Purchases */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Purchases</CardTitle>
+              <CardDescription>Latest completed transactions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {revenueLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              ) : revenueAnalytics?.recentPurchases && revenueAnalytics.recentPurchases.length > 0 ? (
+                <div className="space-y-4">
+                  {revenueAnalytics.recentPurchases.map((purchase: any) => (
+                    <div key={purchase.id} className="flex items-center justify-between pb-3 border-b last:border-0">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">
+                          {purchase.productType === "premium_prompt" ? "Premium Package" : "Pro Subscription"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(purchase.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-bold">${(purchase.amount / 100).toFixed(2)}</p>
+                        <Badge variant="outline" className="text-xs">
+                          {purchase.status}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-8">No purchases yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {/* User Management Table */}
         <Card>

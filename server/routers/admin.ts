@@ -1,6 +1,7 @@
 import { router, platformOwnerProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
+import { getTotalRevenue, getMonthlyRevenue, getTotalPurchaseCount, getRecentPurchases, getRevenueByMonth, getAverageOrderValue } from "../db-analytics";
 import { users, purchases, resumes } from "../../drizzle/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -149,4 +150,27 @@ export const adminRouter = router({
 
       return activities;
     }),
+
+  /**
+   * Get revenue analytics (platform owner only)
+   */
+  getRevenueAnalytics: platformOwnerProcedure.query(async () => {
+    const [totalRevenue, monthlyRevenue, totalPurchases, recentPurchases, revenueByMonth, avgOrderValue] = await Promise.all([
+      getTotalRevenue(),
+      getMonthlyRevenue(),
+      getTotalPurchaseCount(),
+      getRecentPurchases(),
+      getRevenueByMonth(),
+      getAverageOrderValue(),
+    ]);
+
+    return {
+      totalRevenue,
+      monthlyRevenue,
+      totalPurchases,
+      avgOrderValue,
+      recentPurchases,
+      revenueByMonth,
+    };
+  }),
 });
