@@ -73,10 +73,10 @@ export function AuthenticatedNav() {
       <div className="container mx-auto flex items-center justify-between h-16">
         <div className="flex items-center gap-2">
           <Link href="/">
-            <a className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity">
+            <span className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity cursor-pointer">
               <span className="text-2xl">🧭</span>
               Pathfinder
-            </a>
+            </span>
           </Link>
         </div>
 
@@ -128,27 +128,23 @@ export function AuthenticatedNav() {
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   return (
-                    <DropdownMenuItem key={item.href} asChild>
-                      <Link href={item.href}>
-                        <a className="flex items-center gap-2 w-full cursor-pointer">
-                          <Icon className="h-4 w-4" />
-                          {item.label}
-                        </a>
-                      </Link>
-                    </DropdownMenuItem>
+                    <Link key={item.href} href={item.href}>
+                      <DropdownMenuItem className="flex items-center gap-2 w-full cursor-pointer">
+                        <Icon className="h-4 w-4" />
+                        {item.label}
+                      </DropdownMenuItem>
+                    </Link>
                   );
                 })}
                 <DropdownMenuSeparator />
               </div>
 
-              <DropdownMenuItem asChild>
-                <Link href="/dashboard">
-                  <a className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Profile Settings
-                  </a>
-                </Link>
-              </DropdownMenuItem>
+              <Link href="/dashboard">
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profile Settings
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
