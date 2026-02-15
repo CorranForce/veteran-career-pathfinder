@@ -17,7 +17,7 @@ import {
   MapPin
 } from "lucide-react";
 import MobileNav from "@/components/MobileNav";
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, getSignupUrl } from "@/const";
 import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
@@ -61,7 +61,7 @@ export default function Home() {
                   <a href={getLoginUrl()}>Login</a>
                 </Button>
                 <Button asChild>
-                  <a href="/pricing">Get Started</a>
+                  <a href={getSignupUrl()}>Sign Up</a>
                 </Button>
               </>
             )}

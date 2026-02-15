@@ -6,7 +6,7 @@ import { trpc } from "@/lib/trpc";
 import { CheckCircle2, Loader2, Shield, Users, Zap, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, getSignupUrl } from "@/const";
 
 export default function Pricing() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -25,8 +25,8 @@ export default function Pricing() {
 
   const handleCheckout = (productKey: "PREMIUM_PROMPT" | "PRO_SUBSCRIPTION") => {
     if (!isAuthenticated) {
-      toast.info("Please log in to continue");
-      window.location.href = getLoginUrl();
+      toast.info("Please sign up or log in to continue");
+      window.location.href = getSignupUrl();
       return;
     }
 
@@ -48,11 +48,18 @@ export default function Pricing() {
               <a href="/">Home</a>
             </Button>
             {isAuthenticated ? (
-              <Button variant="outline">Dashboard</Button>
-            ) : (
-              <Button asChild>
-                <a href={getLoginUrl()}>Sign In</a>
+              <Button variant="outline" asChild>
+                <a href="/dashboard">Dashboard</a>
               </Button>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <a href={getLoginUrl()}>Login</a>
+                </Button>
+                <Button asChild>
+                  <a href={getSignupUrl()}>Sign Up</a>
+                </Button>
+              </>
             )}
           </div>
           {/* Mobile Navigation */}
@@ -68,11 +75,18 @@ export default function Pricing() {
                   <a href="/">Home</a>
                 </Button>
                 {isAuthenticated ? (
-                  <Button variant="outline" className="justify-start">Dashboard</Button>
-                ) : (
-                  <Button className="justify-start" asChild>
-                    <a href={getLoginUrl()}>Sign In</a>
+                  <Button variant="outline" className="justify-start" asChild>
+                    <a href="/dashboard">Dashboard</a>
                   </Button>
+                ) : (
+                  <>
+                    <Button variant="outline" className="justify-start" asChild>
+                      <a href={getLoginUrl()}>Login</a>
+                    </Button>
+                    <Button className="justify-start" asChild>
+                      <a href={getSignupUrl()}>Sign Up</a>
+                    </Button>
+                  </>
                 )}
               </div>
             </SheetContent>

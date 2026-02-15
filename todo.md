@@ -727,3 +727,15 @@
 - [x] Add AuthenticatedNav to AdminTemplates page
 - [x] Test navigation consistency across all pages
 - [x] Verify navigation works for both regular users and platform owners
+
+
+## Public Authentication System (COMPLETED)
+
+### Manus OAuth Signup Flow
+- [x] Create getSignupUrl helper function
+- [x] Update Home page navigation to show "Sign Up" and "Login" buttons
+- [x] Update Pricing page to show "Sign Up" and "Login" buttons
+- [x] Update MobileNav to show "Sign Up" button
+- [x] Update Pricing page checkout flow to redirect to signup
+- [x] Test signup button visibility on all pages
+- [ ] Test end-to-end signup → login → Stripe checkout flow (requires deployment)

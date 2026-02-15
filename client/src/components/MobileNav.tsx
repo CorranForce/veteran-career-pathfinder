@@ -3,7 +3,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Compass } from "lucide-react";
-import { getLoginUrl } from "@/const";
+import { getLoginUrl, getSignupUrl } from "@/const";
 
 interface MobileNavProps {
   onScrollToPrompt: () => void;
@@ -67,7 +67,7 @@ export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
                   className="justify-start text-lg"
                   asChild
                 >
-                  <a href="/pricing" onClick={() => setOpen(false)}>Get Started</a>
+                  <a href={getSignupUrl()} onClick={() => setOpen(false)}>Sign Up</a>
                 </Button>
               </>
             )}
