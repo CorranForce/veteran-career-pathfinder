@@ -1,6 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -421,6 +421,189 @@ export async function deleteResume(resumeId: number) {
     return true;
   } catch (error) {
     console.error("[Database] Failed to delete resume:", error);
+    return false;
+  }
+}
+
+
+// Analytics operations
+export async function getAnalytics() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get analytics: database not available");
+    return null;
+  }
+
+  try {
+    // Total users
+    const totalUsersResult = await db.execute("SELECT COUNT(*) as count FROM users");
+    const totalUsers = Array.isArray(totalUsersResult[0]) ? totalUsersResult[0][0]?.count : 0;
+
+    // Total resumes analyzed
+    const totalResumesResult = await db.execute("SELECT COUNT(*) as count FROM resumes");
+    const totalResumes = Array.isArray(totalResumesResult[0]) ? totalResumesResult[0][0]?.count : 0;
+
+    // Completed analyses
+    const completedAnalysesResult = await db.execute(
+      "SELECT COUNT(*) as count FROM resumes WHERE analysisStatus = 'completed'"
+    );
+    const completedAnalyses = Array.isArray(completedAnalysesResult[0]) ? completedAnalysesResult[0][0]?.count : 0;
+
+    // Average ATS score
+    const avgScoreResult = await db.execute(
+      "SELECT AVG(atsScore) as avgScore FROM resumes WHERE atsScore IS NOT NULL"
+    );
+    const avgAtsScore = Array.isArray(avgScoreResult[0]) ? avgScoreResult[0][0]?.avgScore : 0;
+
+    // Recent activity (last 7 days)
+    const recentUsersResult = await db.execute(
+      "SELECT COUNT(*) as count FROM users WHERE createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+    );
+    const recentUsers = Array.isArray(recentUsersResult[0]) ? recentUsersResult[0][0]?.count : 0;
+
+    const recentResumesResult = await db.execute(
+      "SELECT COUNT(*) as count FROM resumes WHERE createdAt >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+    );
+    const recentResumes = Array.isArray(recentResumesResult[0]) ? recentResumesResult[0][0]?.count : 0;
+
+    // Score distribution
+    const scoreDistributionResult = await db.execute(`
+      SELECT 
+        CASE 
+          WHEN atsScore >= 80 THEN 'Excellent (80-100)'
+          WHEN atsScore >= 60 THEN 'Good (60-79)'
+          WHEN atsScore >= 40 THEN 'Fair (40-59)'
+          ELSE 'Needs Work (0-39)'
+        END as scoreRange,
+        COUNT(*) as count
+      FROM resumes
+      WHERE atsScore IS NOT NULL
+      GROUP BY scoreRange
+      ORDER BY MIN(atsScore) DESC
+    `);
+    const scoreDistribution = Array.isArray(scoreDistributionResult[0]) ? scoreDistributionResult[0] : [];
+
+    return {
+      totalUsers: Number(totalUsers),
+      totalResumes: Number(totalResumes),
+      completedAnalyses: Number(completedAnalyses),
+      avgAtsScore: Math.round(Number(avgAtsScore)),
+      recentUsers: Number(recentUsers),
+      recentResumes: Number(recentResumes),
+      scoreDistribution,
+    };
+  } catch (error) {
+    console.error("[Database] Failed to get analytics:", error);
+    return null;
+  }
+}
+
+
+// Resume template operations
+export async function createResumeTemplate(template: {
+  name: string;
+  description: string;
+  category: string;
+  fileUrl: string;
+  fileKey: string;
+  thumbnailUrl?: string;
+}) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create resume template: database not available");
+    return null;
+  }
+
+  try {
+    const [result] = await db.insert(resumeTemplates).values({
+      name: template.name,
+      description: template.description,
+      category: template.category,
+      fileUrl: template.fileUrl,
+      fileKey: template.fileKey,
+      thumbnailUrl: template.thumbnailUrl || null,
+    });
+    
+    const insertId = result.insertId;
+    return await getResumeTemplateById(insertId);
+  } catch (error) {
+    console.error("[Database] Failed to create resume template:", error);
+    return null;
+  }
+}
+
+export async function getAllResumeTemplates() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get resume templates: database not available");
+    return [];
+  }
+
+  try {
+    return await db
+      .select()
+      .from(resumeTemplates)
+      .where(eq(resumeTemplates.isActive, true));
+  } catch (error) {
+    console.error("[Database] Failed to get resume templates:", error);
+    return [];
+  }
+}
+
+export async function getResumeTemplateById(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get resume template: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(resumeTemplates)
+      .where(eq(resumeTemplates.id, id))
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    console.error("[Database] Failed to get resume template:", error);
+    return null;
+  }
+}
+
+export async function incrementTemplateDownloadCount(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot increment download count: database not available");
+    return false;
+  }
+
+  try {
+    await db
+      .update(resumeTemplates)
+      .set({ downloadCount: sql`${resumeTemplates.downloadCount} + 1` })
+      .where(eq(resumeTemplates.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to increment download count:", error);
+    return false;
+  }
+}
+
+export async function deleteResumeTemplate(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete resume template: database not available");
+    return false;
+  }
+
+  try {
+    await db
+      .update(resumeTemplates)
+      .set({ isActive: false })
+      .where(eq(resumeTemplates.id, id));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete resume template:", error);
     return false;
   }
 }

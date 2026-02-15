@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, date } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, date, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -224,3 +224,31 @@ export const resumes = mysqlTable("resumes", {
 
 export type Resume = typeof resumes.$inferSelect;
 export type InsertResume = typeof resumes.$inferInsert;
+
+
+/**
+ * Resume templates table - ATS-optimized templates for veterans
+ */
+export const resumeTemplates = mysqlTable("resumeTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Template information
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // e.g., "IT", "Management", "Technical", "General"
+  
+  // File information
+  fileUrl: text("fileUrl").notNull(), // S3 URL to template file
+  fileKey: varchar("fileKey", { length: 500 }).notNull(), // S3 key
+  thumbnailUrl: text("thumbnailUrl"), // Preview image
+  
+  // Metadata
+  downloadCount: int("downloadCount").default(0).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ResumeTemplate = typeof resumeTemplates.$inferSelect;
+export type InsertResumeTemplate = typeof resumeTemplates.$inferInsert;

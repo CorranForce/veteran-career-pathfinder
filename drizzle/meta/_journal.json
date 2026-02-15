@@ -57,6 +57,13 @@
       "when": 1771187612144,
       "tag": "0007_organic_harpoon",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1771188515481,
+      "tag": "0008_sour_morbius",
+      "breakpoints": true
     }
   ]
 }

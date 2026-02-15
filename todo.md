@@ -479,3 +479,88 @@
 - [x] Display AI analysis results with ATS recommendations
 - [x] Add resume management section to dashboard (view, download, delete)
 - [x] Write tests for resume upload and AI analysis
+
+
+## PDF Text Extraction & Enhanced Analysis
+
+- [ ] Install pdf-parse library for PDF text extraction
+- [ ] Create PDF text extraction helper function
+- [ ] Update resume analysis to use extracted text instead of metadata
+- [ ] Test PDF extraction with sample resumes
+
+## Admin Analytics Dashboard
+
+- [ ] Create analytics database queries (total users, resumes analyzed, avg ATS scores)
+- [ ] Build admin analytics router with platformOwnerProcedure
+- [ ] Create AdminDashboard page component
+- [ ] Add charts/visualizations for metrics
+- [ ] Add navigation link to admin dashboard for platform owners
+
+## Resume Templates Library
+
+- [ ] Create resume_templates table in database schema
+- [ ] Design 3-5 ATS-optimized resume templates for veterans
+- [ ] Create templates router with CRUD operations
+- [ ] Build templates library UI page
+- [ ] Add template download functionality
+- [ ] Write tests for new features
+
+
+## PDF Text Extraction & Enhanced Resume Analysis
+
+- [x] Install pdf-parse library for PDF text extraction
+- [x] Create PDF extraction utility function
+- [x] Update resume analysis to extract actual PDF text
+- [x] Test PDF text extraction with sample resumes
+
+## Admin Analytics Dashboard
+
+- [x] Create analytics database helpers for site metrics
+- [x] Build analytics router with platform owner access
+- [x] Create AdminDashboard page with charts and metrics
+- [x] Add admin analytics link to navigation for platform owners
+- [x] Add recharts library for data visualization
+- [x] Display total users, resumes, completed analyses, avg ATS score
+- [x] Show recent activity (last 7 days)
+- [x] Add ATS score distribution chart
+
+## Resume Templates Library
+
+- [x] Create resume_templates table in database schema
+- [x] Build templates router with CRUD operations
+- [x] Create ResumeTemplates page for browsing and downloading
+- [x] Add template upload functionality for platform owners
+- [x] Add template download tracking
+- [x] Add category badges and download counts
+- [x] Create /templates route in App.tsx
+- [x] Test template download tracking
+
+## Platform-Owner Role & Resume Review
+
+- [x] Add platform_owner role to database schema
+- [x] Update corranforce@gmail.com account to platform_owner role
+- [x] Create platformOwnerProcedure middleware with full access
+- [x] Create resumes table in database schema
+- [x] Build resume upload API endpoint with S3 storage
+- [x] Create AI resume analysis procedure using LLM
+- [x] Build resume upload UI component on dashboard
+- [x] Display AI analysis results with ATS recommendations
+- [x] Add resume management section to dashboard (view, download, delete)
+- [x] Write tests for resume upload and AI analysis
+
+## Login Redirect & User Dashboard
+
+- [x] Fix post-login redirect to go to /dashboard instead of landing page
+- [x] Create /dashboard route with authenticated user layout
+- [x] Add name update functionality on dashboard
+- [x] Add email update functionality on dashboard
+- [x] Add password change functionality on dashboard
+- [x] Create backend tRPC procedures for profile and password updates
+- [x] Update navigation to show authenticated state (user menu vs login button)
+- [x] Write tests for dashboard functionality
+
+## Navigation Updates
+
+- [x] Add Login link next to Get Started button in desktop nav
+- [x] Add Login link to mobile hamburger menu
+- [x] Test Login link on desktop and mobile

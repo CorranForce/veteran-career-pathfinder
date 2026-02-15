@@ -12,6 +12,8 @@ import Marketing from "./pages/Marketing";
 import Downloads from "./pages/Downloads";
 import ProfileEdit from "./pages/ProfileEdit";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import ResumeTemplates from "./pages/ResumeTemplates";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -25,6 +27,8 @@ function Router() {
       <Route path={"/downloads"} component={Downloads} />
       <Route path={"/profile/edit"} component={ProfileEdit} />
       <Route path={"/dashboard"} component={Dashboard} />
+      <Route path={"/admin/analytics"} component={AdminDashboard} />
+      <Route path={"/templates"} component={ResumeTemplates} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

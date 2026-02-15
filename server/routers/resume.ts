@@ -10,6 +10,7 @@ import {
 import { storagePut } from "../storage";
 import { invokeLLM } from "../_core/llm";
 import { TRPCError } from "@trpc/server";
+import { extractPdfTextFromUrl, cleanExtractedText } from "../utils/pdfExtractor";
 
 // Helper to generate random suffix for file keys
 function randomSuffix() {
@@ -152,20 +153,26 @@ export const resumeRouter = router({
       }
 
       try {
-        // Fetch resume content from S3 URL
-        const response = await fetch(resume.fileUrl);
-        if (!response.ok) {
-          throw new Error("Failed to fetch resume file");
+        // Extract text from PDF
+        let resumeText = "";
+        if (resume.mimeType === "application/pdf") {
+          try {
+            const rawText = await extractPdfTextFromUrl(resume.fileUrl);
+            resumeText = cleanExtractedText(rawText);
+          } catch (error) {
+            console.error("[Resume Analysis] PDF extraction failed:", error);
+            // Fall back to metadata-based analysis if extraction fails
+          }
         }
 
-        // For now, we'll analyze based on file metadata
-        // In production, you'd extract text from PDF/DOCX
         const prompt = `You are an expert ATS (Applicant Tracking System) resume reviewer specializing in helping military veterans transition to civilian careers.
 
 Analyze this resume and provide detailed feedback following ATS best practices:
 
 Resume File: ${resume.fileName}
 File Type: ${resume.mimeType}
+
+${resumeText ? `Resume Content:\n${resumeText.substring(0, 4000)}` : "Note: Text extraction not available for this file type. Analysis based on file metadata."}
 
 Provide your analysis in the following JSON format:
 {

@@ -45,9 +45,16 @@ export default function Home() {
               <a href="/pricing">Pricing</a>
             </Button>
             {isAuthenticated ? (
-              <Button asChild>
-                <a href="/dashboard">Dashboard</a>
-              </Button>
+              <>
+                <Button asChild>
+                  <a href="/dashboard">Dashboard</a>
+                </Button>
+                {user?.role === "platform_owner" && (
+                  <Button variant="outline" asChild>
+                    <a href="/admin/analytics">Analytics</a>
+                  </Button>
+                )}
+              </>
             ) : (
               <>
                 <Button variant="outline" asChild>
