@@ -28,6 +28,10 @@ export function registerOAuthRoutes(app: Express) {
         return;
       }
 
+      // Check if user exists to determine if this is a signup
+      const existingUser = await db.getUserByOpenId(userInfo.openId);
+      const isNewUser = !existingUser;
+
       await db.upsertUser({
         openId: userInfo.openId,
         name: userInfo.name || null,
@@ -35,6 +39,17 @@ export function registerOAuthRoutes(app: Express) {
         loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
         lastSignedIn: new Date(),
       });
+
+      // Log activity for new user signups
+      if (isNewUser) {
+        await db.logActivity({
+          activityType: "user_signup",
+          userName: userInfo.name || null,
+          userEmail: userInfo.email || null,
+          description: `New user signed up: ${userInfo.name || userInfo.email || "Unknown"}`,
+          metadata: JSON.stringify({ loginMethod: userInfo.loginMethod || userInfo.platform }),
+        });
+      }
 
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",

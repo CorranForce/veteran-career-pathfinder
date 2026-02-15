@@ -33,6 +33,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
+import ActivityFeed from "@/components/ActivityFeed";
 
 export default function PlatformOwnerDashboard() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -211,6 +212,9 @@ export default function PlatformOwnerDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Activity Feed */}
+        <ActivityFeed />
 
         {/* User Management Table */}
         <Card>

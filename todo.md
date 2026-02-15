@@ -636,3 +636,19 @@
 - [x] Add user search and filtering in Platform-Owner Dashboard
 - [x] Test dashboard visibility for regular users
 - [x] Test Platform-Owner Dashboard features
+
+
+## Revenue Tracking & Activity Feed
+
+- [x] Update getSiteAnalytics to calculate actual revenue from purchases table
+- [x] Add revenue this month calculation from purchases
+- [x] Create activity_logs table in database schema
+- [x] Add activity log helpers to db.ts
+- [x] Create activity tracking middleware/functions
+- [x] Build ActivityFeed component for Platform-Owner Dashboard
+- [x] Add activity logging for user signups
+- [x] Add activity logging for resume uploads
+- [x] Add activity logging for purchases
+- [x] Display recent activity feed on Platform-Owner Dashboard
+- [x] Test revenue calculations with sample data
+- [x] Test activity feed real-time updates

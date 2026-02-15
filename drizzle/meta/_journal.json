@@ -64,6 +64,20 @@
       "when": 1771188515481,
       "tag": "0008_sour_morbius",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1771191290614,
+      "tag": "0009_moaning_triathlon",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1771191318730,
+      "tag": "0010_red_scarlet_witch",
+      "breakpoints": true
     }
   ]
 }

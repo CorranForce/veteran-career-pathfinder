@@ -42,6 +42,8 @@ export const purchases = mysqlTable("purchases", {
   
   // Product information
   productType: mysqlEnum("productType", ["premium_prompt", "pro_subscription"]).notNull(),
+  amount: int("amount").notNull(), // Amount in cents
+  currency: varchar("currency", { length: 3 }).default("USD").notNull(),
   
   // Purchase status
   status: mysqlEnum("status", ["pending", "completed", "failed", "cancelled"]).default("pending").notNull(),
@@ -252,3 +254,26 @@ export const resumeTemplates = mysqlTable("resumeTemplates", {
 
 export type ResumeTemplate = typeof resumeTemplates.$inferSelect;
 export type InsertResumeTemplate = typeof resumeTemplates.$inferInsert;
+
+
+/**
+ * Activity logs table - tracks platform activity for admin monitoring
+ */
+export const activityLogs = mysqlTable("activityLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Activity details
+  activityType: mysqlEnum("activityType", ["user_signup", "resume_upload", "purchase", "template_download"]).notNull(),
+  userId: int("userId"),
+  userName: varchar("userName", { length: 255 }),
+  userEmail: varchar("userEmail", { length: 320 }),
+  
+  // Activity metadata
+  description: text("description").notNull(),
+  metadata: text("metadata"), // JSON string with additional details
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type InsertActivityLog = typeof activityLogs.$inferInsert;

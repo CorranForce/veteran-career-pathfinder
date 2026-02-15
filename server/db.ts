@@ -1,7 +1,8 @@
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { desc } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -606,4 +607,33 @@ export async function deleteResumeTemplate(id: number) {
     console.error("[Database] Failed to delete resume template:", error);
     return false;
   }
+}
+
+
+/**
+ * Activity Log helpers
+ */
+export async function logActivity(activity: InsertActivityLog): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot log activity: database not available");
+    return;
+  }
+
+  try {
+    await db.insert(activityLogs).values(activity);
+  } catch (error) {
+    console.error("[Database] Failed to log activity:", error);
+  }
+}
+
+export async function getRecentActivity(limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(activityLogs)
+    .orderBy(desc(activityLogs.createdAt))
+    .limit(limit);
 }

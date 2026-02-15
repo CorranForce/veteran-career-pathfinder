@@ -83,6 +83,17 @@ export const resumeRouter = router({
         const resumes = await getUserResumes(ctx.user.id);
         const latestResume = resumes[resumes.length - 1];
 
+        // Log activity
+        const { logActivity } = await import("../db");
+        await logActivity({
+          activityType: "resume_upload",
+          userId: ctx.user.id,
+          userName: ctx.user.name || null,
+          userEmail: ctx.user.email || null,
+          description: `${ctx.user.name || ctx.user.email || "User"} uploaded a resume: ${input.fileName}`,
+          metadata: JSON.stringify({ fileName: input.fileName, fileSize, mimeType: input.mimeType }),
+        });
+
         return {
           success: true,
           resumeId: latestResume?.id || 0,

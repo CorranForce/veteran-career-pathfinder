@@ -51,6 +51,8 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         await createPurchase({
           userId: parseInt(userId),
           productType,
+          amount: session.amount_total || 0, // Amount in cents
+          currency: session.currency || "usd",
           stripePaymentIntentId: session.payment_intent as string,
           stripeSubscriptionId: session.subscription as string | undefined,
           status: "pending",
