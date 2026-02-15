@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,34 +97,20 @@ export default function PlatformOwnerDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      <AuthenticatedNav />
+      
+      {/* Page Header */}
       <div className="border-b bg-card">
         <div className="container mx-auto py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Shield className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold">Platform Owner Dashboard</h1>
-                <p className="text-muted-foreground">
-                  Manage users, view analytics, and configure site settings
-                </p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-primary" />
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => setLocation("/dashboard")}>
-                <Home className="h-4 w-4 mr-2" />
-                User Dashboard
-              </Button>
-              <Button variant="outline" onClick={() => setLocation("/admin/analytics")}>
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Analytics
-              </Button>
-              <Button variant="outline" onClick={() => setLocation("/admin/templates")}>
-                <Settings className="h-4 w-4 mr-2" />
-                Templates
-              </Button>
+            <div>
+              <h1 className="text-3xl font-bold">Platform Owner Dashboard</h1>
+              <p className="text-muted-foreground">
+                Manage users, view analytics, and configure site settings
+              </p>
             </div>
           </div>
         </div>
@@ -202,7 +189,7 @@ export default function PlatformOwnerDashboard() {
               ) : (
                 <>
                   <div className="text-2xl font-bold">
-                    {analytics?.averageAtsScore?.toFixed(1) || "—"}
+                    {typeof analytics?.averageAtsScore === 'number' ? analytics.averageAtsScore.toFixed(1) : "—"}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Platform average

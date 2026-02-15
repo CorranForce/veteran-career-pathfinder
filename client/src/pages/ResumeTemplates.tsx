@@ -1,4 +1,6 @@
 import { trpc } from "@/lib/trpc";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +8,7 @@ import { Loader2, Download, FileText, CheckCircle2, Compass } from "lucide-react
 import { toast } from "sonner";
 
 export default function ResumeTemplates() {
+  const { isAuthenticated } = useAuth();
   const { data: templates, isLoading } = trpc.templates.getAllTemplates.useQuery();
   const trackDownload = trpc.templates.trackDownload.useMutation();
 
@@ -34,26 +37,27 @@ export default function ResumeTemplates() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between h-16 px-4">
-          <a href="/" className="flex items-center gap-2">
-            <Compass className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Pathfinder</span>
-          </a>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <a href="/">Home</a>
-            </Button>
-            <Button variant="ghost" asChild>
-              <a href="/pricing">Pricing</a>
-            </Button>
-            <Button asChild>
-              <a href="/dashboard">Dashboard</a>
-            </Button>
+      {isAuthenticated ? <AuthenticatedNav /> : (
+        <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto flex items-center justify-between h-16 px-4">
+            <a href="/" className="flex items-center gap-2">
+              <Compass className="h-6 w-6 text-primary" />
+              <span className="font-bold text-xl">Pathfinder</span>
+            </a>
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" asChild>
+                <a href="/">Home</a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/pricing">Pricing</a>
+              </Button>
+              <Button asChild>
+                <a href="/dashboard">Dashboard</a>
+              </Button>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
 
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5">

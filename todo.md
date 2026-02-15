@@ -701,3 +701,29 @@
 - [x] Fix upsertUser to set platform_owner for owner instead of admin
 - [x] Restart dev server to apply fixes
 - [x] Verify PDF extraction works without errors
+
+
+## Unified Navigation for Authenticated Pages
+
+- [ ] Analyze current navigation across all pages (Home, Dashboard, Admin, Pricing, etc.)
+- [ ] Create unified AuthenticatedNav component with consistent menu
+- [ ] Apply AuthenticatedNav to Dashboard page
+- [ ] Apply AuthenticatedNav to PlatformOwnerDashboard page
+- [ ] Apply AuthenticatedNav to AdminDashboard page
+- [ ] Apply AuthenticatedNav to AdminTemplates page
+- [ ] Apply AuthenticatedNav to ResumeTemplates page
+- [ ] Apply AuthenticatedNav to Pricing page when authenticated
+- [ ] Test navigation consistency across all pages
+- [ ] Verify mobile responsiveness of navigation
+
+
+## Unified Navigation for Authenticated Pages
+
+- [x] Analyze current navigation across all authenticated pages
+- [x] Create unified AuthenticatedNav component
+- [x] Replace Dashboard navigation with AuthenticatedNav
+- [x] Replace PlatformOwnerDashboard navigation with AuthenticatedNav
+- [x] Add AuthenticatedNav to ResumeTemplates page
+- [x] Add AuthenticatedNav to AdminTemplates page
+- [x] Test navigation consistency across all pages
+- [x] Verify navigation works for both regular users and platform owners

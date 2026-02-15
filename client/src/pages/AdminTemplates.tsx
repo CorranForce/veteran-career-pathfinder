@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -139,7 +140,9 @@ export default function AdminTemplates() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background">
+      <AuthenticatedNav />
+      <div className="p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -375,6 +378,7 @@ export default function AdminTemplates() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      </div>
       </div>
     </div>
   );
