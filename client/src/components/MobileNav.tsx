@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, X, Compass } from "lucide-react";
+import { getLoginUrl } from "@/const";
 
 interface MobileNavProps {
   onScrollToPrompt: () => void;
@@ -45,7 +46,14 @@ export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
               <a href="/pricing" onClick={() => setOpen(false)}>Pricing</a>
             </Button>
             <Button 
+              variant="outline"
               className="justify-start text-lg mt-4"
+              asChild
+            >
+              <a href={getLoginUrl()} onClick={() => setOpen(false)}>Login</a>
+            </Button>
+            <Button 
+              className="justify-start text-lg"
               asChild
             >
               <a href="/pricing" onClick={() => setOpen(false)}>Get Started</a>

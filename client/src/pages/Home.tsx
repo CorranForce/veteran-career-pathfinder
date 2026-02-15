@@ -17,6 +17,7 @@ import {
   MapPin
 } from "lucide-react";
 import MobileNav from "@/components/MobileNav";
+import { getLoginUrl } from "@/const";
 import Testimonials from "@/components/Testimonials";
 
 export default function Home() {
@@ -42,6 +43,9 @@ export default function Home() {
             <Button variant="ghost" onClick={scrollToPrompt}>View Prompt</Button>
             <Button variant="ghost" asChild>
               <a href="/pricing">Pricing</a>
+            </Button>
+            <Button variant="outline" asChild>
+              <a href={getLoginUrl()}>Login</a>
             </Button>
             <Button asChild>
               <a href="/pricing">Get Started</a>
@@ -89,7 +93,7 @@ export default function Home() {
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img 
-                  src="/hero-veteran.png" 
+                  src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/nMLVtQCUxVmNISWs.png" 
                   alt="Veteran professional looking toward future career" 
                   className="w-full h-auto"
                 />
@@ -217,7 +221,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <img 
-                src="/skills-translation.png" 
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/HLabsInJZVDtDwUX.png" 
                 alt="Military to civilian skills translation" 
                 className="rounded-2xl shadow-xl w-full"
               />
@@ -269,7 +273,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="overflow-hidden">
               <img 
-                src="/career-planning.png" 
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/vIfMQuTszYmWMpqj.png" 
                 alt="Career planning workspace" 
                 className="w-full h-64 object-cover"
               />
@@ -283,7 +287,7 @@ export default function Home() {
 
             <Card className="overflow-hidden">
               <img 
-                src="/success-story.png" 
+                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/JaDsvnmtKVMrkAOY.png" 
                 alt="Successful veteran professionals" 
                 className="w-full h-64 object-cover"
               />
