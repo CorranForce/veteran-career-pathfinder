@@ -159,6 +159,12 @@ export default function Dashboard() {
               <Download className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Downloads</span>
             </Button>
+            {user?.role === "platform_owner" && (
+              <Button variant="ghost" size="sm" onClick={() => setLocation("/admin/dashboard")}>
+                <Shield className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Admin</span>
+              </Button>
+            )}
             <Separator orientation="vertical" className="h-6" />
             <div className="flex items-center gap-2">
               <Avatar className="h-8 w-8">

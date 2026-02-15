@@ -652,3 +652,16 @@
 - [x] Display recent activity feed on Platform-Owner Dashboard
 - [x] Test revenue calculations with sample data
 - [x] Test activity feed real-time updates
+
+
+## Dashboard Visibility Issue After Login
+
+- [x] Check OAuth callback redirect configuration
+- [x] Verify /dashboard route is properly registered in App.tsx
+- [x] Test authentication state after login
+- [x] Check if Dashboard component has auth guards blocking access
+- [x] Verify useAuth hook returns correct user data
+- [x] Test dashboard access directly via URL
+- [x] Fix any routing or auth issues found
+- [x] Update user role to platform_owner in database
+- [x] Add Admin dashboard link to user dashboard navigation
