@@ -464,3 +464,18 @@
 - [x] Create backend tRPC procedures for profile and password updates
 - [x] Update navigation to show authenticated state (user menu vs login button)
 - [x] Write tests for dashboard functionality
+
+
+## Platform-Owner Role & Resume Review Feature
+
+- [x] Update database schema to add platform_owner role enum value
+- [x] Run database migration to apply schema changes
+- [x] Update corranforce@gmail.com account to platform_owner role via SQL
+- [x] Create platformOwnerProcedure middleware for role-based access
+- [x] Create resumes table in database schema
+- [x] Build resume upload API endpoint with S3 storage
+- [x] Create AI resume analysis procedure using LLM
+- [x] Build resume upload UI component on dashboard
+- [x] Display AI analysis results with ATS recommendations
+- [x] Add resume management section to dashboard (view, download, delete)
+- [x] Write tests for resume upload and AI analysis

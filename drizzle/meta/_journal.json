@@ -50,6 +50,13 @@
       "when": 1768487404083,
       "tag": "0006_funny_scarlet_witch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1771187612144,
+      "tag": "0007_organic_harpoon",
+      "breakpoints": true
     }
   ]
 }

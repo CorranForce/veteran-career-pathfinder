@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -318,6 +318,109 @@ export async function deleteCareerHighlight(highlightId: number) {
     return true;
   } catch (error) {
     console.error("[Database] Failed to delete career highlight:", error);
+    return false;
+  }
+}
+
+
+// Resume operations
+export async function createResume(resume: InsertResume) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create resume: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db.insert(resumes).values(resume);
+    return result;
+  } catch (error) {
+    console.error("[Database] Failed to create resume:", error);
+    return null;
+  }
+}
+
+export async function getUserResumes(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get resumes: database not available");
+    return [];
+  }
+
+  try {
+    return await db
+      .select()
+      .from(resumes)
+      .where(eq(resumes.userId, userId))
+      .orderBy(resumes.createdAt);
+  } catch (error) {
+    console.error("[Database] Failed to get user resumes:", error);
+    return [];
+  }
+}
+
+export async function getResumeById(resumeId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get resume: database not available");
+    return null;
+  }
+
+  try {
+    const result = await db
+      .select()
+      .from(resumes)
+      .where(eq(resumes.id, resumeId))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("[Database] Failed to get resume:", error);
+    return null;
+  }
+}
+
+export async function updateResumeAnalysis(
+  resumeId: number,
+  analysis: {
+    analysisStatus: "completed" | "failed";
+    analysisResult?: string;
+    atsScore?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update resume analysis: database not available");
+    return null;
+  }
+
+  try {
+    await db
+      .update(resumes)
+      .set({
+        ...analysis,
+        updatedAt: new Date(),
+      })
+      .where(eq(resumes.id, resumeId));
+
+    return await getResumeById(resumeId);
+  } catch (error) {
+    console.error("[Database] Failed to update resume analysis:", error);
+    return null;
+  }
+}
+
+export async function deleteResume(resumeId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete resume: database not available");
+    return false;
+  }
+
+  try {
+    await db.delete(resumes).where(eq(resumes.id, resumeId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to delete resume:", error);
     return false;
   }
 }

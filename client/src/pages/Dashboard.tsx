@@ -25,6 +25,8 @@ import { useState, useEffect } from "react";
 import { getLoginUrl } from "@/const";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
+import ResumeUpload from "@/components/ResumeUpload";
+import ResumeList from "@/components/ResumeList";
 
 export default function Dashboard() {
   const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
@@ -348,6 +350,19 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Resume Review Section */}
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold">AI Resume Review</h2>
+            <p className="text-muted-foreground mt-1">
+              Upload your resume for AI-powered ATS analysis and get personalized recommendations
+            </p>
+          </div>
+
+          <ResumeUpload />
+          <ResumeList />
+        </div>
       </div>
     </div>
   );
