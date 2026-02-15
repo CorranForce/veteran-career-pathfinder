@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, userId, fileName, analysisStatus, atsScore, createdAt FROM resumes WHERE userId = (SELECT id FROM users WHERE email = 'corranforce@gmail.com') ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, userId, fileName, analysisStatus, atsScore, createdAt FROM resumes WHERE userId = (SELECT id FROM users WHERE email = 'corranforce@gmail.com') ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "1",
+      "fileName": "ALLEN PAUL DAVIS JR - Resume.pdf",
+      "analysisStatus": "pending",
+      "atsScore": "NULL",
+      "createdAt": "2026-02-15 20:43:09"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tfileName\tanalysisStatus\tatsScore\tcreatedAt\n1\t1\tALLEN PAUL DAVIS JR - Resume.pdf\tpending\tNULL\t2026-02-15 20:43:09\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
