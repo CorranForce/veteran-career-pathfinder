@@ -95,14 +95,14 @@ export async function getRevenueByMonth() {
 
   const result = await db
     .select({
-      month: sql<string>`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`,
-      revenue: sql<number>`SUM(${purchases.amount})`,
-      count: sql<number>`COUNT(*)`,
+      month: sql<string>`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`.as('month'),
+      revenue: sql<number>`SUM(${purchases.amount})`.as('revenue'),
+      count: sql<number>`COUNT(*)`.as('count'),
     })
     .from(purchases)
     .where(eq(purchases.status, "completed"))
     .groupBy(sql`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`)
-    .orderBy(sql`DATE_FORMAT(${purchases.createdAt}, '%Y-%m') DESC`)
+    .orderBy(desc(sql`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`))
     .limit(12);
 
   return result.reverse(); // Show oldest to newest
