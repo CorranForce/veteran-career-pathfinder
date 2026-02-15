@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import Marketing from "./pages/Marketing";
 import Downloads from "./pages/Downloads";
 import ProfileEdit from "./pages/ProfileEdit";
+import Dashboard from "./pages/Dashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -23,6 +24,7 @@ function Router() {
       <Route path={"/marketing"} component={Marketing} />
       <Route path={"/downloads"} component={Downloads} />
       <Route path={"/profile/edit"} component={ProfileEdit} />
+      <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

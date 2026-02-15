@@ -452,3 +452,15 @@
 - [x] Add Login link next to Get Started button in desktop nav
 - [x] Add Login link to mobile hamburger menu
 - [x] Test Login link on desktop and mobile
+
+
+## Login Redirect & User Dashboard
+
+- [x] Fix post-login redirect to go to /dashboard instead of landing page
+- [x] Create /dashboard route with authenticated user layout
+- [x] Add name update functionality on dashboard
+- [x] Add email update functionality on dashboard
+- [x] Add password change functionality on dashboard
+- [x] Create backend tRPC procedures for profile and password updates
+- [x] Update navigation to show authenticated state (user menu vs login button)
+- [x] Write tests for dashboard functionality

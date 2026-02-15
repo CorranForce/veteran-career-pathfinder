@@ -44,12 +44,20 @@ export default function Home() {
             <Button variant="ghost" asChild>
               <a href="/pricing">Pricing</a>
             </Button>
-            <Button variant="outline" asChild>
-              <a href={getLoginUrl()}>Login</a>
-            </Button>
-            <Button asChild>
-              <a href="/pricing">Get Started</a>
-            </Button>
+            {isAuthenticated ? (
+              <Button asChild>
+                <a href="/dashboard">Dashboard</a>
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <a href={getLoginUrl()}>Login</a>
+                </Button>
+                <Button asChild>
+                  <a href="/pricing">Get Started</a>
+                </Button>
+              </>
+            )}
           </div>
           {/* Mobile Navigation */}
           <MobileNav onScrollToPrompt={scrollToPrompt} />

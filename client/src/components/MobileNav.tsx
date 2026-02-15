@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, X, Compass } from "lucide-react";
+import { Menu, Compass } from "lucide-react";
 import { getLoginUrl } from "@/const";
 
 interface MobileNavProps {
@@ -10,6 +11,7 @@ interface MobileNavProps {
 
 export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const handleNavClick = (action: () => void) => {
     action();
@@ -45,19 +47,30 @@ export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
             >
               <a href="/pricing" onClick={() => setOpen(false)}>Pricing</a>
             </Button>
-            <Button 
-              variant="outline"
-              className="justify-start text-lg mt-4"
-              asChild
-            >
-              <a href={getLoginUrl()} onClick={() => setOpen(false)}>Login</a>
-            </Button>
-            <Button 
-              className="justify-start text-lg"
-              asChild
-            >
-              <a href="/pricing" onClick={() => setOpen(false)}>Get Started</a>
-            </Button>
+            {isAuthenticated ? (
+              <Button 
+                className="justify-start text-lg mt-4"
+                asChild
+              >
+                <a href="/dashboard" onClick={() => setOpen(false)}>Dashboard</a>
+              </Button>
+            ) : (
+              <>
+                <Button 
+                  variant="outline"
+                  className="justify-start text-lg mt-4"
+                  asChild
+                >
+                  <a href={getLoginUrl()} onClick={() => setOpen(false)}>Login</a>
+                </Button>
+                <Button 
+                  className="justify-start text-lg"
+                  asChild
+                >
+                  <a href="/pricing" onClick={() => setOpen(false)}>Get Started</a>
+                </Button>
+              </>
+            )}
           </nav>
         </div>
       </SheetContent>
