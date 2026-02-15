@@ -23,7 +23,7 @@ export default function Pricing() {
     },
   });
 
-  const handleCheckout = (productKey: "PREMIUM_PROMPT" | "PRO_SUBSCRIPTION") => {
+  const handleCheckout = (productKey: "PREMIUM_PROMPT") => {
     if (!isAuthenticated) {
       toast.info("Please sign up or log in to continue");
       window.location.href = getSignupUrl();
@@ -52,14 +52,9 @@ export default function Pricing() {
                 <a href="/dashboard">Dashboard</a>
               </Button>
             ) : (
-              <>
-                <Button variant="outline" asChild>
-                  <a href={getLoginUrl()}>Login</a>
-                </Button>
-                <Button asChild>
-                  <a href={getSignupUrl()}>Sign Up</a>
-                </Button>
-              </>
+              <Button variant="outline" asChild>
+                <a href={getLoginUrl()}>Login</a>
+              </Button>
             )}
           </div>
           {/* Mobile Navigation */}
@@ -79,14 +74,9 @@ export default function Pricing() {
                     <a href="/dashboard">Dashboard</a>
                   </Button>
                 ) : (
-                  <>
-                    <Button variant="outline" className="justify-start" asChild>
-                      <a href={getLoginUrl()}>Login</a>
-                    </Button>
-                    <Button className="justify-start" asChild>
-                      <a href={getSignupUrl()}>Sign Up</a>
-                    </Button>
-                  </>
+                  <Button variant="outline" className="justify-start" asChild>
+                    <a href={getLoginUrl()}>Login</a>
+                  </Button>
                 )}
               </div>
             </SheetContent>
@@ -108,7 +98,7 @@ export default function Pricing() {
       {/* Pricing Tiers */}
       <section className="py-12 md:py-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
             {/* Free Tier */}
             <Card className="border-2 relative">
               <CardHeader>
@@ -142,13 +132,13 @@ export default function Pricing() {
             </Card>
 
             {/* Premium Tier */}
-            <Card className="border-2 border-primary shadow-xl relative md:scale-105 order-first md:order-none">
+            <Card className="border-2 border-primary shadow-xl relative order-first md:order-none">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-primary text-primary-foreground px-4 py-1">Most Popular</Badge>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">Premium Prompt</CardTitle>
-                <CardDescription>Complete career transition toolkit</CardDescription>
+                <CardTitle className="text-2xl">Premium Package</CardTitle>
+                <CardDescription>Everything you need for a successful transition</CardDescription>
                 <div className="pt-4">
                   <span className="text-4xl font-bold">$29</span>
                   <span className="text-muted-foreground ml-2">one-time</span>
@@ -180,6 +170,22 @@ export default function Pricing() {
                     <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Lifetime access & updates</span>
                   </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium">Monthly live career transition webinars</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium">Private veteran community access (Skool)</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium">Q&A sessions with career experts</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                    <span className="text-sm font-medium">Job posting board & networking</span>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
@@ -203,65 +209,7 @@ export default function Pricing() {
               </CardFooter>
             </Card>
 
-            {/* Pro Tier */}
-            <Card className="border-2 relative">
-              <CardHeader>
-                <CardTitle className="text-2xl">Pro Membership</CardTitle>
-                <CardDescription>Ongoing support & community</CardDescription>
-                <div className="pt-4">
-                  <span className="text-4xl font-bold">$9.99</span>
-                  <span className="text-muted-foreground ml-2">/month</span>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium">Everything in Premium</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Monthly live career transition webinars</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Private veteran community access</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Q&A sessions with career experts</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Job posting board & networking</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Cancel anytime, no commitment</span>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => handleCheckout("PRO_SUBSCRIPTION")}
-                  disabled={createCheckoutMutation.isPending}
-                >
-                  {createCheckoutMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <Users className="mr-2 h-4 w-4" />
-                      Join Pro Community
-                    </>
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
+
           </div>
 
           {/* Trust Indicators */}

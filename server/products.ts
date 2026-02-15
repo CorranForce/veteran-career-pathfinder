@@ -5,21 +5,12 @@
 
 export const PRODUCTS = {
   PREMIUM_PROMPT: {
-    name: "Premium Prompt Access",
-    description: "Full optimized AI career transition prompt with bonus resources",
+    name: "Premium Career Transition Package",
+    description: "Complete career transition toolkit with AI prompt, webinars, community access, and ongoing support",
     priceId: "price_premium_prompt", // Will be created in Stripe dashboard
     amount: 2900, // $29.00 in cents
     currency: "usd",
     type: "one_time" as const,
-  },
-  PRO_SUBSCRIPTION: {
-    name: "Pro Membership",
-    description: "Full prompt + monthly webinars + private community access",
-    priceId: "price_pro_subscription", // Will be created in Stripe dashboard
-    amount: 999, // $9.99 in cents
-    currency: "usd",
-    type: "recurring" as const,
-    interval: "month" as const,
   },
 } as const;
 

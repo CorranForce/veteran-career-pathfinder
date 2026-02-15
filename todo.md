@@ -739,3 +739,27 @@
 - [x] Update Pricing page checkout flow to redirect to signup
 - [x] Test signup button visibility on all pages
 - [ ] Test end-to-end signup → login → Stripe checkout flow (requires deployment)
+
+
+## Payment-First Signup Workflow (COMPLETED)
+
+### Pricing Structure Changes
+- [x] Remove Pro Membership tier from products configuration
+- [x] Update Premium Prompt to include all Pro features (webinars, community, Q&A, job board)
+- [x] Update pricing page to show only Free and Premium tiers
+- [x] Remove Pro subscription from Stripe products
+- [x] Fix TypeScript errors in payment router
+
+### Payment Flow Restructuring (Option B - Signup then Checkout)
+- [x] Update checkout flow to redirect to signup if not authenticated
+- [x] Remove "Sign Up" buttons from main navigation
+- [x] Keep "Get Started" button that goes to pricing page
+- [x] Users must create account before accessing checkout
+
+### UI Updates
+- [x] Update Pricing page to remove Pro tier card
+- [x] Add all Pro features to Premium tier feature list
+- [x] Update Home page to show "Get Started" instead of "Sign Up"
+- [x] Remove "Sign Up" buttons from all navigation (Home, Pricing, Mobile)
+- [x] Change pricing grid from 3 columns to 2 columns
+- [ ] Test end-to-end: Browse Free → Click Get Started → Pricing → Get Premium → Signup → Checkout → Pay

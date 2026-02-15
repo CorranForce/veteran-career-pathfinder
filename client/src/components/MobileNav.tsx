@@ -67,7 +67,7 @@ export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
                   className="justify-start text-lg"
                   asChild
                 >
-                  <a href={getSignupUrl()} onClick={() => setOpen(false)}>Sign Up</a>
+                  <a href="/pricing" onClick={() => setOpen(false)}>Get Started</a>
                 </Button>
               </>
             )}

@@ -12,7 +12,7 @@ export const paymentRouter = router({
   createCheckoutSession: protectedProcedure
     .input(
       z.object({
-        productKey: z.enum(["PREMIUM_PROMPT", "PRO_SUBSCRIPTION"]),
+        productKey: z.enum(["PREMIUM_PROMPT"]),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -35,7 +35,7 @@ export const paymentRouter = router({
       }
 
       // Determine product type for metadata
-      const productType = input.productKey === "PREMIUM_PROMPT" ? "premium_prompt" : "pro_subscription";
+      const productType = "premium_prompt";
 
       // Create checkout session
       const session = await stripe.checkout.sessions.create({
@@ -56,16 +56,11 @@ export const paymentRouter = router({
                 description: product.description,
               },
               unit_amount: product.amount,
-              ...(product.type === "recurring" && {
-                recurring: {
-                  interval: product.interval,
-                },
-              }),
             },
             quantity: 1,
           },
         ],
-        mode: product.type === "recurring" ? "subscription" : "payment",
+        mode: "payment",
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/pricing`,
         allow_promotion_codes: true,

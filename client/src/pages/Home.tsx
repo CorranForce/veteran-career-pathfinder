@@ -61,7 +61,7 @@ export default function Home() {
                   <a href={getLoginUrl()}>Login</a>
                 </Button>
                 <Button asChild>
-                  <a href={getSignupUrl()}>Sign Up</a>
+                  <a href="/pricing">Get Started</a>
                 </Button>
               </>
             )}
