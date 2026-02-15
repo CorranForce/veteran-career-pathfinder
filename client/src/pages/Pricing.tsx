@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { UrgencyBanner } from "@/components/UrgencyBanner";
+import { SocialProof } from "@/components/SocialProof";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
@@ -232,6 +233,9 @@ export default function Pricing() {
           </div>
         </div>
       </section>
+
+      {/* Social Proof Section */}
+      <SocialProof />
 
       {/* FAQ Section */}
       <section className="py-20 bg-muted/30">
