@@ -763,3 +763,15 @@
 - [x] Remove "Sign Up" buttons from all navigation (Home, Pricing, Mobile)
 - [x] Change pricing grid from 3 columns to 2 columns
 - [ ] Test end-to-end: Browse Free → Click Get Started → Pricing → Get Premium → Signup → Checkout → Pay
+
+
+## Limited-Time Offer Banner (COMPLETED)
+
+### Urgency Banner Implementation
+- [x] Create banner component with countdown timer
+- [x] Add urgency messaging (limited spots, deadline, etc.)
+- [x] Implement countdown timer that resets daily at midnight
+- [x] Style banner to stand out (gradient colors, animated icon)
+- [x] Add banner to pricing page between navigation and hero
+- [x] Test countdown timer functionality
+- [x] Verify banner displays correctly on mobile and desktop

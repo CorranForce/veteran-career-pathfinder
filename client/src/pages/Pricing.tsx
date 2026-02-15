@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { UrgencyBanner } from "@/components/UrgencyBanner";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
@@ -83,6 +84,9 @@ export default function Pricing() {
           </Sheet>
         </div>
       </nav>
+
+      {/* Urgency Banner */}
+      <UrgencyBanner />
 
       {/* Pricing Hero */}
       <section className="py-20 bg-gradient-to-br from-background via-secondary/30 to-background">
