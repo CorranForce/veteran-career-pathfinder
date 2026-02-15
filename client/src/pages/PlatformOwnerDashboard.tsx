@@ -1,0 +1,300 @@
+import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Users,
+  DollarSign,
+  FileText,
+  TrendingUp,
+  Loader2,
+  Shield,
+  Home,
+  BarChart3,
+  Settings,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { useLocation } from "wouter";
+
+export default function PlatformOwnerDashboard() {
+  const { user, loading: authLoading, isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  // Fetch all users
+  const { data: users, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(
+    undefined,
+    { enabled: isAuthenticated && user?.role === "platform_owner" }
+  );
+
+  // Fetch site analytics
+  const { data: analytics, isLoading: analyticsLoading } = trpc.admin.getSiteAnalytics.useQuery(
+    undefined,
+    { enabled: isAuthenticated && user?.role === "platform_owner" }
+  );
+
+  // Change user role mutation
+  const changeRole = trpc.admin.changeUserRole.useMutation({
+    onSuccess: () => {
+      toast.success("User role updated successfully");
+      refetchUsers();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update user role");
+    },
+  });
+
+  // Loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Not authenticated or not platform owner
+  if (!isAuthenticated || user?.role !== "platform_owner") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground mb-4">
+            You don't have permission to access this page
+          </p>
+          <Button onClick={() => setLocation("/dashboard")}>
+            Go to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleRoleChange = (userId: number, newRole: string) => {
+    changeRole.mutate({ userId, role: newRole as "user" | "admin" | "platform_owner" });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card">
+        <div className="container mx-auto py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold">Platform Owner Dashboard</h1>
+                <p className="text-muted-foreground">
+                  Manage users, view analytics, and configure site settings
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => setLocation("/dashboard")}>
+                <Home className="h-4 w-4 mr-2" />
+                User Dashboard
+              </Button>
+              <Button variant="outline" onClick={() => setLocation("/admin/analytics")}>
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button variant="outline" onClick={() => setLocation("/admin/templates")}>
+                <Settings className="h-4 w-4 mr-2" />
+                Templates
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto py-8">
+        {/* Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {analyticsLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{analytics?.totalUsers || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    +{analytics?.newUsersThisMonth || 0} new this month
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {analyticsLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    ${((analytics?.totalRevenue || 0) / 100).toFixed(2)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Total revenue
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Resumes Analyzed</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {analyticsLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{analytics?.totalResumes || 0}</div>
+                  <p className="text-xs text-muted-foreground">
+                    +{analytics?.totalResumes || 0} total
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Avg ATS Score</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {analyticsLoading ? (
+                <Loader2 className="h-6 w-6 animate-spin" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">
+                    {analytics?.averageAtsScore?.toFixed(1) || "—"}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Platform average
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* User Management Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>User Management</CardTitle>
+            <CardDescription>
+              View and manage all registered users on the platform
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {usersLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Joined</TableHead>
+                      <TableHead>Last Sign In</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users && users.length > 0 ? (
+                      users.map((u: any) => (
+                        <TableRow key={u.id}>
+                          <TableCell className="font-medium">{u.name || "—"}</TableCell>
+                          <TableCell>{u.email || "—"}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                u.role === "platform_owner"
+                                  ? "default"
+                                  : u.role === "admin"
+                                  ? "secondary"
+                                  : "outline"
+                              }
+                            >
+                              {u.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(u.createdAt), "MMM d, yyyy")}
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(u.lastSignedIn), "MMM d, yyyy")}
+                          </TableCell>
+                          <TableCell>
+                            <Select
+                              value={u.role}
+                              onValueChange={(value) => handleRoleChange(u.id, value)}
+                              disabled={u.id === user.id} // Can't change own role
+                            >
+                              <SelectTrigger className="w-[140px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="user">User</SelectItem>
+                                <SelectItem value="admin">Admin</SelectItem>
+                                <SelectItem value="platform_owner">Platform Owner</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                          No users found
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

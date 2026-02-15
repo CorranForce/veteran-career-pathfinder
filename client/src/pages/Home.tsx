@@ -51,7 +51,7 @@ export default function Home() {
                 </Button>
                 {user?.role === "platform_owner" && (
                   <Button variant="outline" asChild>
-                    <a href="/admin/analytics">Analytics</a>
+                    <a href="/admin/dashboard">Admin Dashboard</a>
                   </Button>
                 )}
               </>

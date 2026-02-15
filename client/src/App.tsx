@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import AdminTemplates from "./pages/AdminTemplates";
+import PlatformOwnerDashboard from "./pages/PlatformOwnerDashboard";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/downloads"} component={Downloads} />
       <Route path={"/profile/edit"} component={ProfileEdit} />
       <Route path={"/dashboard"} component={Dashboard} />
+      <Route path={"/admin/dashboard"} component={PlatformOwnerDashboard} />
       <Route path={"/admin/analytics"} component={AdminDashboard} />
       <Route path={"/admin/templates"} component={AdminTemplates} />
       <Route path={"/templates"} component={ResumeTemplates} />

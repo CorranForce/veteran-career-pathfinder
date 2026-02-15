@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 import ResumeUpload from "@/components/ResumeUpload";
 import ResumeList from "@/components/ResumeList";
+import PurchaseHistory from "@/components/PurchaseHistory";
 
 export default function Dashboard() {
   const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
@@ -348,6 +349,26 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Purchase History Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Download className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle>Purchase History</CardTitle>
+                <CardDescription>
+                  View your purchases and download digital products
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <PurchaseHistory />
           </CardContent>
         </Card>
 
