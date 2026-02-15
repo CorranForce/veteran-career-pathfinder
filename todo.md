@@ -677,3 +677,27 @@
 - [x] Fix resume status to update after AI analysis completes (working correctly, user needs to click Analyze button)
 - [x] Test role display after fixes
 - [x] Test resume analysis end-to-end
+
+
+## Role Display Fix & PDF Error Resolution
+
+- [ ] Investigate why role still shows "Admin" after logout/login
+- [ ] Check OAuth callback user data loading from database
+- [ ] Verify user role is correctly fetched in context.ts
+- [ ] Check if role mapping is correct between database and session
+- [ ] Fix role display to show platform_owner correctly
+- [ ] Check server logs for PDF extraction errors
+- [ ] Fix PDF extraction error handling
+- [ ] Test role display after fix
+- [ ] Test PDF extraction with various resume formats
+
+
+## Role Display Fix & PDF Extraction Fix
+
+- [x] Check server logs for PDF extraction errors
+- [x] Fix require() usage in pdfExtractor.ts for ES modules using createRequire
+- [x] Test PDF extraction with sample resume
+- [x] Investigate why role shows "admin" instead of "platform_owner"
+- [x] Fix upsertUser to set platform_owner for owner instead of admin
+- [x] Restart dev server to apply fixes
+- [x] Verify PDF extraction works without errors

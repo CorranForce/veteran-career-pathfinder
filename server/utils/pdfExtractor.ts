@@ -1,3 +1,6 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
 /**
  * Extract text content from a PDF buffer
  * @param pdfBuffer - Buffer containing PDF file data
