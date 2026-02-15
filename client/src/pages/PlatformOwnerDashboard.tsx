@@ -59,6 +59,12 @@ export default function PlatformOwnerDashboard() {
     { enabled: isAuthenticated && user?.role === "platform_owner" }
   );
 
+  // Fetch LTV analytics
+  const { data: ltvAnalytics, isLoading: ltvLoading } = trpc.admin.getLTVAnalytics.useQuery(
+    undefined,
+    { enabled: isAuthenticated && user?.role === "platform_owner" }
+  );
+
   // Change user role mutation
   const changeRole = trpc.admin.changeUserRole.useMutation({
     onSuccess: () => {
@@ -320,6 +326,115 @@ export default function PlatformOwnerDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Customer Lifetime Value Tracker */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Customer Lifetime Value (LTV) Tracker</CardTitle>
+            <CardDescription>Analyze customer value and identify top spenders</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {ltvLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {/* LTV Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Avg Revenue Per User</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">
+                        ${((ltvAnalytics?.avgRevenuePerUser || 0) / 100).toFixed(2)}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        From {ltvAnalytics?.totalPayingCustomers || 0} paying customers
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Repeat Purchase Rate</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">
+                        {(ltvAnalytics?.repeatPurchaseRate || 0).toFixed(1)}%
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Customers who bought 2+ times
+                      </p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">Total Paying Customers</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-bold">
+                        {ltvAnalytics?.totalPayingCustomers || 0}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Unique customers with purchases
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Top Customers Table */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">Top 10 Customers by Total Spend</h3>
+                  {ltvAnalytics?.topCustomers && ltvAnalytics.topCustomers.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Rank</TableHead>
+                            <TableHead>Customer</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead className="text-right">Total Spent</TableHead>
+                            <TableHead className="text-right">Purchases</TableHead>
+                            <TableHead>First Purchase</TableHead>
+                            <TableHead>Last Purchase</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {ltvAnalytics.topCustomers.map((customer: any, index: number) => (
+                            <TableRow key={customer.userId}>
+                              <TableCell>
+                                <Badge variant={index === 0 ? "default" : "outline"}>
+                                  #{index + 1}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="font-medium">{customer.name}</TableCell>
+                              <TableCell>{customer.email}</TableCell>
+                              <TableCell className="text-right font-bold">
+                                ${(customer.totalSpent / 100).toFixed(2)}
+                              </TableCell>
+                              <TableCell className="text-right">{customer.purchaseCount}</TableCell>
+                              <TableCell>
+                                {format(new Date(customer.firstPurchase), "MMM d, yyyy")}
+                              </TableCell>
+                              <TableCell>
+                                {format(new Date(customer.lastPurchase), "MMM d, yyyy")}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-8">No customer data available yet</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* User Management Table */}
         <Card>

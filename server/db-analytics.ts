@@ -125,3 +125,87 @@ export async function getAverageOrderValue() {
 
   return result[0]?.avg || 0;
 }
+
+/**
+ * Get customer lifetime value analytics
+ */
+export async function getLTVAnalytics() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get LTV analytics: database not available");
+    return {
+      avgRevenuePerUser: 0,
+      totalPayingCustomers: 0,
+      repeatPurchaseRate: 0,
+      topCustomers: [],
+    };
+  }
+
+  // Get average revenue per paying user
+  const avgRevenueResult = await db
+    .select({
+      avgRevenue: sql<number>`AVG(total_spent)`,
+    })
+    .from(
+      sql`(
+        SELECT ${purchases.userId}, SUM(${purchases.amount}) as total_spent
+        FROM ${purchases}
+        WHERE ${purchases.status} = 'completed'
+        GROUP BY ${purchases.userId}
+      ) as user_totals`
+    );
+
+  const avgRevenuePerUser = avgRevenueResult[0]?.avgRevenue || 0;
+
+  // Get total number of paying customers
+  const payingCustomersResult = await db
+    .select({
+      count: sql<number>`COUNT(DISTINCT ${purchases.userId})`,
+    })
+    .from(purchases)
+    .where(eq(purchases.status, "completed"));
+
+  const totalPayingCustomers = payingCustomersResult[0]?.count || 0;
+
+  // Get repeat purchase rate (customers with 2+ purchases / total customers)
+  const repeatCustomersResult = await db
+    .select({
+      count: sql<number>`COUNT(*)`,
+    })
+    .from(
+      sql`(
+        SELECT ${purchases.userId}, COUNT(*) as purchase_count
+        FROM ${purchases}
+        WHERE ${purchases.status} = 'completed'
+        GROUP BY ${purchases.userId}
+        HAVING purchase_count >= 2
+      ) as repeat_customers`
+    );
+
+  const repeatCustomers = repeatCustomersResult[0]?.count || 0;
+  const repeatPurchaseRate = totalPayingCustomers > 0 
+    ? (repeatCustomers / totalPayingCustomers) * 100 
+    : 0;
+
+  // Get top 10 customers by total spend
+  const topCustomersResult = await db
+    .select({
+      userId: purchases.userId,
+      totalSpent: sql<number>`SUM(${purchases.amount})`.as('totalSpent'),
+      purchaseCount: sql<number>`COUNT(*)`.as('purchaseCount'),
+      firstPurchase: sql<Date>`MIN(${purchases.createdAt})`.as('firstPurchase'),
+      lastPurchase: sql<Date>`MAX(${purchases.createdAt})`.as('lastPurchase'),
+    })
+    .from(purchases)
+    .where(eq(purchases.status, "completed"))
+    .groupBy(purchases.userId)
+    .orderBy(desc(sql`SUM(${purchases.amount})`))
+    .limit(10);
+
+  return {
+    avgRevenuePerUser,
+    totalPayingCustomers,
+    repeatPurchaseRate,
+    topCustomers: topCustomersResult,
+  };
+}

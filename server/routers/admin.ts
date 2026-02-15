@@ -1,7 +1,7 @@
 import { router, platformOwnerProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb } from "../db";
-import { getTotalRevenue, getMonthlyRevenue, getTotalPurchaseCount, getRecentPurchases, getRevenueByMonth, getAverageOrderValue } from "../db-analytics";
+import { getTotalRevenue, getMonthlyRevenue, getTotalPurchaseCount, getRecentPurchases, getRevenueByMonth, getAverageOrderValue, getLTVAnalytics } from "../db-analytics";
 import { users, purchases, resumes } from "../../drizzle/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -171,6 +171,41 @@ export const adminRouter = router({
       avgOrderValue,
       recentPurchases,
       revenueByMonth,
+    };
+  }),
+
+  /**
+   * Get customer lifetime value analytics (platform owner only)
+   */
+  getLTVAnalytics: platformOwnerProcedure.query(async () => {
+    const ltvData = await getLTVAnalytics();
+    
+    // Fetch user details for top customers
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    
+    const topCustomersWithDetails = await Promise.all(
+      ltvData.topCustomers.map(async (customer) => {
+        const userDetails = await db
+          .select({
+            name: users.name,
+            email: users.email,
+          })
+          .from(users)
+          .where(eq(users.id, customer.userId))
+          .limit(1);
+        
+        return {
+          ...customer,
+          name: userDetails[0]?.name || "Unknown",
+          email: userDetails[0]?.email || "Unknown",
+        };
+      })
+    );
+    
+    return {
+      ...ltvData,
+      topCustomers: topCustomersWithDetails,
     };
   }),
 });

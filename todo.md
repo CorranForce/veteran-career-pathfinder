@@ -817,3 +817,15 @@
 - [x] Add proper column aliases and use desc() for ORDER BY
 - [x] Test revenue analytics query on admin dashboard
 - [x] Verify all revenue metrics display correctly
+
+
+## Customer Lifetime Value (LTV) Tracker (COMPLETED)
+- [x] Create LTV analytics functions in db-analytics.ts
+- [x] Calculate average revenue per user
+- [x] Identify top 10 customers by total spend
+- [x] Calculate repeat purchase rate
+- [x] Add getLTVAnalytics endpoint to admin router
+- [x] Build LTV tracker UI component for admin dashboard
+- [x] Display top customers table with email, total spent, purchase count
+- [x] Add LTV metrics cards (avg revenue per user, repeat rate, total paying customers)
+- [x] Test LTV calculations and display
