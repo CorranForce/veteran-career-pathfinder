@@ -564,3 +564,61 @@
 - [x] Add Login link next to Get Started button in desktop nav
 - [x] Add Login link to mobile hamburger menu
 - [x] Test Login link on desktop and mobile
+
+
+## Resume Templates Seeding & Admin UI
+
+- [ ] Create ATS-optimized IT resume template (for Signal/Cyber veterans)
+- [ ] Create ATS-optimized Management resume template (for leadership roles)
+- [ ] Create ATS-optimized Technical resume template (for skilled trades)
+- [ ] Create ATS-optimized General resume template (for entry-level transitions)
+- [ ] Upload all templates to S3 storage
+- [ ] Seed templates into database with metadata
+- [ ] Build admin template management page at /admin/templates
+- [ ] Add template upload form with file picker
+- [ ] Add template editing functionality
+- [ ] Add template deletion with confirmation
+- [ ] Add template preview functionality
+- [ ] Create sample veteran resume #1 (Army 25U to IT)
+- [ ] Create sample veteran resume #2 (Marines Infantry to Operations)
+- [ ] Create sample veteran resume #3 (Navy IT to Cloud Engineer)
+- [ ] Test PDF extraction with all sample resumes
+- [ ] Test AI analysis accuracy with sample resumes
+- [ ] Verify ATS score calculations
+
+
+## PDF Text Extraction & Enhanced Resume Analysis
+
+- [x] Install pdf-parse library for PDF text extraction
+- [x] Create PDF extraction utility function
+- [x] Update resume analysis to extract actual PDF text
+- [x] Test PDF text extraction with sample resumes
+
+## Admin Analytics Dashboard
+
+- [x] Create analytics database helpers for site metrics
+- [x] Build analytics router with platform owner access
+- [x] Create AdminDashboard page with charts and metrics
+- [x] Add admin analytics link to navigation for platform owners
+- [x] Install recharts for data visualization
+
+## Resume Templates Library
+
+- [x] Create resume_templates table in database schema
+- [x] Build templates router with CRUD operations
+- [x] Create ResumeTemplates page for browsing and downloading
+- [x] Add template upload functionality for platform owners
+- [x] Test template download tracking
+
+## Resume Templates Seeding & Admin UI
+
+- [x] Create 4 ATS-optimized resume templates for different career paths (IT, Management, Technical, General)
+- [x] Upload resume templates to S3
+- [x] Seed templates into database
+- [x] Build admin template management page at /admin/templates
+- [x] Add template upload form with file conversion to base64
+- [x] Add template deletion functionality
+- [x] Test template download tracking
+- [x] Generate 3 sample veteran resumes with realistic content
+- [x] Test PDF text extraction with sample resumes
+- [x] Verify AI analysis works with extracted text

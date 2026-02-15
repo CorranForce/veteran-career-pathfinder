@@ -14,6 +14,7 @@ import ProfileEdit from "./pages/ProfileEdit";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ResumeTemplates from "./pages/ResumeTemplates";
+import AdminTemplates from "./pages/AdminTemplates";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/profile/edit"} component={ProfileEdit} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/admin/analytics"} component={AdminDashboard} />
+      <Route path={"/admin/templates"} component={AdminTemplates} />
       <Route path={"/templates"} component={ResumeTemplates} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
