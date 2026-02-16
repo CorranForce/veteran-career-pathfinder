@@ -131,85 +131,58 @@ export default function PlatformOwnerDashboard() {
       <div className="container mx-auto py-8">
         {/* Analytics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {analyticsLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                <>
-                  <div className="text-2xl font-bold">{analytics?.totalUsers || 0}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{analytics?.newUsersThisMonth || 0} new this month
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {analyticsLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                <>
-                  <div className="text-2xl font-bold">
-                    ${((analytics?.totalRevenue || 0) / 100).toFixed(2)}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Total revenue
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumes Analyzed</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {analyticsLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                <>
-                  <div className="text-2xl font-bold">{analytics?.totalResumes || 0}</div>
-                  <p className="text-xs text-muted-foreground">
-                    +{analytics?.totalResumes || 0} total
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg ATS Score</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {analyticsLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin" />
-              ) : (
-                <>
-                  <div className="text-2xl font-bold">
-                    {typeof analytics?.averageAtsScore === 'number' ? analytics.averageAtsScore.toFixed(1) : "—"}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Platform average
-                  </p>
-                </>
-              )}
-            </CardContent>
-          </Card>
+          {[
+            {
+              key: 'total-users',
+              title: 'Total Users',
+              icon: Users,
+              value: analytics?.totalUsers || 0,
+              subtitle: `+${analytics?.newUsersThisMonth || 0} new this month`
+            },
+            {
+              key: 'total-revenue',
+              title: 'Total Revenue',
+              icon: DollarSign,
+              value: `$${((analytics?.totalRevenue || 0) / 100).toFixed(2)}`,
+              subtitle: 'Total revenue'
+            },
+            {
+              key: 'resumes-analyzed',
+              title: 'Resumes Analyzed',
+              icon: FileText,
+              value: analytics?.totalResumes || 0,
+              subtitle: `+${analytics?.totalResumes || 0} total`
+            },
+            {
+              key: 'avg-ats-score',
+              title: 'Avg ATS Score',
+              icon: TrendingUp,
+              value: typeof analytics?.averageAtsScore === 'number' ? analytics.averageAtsScore.toFixed(1) : "—",
+              subtitle: 'Platform average'
+            }
+          ].map(card => {
+            const Icon = card.icon;
+            return (
+              <Card key={card.key}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  {analyticsLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold">{card.value}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {card.subtitle}
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Activity Feed */}
