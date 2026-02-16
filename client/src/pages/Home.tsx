@@ -19,6 +19,8 @@ import {
 import MobileNav from "@/components/MobileNav";
 import { getLoginUrl, getSignupUrl } from "@/const";
 import Testimonials from "@/components/Testimonials";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { SimpleContactButton } from "@/components/LiveChatWidget";
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -31,6 +33,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ExitIntentPopup />
+      <SimpleContactButton />
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -43,6 +47,9 @@ export default function Home() {
             <Button variant="ghost" onClick={scrollToPrompt}>View Prompt</Button>
             <Button variant="ghost" asChild>
               <a href="/pricing">Pricing</a>
+            </Button>
+            <Button variant="ghost" asChild>
+              <a href="/blog">Blog</a>
             </Button>
             {isAuthenticated ? (
               <>

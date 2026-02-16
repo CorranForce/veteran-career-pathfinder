@@ -47,6 +47,13 @@ export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
             >
               <a href="/pricing" onClick={() => setOpen(false)}>Pricing</a>
             </Button>
+            <Button 
+              variant="ghost" 
+              className="justify-start text-lg"
+              asChild
+            >
+              <a href="/blog" onClick={() => setOpen(false)}>Blog</a>
+            </Button>
             {isAuthenticated ? (
               <Button 
                 className="justify-start text-lg mt-4"

@@ -10,6 +10,8 @@ import { CheckCircle2, Loader2, Shield, Users, Zap, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { getLoginUrl, getSignupUrl } from "@/const";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
+import { SimpleContactButton } from "@/components/LiveChatWidget";
 
 export default function Pricing() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
@@ -38,6 +40,8 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ExitIntentPopup />
+      <SimpleContactButton />
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -49,6 +53,9 @@ export default function Pricing() {
           <div className="hidden md:flex items-center gap-4">
             <Button variant="ghost" asChild>
               <a href="/">Home</a>
+            </Button>
+            <Button variant="ghost" asChild>
+              <a href="/blog">Blog</a>
             </Button>
             {isAuthenticated ? (
               <Button variant="outline" asChild>
@@ -71,6 +78,9 @@ export default function Pricing() {
               <div className="flex flex-col gap-4 mt-8">
                 <Button variant="ghost" className="justify-start" asChild>
                   <a href="/">Home</a>
+                </Button>
+                <Button variant="ghost" className="justify-start" asChild>
+                  <a href="/blog">Blog</a>
                 </Button>
                 {isAuthenticated ? (
                   <Button variant="outline" className="justify-start" asChild>

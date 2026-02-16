@@ -548,5 +548,427 @@ You've already proven you can handle high-pressure situations, lead teams, and a
 
 **Your next mission starts now.**
     `
+  },
+  {
+    slug: "veteran-resume-mistakes-to-avoid",
+    title: "7 Resume Mistakes That Cost Veterans Job Interviews (And How to Fix Them)",
+    description: "Learn the most common resume mistakes veterans make when transitioning to civilian careers and how to create an ATS-friendly resume that gets results.",
+    author: "Allen Davis",
+    publishDate: "2026-02-16",
+    readTime: "10 min read",
+    category: "Resume Tips",
+    image: "/blog/resume-mistakes.jpg",
+    content: `
+# 7 Resume Mistakes That Cost Veterans Job Interviews (And How to Fix Them)
+
+Your military resume got you through the ranks, but civilian hiring managers speak a different language. Even highly qualified veterans get passed over because their resumes don't translate their experience effectively.
+
+After helping hundreds of veterans land civilian jobs, I've identified the seven most common resume mistakes—and more importantly, how to fix them.
+
+## Mistake #1: Using Military Jargon and Acronyms
+
+**The Problem:** Civilian HR managers and recruiters don't know what "11B MOS" or "NCOIC" means. When they see unfamiliar terms, they move to the next resume.
+
+**Example of What NOT to Do:**
+- "Served as NCOIC for a 12-man squad conducting COIN operations in OEF"
+
+**The Fix:**
+- "Led a 12-person security team conducting counterinsurgency operations in Afghanistan"
+
+**Action Step:** Go through your resume and replace every military acronym with plain English. If a civilian wouldn't understand it, rewrite it.
+
+## Mistake #2: Focusing on Duties Instead of Achievements
+
+**The Problem:** Listing what you were responsible for doesn't show what you actually accomplished. Employers want to see results, not job descriptions.
+
+**Example of What NOT to Do:**
+- "Responsible for maintaining communications equipment"
+- "Managed inventory of weapons and supplies"
+
+**The Fix:**
+- "Maintained 100% operational readiness of $2M communications equipment across 6-month deployment"
+- "Managed $500K inventory with zero loss incidents, improving accountability by 40%"
+
+**Action Step:** Use the STAR method (Situation, Task, Action, Result) and quantify everything. Numbers prove impact.
+
+## Mistake #3: Ignoring ATS (Applicant Tracking Systems)
+
+**The Problem:** 75% of resumes never reach human eyes—they're filtered out by ATS software that scans for keywords. If your resume doesn't match the job description, it's automatically rejected.
+
+**The Fix:**
+- Read the job posting carefully and identify key skills and requirements
+- Mirror the exact language used in the job description
+- Include industry-specific keywords naturally throughout your resume
+- Use standard section headings ("Work Experience" not "Service History")
+- Avoid tables, graphics, and complex formatting that confuse ATS
+
+**Action Step:** Create a master resume with all your experience, then customize it for each job application by emphasizing relevant keywords.
+
+## Mistake #4: Not Translating Leadership Experience
+
+**The Problem:** Veterans often undersell their leadership experience because they don't realize how valuable it is in civilian roles.
+
+**Example of What NOT to Do:**
+- "Squad leader for infantry platoon"
+
+**The Fix:**
+- "Managed team of 12 personnel with direct responsibility for performance evaluations, training, and mission execution"
+- "Led cross-functional teams in high-pressure environments, resulting in 98% mission success rate"
+
+**Civilian Equivalents:**
+- Squad Leader = Team Manager / Supervisor
+- Platoon Sergeant = Operations Manager
+- Company Commander = Department Director
+- Battalion Commander = Senior Director / VP
+
+**Action Step:** Frame your military leadership in terms civilians understand: team management, performance reviews, training, budget oversight.
+
+## Mistake #5: Resume Too Long or Too Short
+
+**The Problem:** 
+- Too long: Civilian hiring managers spend 6-7 seconds scanning a resume. If it's 4+ pages, they won't read it.
+- Too short: A one-page resume for 10+ years of military service undersells your experience.
+
+**The Sweet Spot:**
+- 0-5 years experience: 1 page
+- 5-15 years experience: 2 pages
+- 15+ years experience: 2-3 pages maximum
+
+**The Fix:**
+- Focus on the last 10-15 years of experience
+- Remove outdated skills (Windows XP, obsolete equipment)
+- Consolidate older positions into a brief "Earlier Career" section
+- Use bullet points, not paragraphs
+
+**Action Step:** Print your resume and highlight only the information directly relevant to the job you're applying for. Cut the rest.
+
+## Mistake #6: Generic Objective Statements
+
+**The Problem:** Outdated objective statements like "Seeking a challenging position where I can utilize my skills" waste valuable space and tell employers nothing.
+
+**Example of What NOT to Do:**
+- "Objective: To obtain a position in a growing company where I can apply my leadership skills"
+
+**The Fix:** Replace with a powerful professional summary that immediately shows your value:
+
+"Results-driven operations professional with 8 years of military leadership experience managing teams of up to 40 personnel. Proven track record in logistics coordination, crisis management, and process optimization. Seeking to leverage strategic planning and team leadership skills in supply chain management role."
+
+**Action Step:** Write a 3-4 sentence summary that includes: your experience level, key skills, major achievements, and what you're targeting.
+
+## Mistake #7: No Civilian-Friendly Formatting
+
+**The Problem:** Military resumes often use dense blocks of text, unusual fonts, or overly formal formatting that doesn't match civilian standards.
+
+**The Fix:**
+- Use a clean, professional font (Arial, Calibri, or Times New Roman, 10-12pt)
+- Include plenty of white space
+- Use bullet points for easy scanning
+- Bold section headers
+- Save as PDF to preserve formatting
+- Include your LinkedIn URL
+- Use a professional email address (not your old .mil address)
+
+**Action Step:** Use a modern resume template designed for ATS compatibility. Many are available free on Canva, Google Docs, or Microsoft Word.
+
+## Bonus Tip: Get Your Resume Reviewed
+
+**Free Resources:**
+- Hire Heroes USA (free resume review for veterans)
+- American Corporate Partners (free mentorship)
+- Your local VA Transition Assistance Program
+- LinkedIn's resume review feature
+
+## The Bottom Line
+
+Your military experience is valuable—but only if you can communicate it in a language civilian employers understand. Avoid these seven mistakes, and you'll dramatically increase your interview rate.
+
+**Remember:**
+- No military jargon
+- Quantify achievements
+- Optimize for ATS
+- Translate leadership clearly
+- Keep it concise (2 pages max)
+- Use a strong professional summary
+- Format for civilian readers
+
+**Ready to create a resume that gets interviews?** Our AI-powered career transition tool includes ATS-optimized resume templates specifically designed for veterans, plus personalized guidance on translating your MOS into civilian job titles.
+
+**Your civilian career starts with a great resume. Make it count.**
+    `
+  },
+  {
+    slug: "veteran-networking-strategies-linkedin",
+    title: "LinkedIn for Veterans: How to Network Your Way Into Your Dream Job",
+    description: "Master LinkedIn networking strategies specifically designed for veterans transitioning to civilian careers. Learn how to build connections, optimize your profile, and land job interviews.",
+    author: "Allen Davis",
+    publishDate: "2026-02-16",
+    readTime: "12 min read",
+    category: "Networking",
+    image: "/blog/linkedin-networking.jpg",
+    content: `
+# LinkedIn for Veterans: How to Network Your Way Into Your Dream Job
+
+Here's a hard truth: **70% of jobs are never publicly posted.** They're filled through networking before they ever hit job boards.
+
+For veterans transitioning to civilian careers, LinkedIn is your most powerful networking tool—but only if you use it strategically. This guide will show you exactly how to leverage LinkedIn to build connections, get noticed by recruiters, and land interviews.
+
+## Why LinkedIn Matters for Veterans
+
+In the military, your network was built-in. In the civilian world, you have to build it yourself. LinkedIn levels the playing field by giving you direct access to:
+
+- **Hiring managers** at your target companies
+- **Recruiters** actively looking for candidates with your skills
+- **Other veterans** who've successfully transitioned
+- **Industry insiders** who can provide referrals
+
+But here's the catch: **most veterans use LinkedIn wrong.** They create a profile, apply to jobs, and wonder why nothing happens.
+
+Let's fix that.
+
+## Step 1: Optimize Your Profile (You Have 3 Seconds)
+
+When someone views your profile, you have 3 seconds to make an impression. Here's how to nail it:
+
+### Your Profile Photo
+- **Use a professional headshot** (not your military portrait)
+- Dress in business casual or business professional attire
+- Smile and make eye contact with the camera
+- Use a clean, simple background
+
+**Pro Tip:** If you don't have a professional photo, use a smartphone with portrait mode. Natural lighting works best.
+
+### Your Headline (120 Characters That Matter)
+
+Your headline appears everywhere on LinkedIn—in search results, comments, and connection requests. Make it count.
+
+**Bad Example:**
+"Veteran | Seeking Opportunities"
+
+**Good Example:**
+"Operations Manager | Military Veteran | Logistics & Supply Chain Expert | Seeking Leadership Roles in Manufacturing"
+
+**Formula:** [Target Role] | [Key Skill 1] | [Key Skill 2] | [What You're Looking For]
+
+### Your About Section (The Hook)
+
+This is your elevator pitch. Tell your story in a way that connects military experience to civilian value.
+
+**Template:**
+
+"After [X years] leading teams in the [Branch], I'm transitioning my skills in [skill 1], [skill 2], and [skill 3] to [target industry].
+
+In the military, I [major achievement]. Now I'm looking to bring that same level of [quality] to [type of role] where I can [value you provide].
+
+I'm particularly interested in [specific area] and would love to connect with professionals in [industry/role]."
+
+**Action Step:** Write your About section in first person, keep it under 300 words, and include a clear call-to-action.
+
+## Step 2: Build Your Network Strategically
+
+Don't just connect randomly. Be strategic about who you add and why.
+
+### Who to Connect With (In Order of Priority)
+
+1. **Fellow Veterans in Your Target Industry**
+   - Search: "Veteran [industry]" or "Former [your MOS] [job title]"
+   - They understand your background and are often willing to help
+
+2. **Alumni from Your Unit or Base**
+   - Search: "[Unit name]" or "[Base name]"
+   - Shared military experience creates instant rapport
+
+3. **Employees at Your Target Companies**
+   - Search: "[Company name] [job title]"
+   - Internal referrals increase your interview chances by 5x
+
+4. **Recruiters in Your Industry**
+   - Search: "Recruiter [industry]" or "Talent Acquisition [industry]"
+   - They're actively looking to fill roles
+
+5. **Industry Thought Leaders**
+   - Follow and engage with their content
+   - Builds your knowledge and visibility
+
+### The Perfect Connection Request
+
+**Never** send a blank connection request. Always personalize it.
+
+**Bad:**
+"I'd like to add you to my professional network."
+
+**Good:**
+"Hi [Name], I'm a veteran transitioning into [industry] and noticed you work at [Company]. I'd love to connect and learn more about your experience in [specific area]. Thank you!"
+
+**Formula:** Greeting + Common Ground + Specific Interest + Thank You
+
+**Action Step:** Send 5-10 personalized connection requests per day. LinkedIn limits you to 100/week for free accounts.
+
+## Step 3: Engage Before You Ask
+
+The biggest mistake veterans make: connecting with someone and immediately asking for a job.
+
+**Better Approach:** Build rapport first.
+
+### The 3-Touch Rule
+
+1. **First Touch:** Send personalized connection request
+2. **Second Touch:** Like or comment on their recent post
+3. **Third Touch:** Send a message asking a specific question
+
+**Example Message (Third Touch):**
+
+"Hi [Name], I saw your post about [topic] and found it really insightful. I'm transitioning from the military into [industry] and would love to hear your perspective on [specific question]. Would you be open to a quick 15-minute call?"
+
+**Key:** Ask for advice, not a job. People love helping—they just don't like being sold to.
+
+## Step 4: Create Content (Even If You're Not a Writer)
+
+Posting content on LinkedIn dramatically increases your visibility. You don't need to be a professional writer—just share your perspective.
+
+### What to Post About
+
+1. **Your Transition Journey**
+   - "3 things I learned in my first month as a civilian"
+   - Authentic stories resonate
+
+2. **Military Skills That Translate**
+   - "How leading a squad prepared me for project management"
+   - Educates civilians about your value
+
+3. **Industry Insights**
+   - Share articles with your take
+   - Shows you're engaged and learning
+
+4. **Wins and Milestones**
+   - "Just completed my PMP certification!"
+   - Builds credibility
+
+### Posting Strategy
+
+- **Frequency:** 2-3 times per week
+- **Best times:** Tuesday-Thursday, 7-9 AM or 12-1 PM
+- **Format:** Short paragraphs, bullet points, emojis for visual breaks
+- **Length:** 150-300 words (longer posts get more engagement)
+
+**Pro Tip:** Comment on other people's posts daily. It's easier than creating your own content and still builds visibility.
+
+## Step 5: Use LinkedIn's Job Search Tools
+
+### Set Up Job Alerts
+
+- Go to Jobs → Search for your target role
+- Click "Create search alert"
+- Get daily emails with new postings
+
+### Use the "Easy Apply" Filter
+
+Applying through LinkedIn is faster and often gets you noticed quicker than external job boards.
+
+### Check "Who Viewed Your Profile"
+
+If a recruiter views your profile after you apply, send them a message:
+
+"Hi [Name], I noticed you viewed my profile after I applied for the [Job Title] role. I'd love to discuss how my [specific skill] could add value to your team. Are you available for a brief call?"
+
+## Step 6: Leverage LinkedIn Premium (Free for Veterans)
+
+**LinkedIn Premium Career** is free for one year for all U.S. military members, veterans, and military spouses.
+
+**Benefits:**
+- See who viewed your profile (full access)
+- Send InMail to people you're not connected with
+- Access LinkedIn Learning courses
+- Get salary insights for roles
+- See how you compare to other applicants
+
+**How to Activate:**
+- Go to Settings → Premium subscription
+- Select "Premium Career"
+- Verify your military status
+
+## Step 7: The Informational Interview Strategy
+
+This is the secret weapon most veterans don't use.
+
+**What It Is:** A 15-20 minute conversation where you ask someone about their career path and industry insights.
+
+**Why It Works:**
+- Builds genuine relationships
+- You learn insider information
+- When jobs open up, you're top of mind
+- Often leads to referrals
+
+**How to Request One:**
+
+"Hi [Name], I'm transitioning from the military into [industry] and would really value your perspective. Would you be open to a 15-minute call to share your experience and any advice for someone entering the field? I'm happy to work around your schedule."
+
+**Questions to Ask:**
+1. How did you get into this field?
+2. What skills are most important for success?
+3. What do you wish you'd known when you started?
+4. Are there any certifications or training you'd recommend?
+5. Who else should I talk to?
+
+**Action Step:** Request 2-3 informational interviews per week. Even if only half say yes, that's 4-6 conversations per month.
+
+## Common LinkedIn Mistakes Veterans Make
+
+### Mistake #1: Only Logging In to Apply for Jobs
+LinkedIn rewards active users. Post, comment, and engage regularly.
+
+### Mistake #2: Not Listing Certifications and Skills
+Add every relevant certification, skill, and training. Recruiters search by keywords.
+
+### Mistake #3: Ignoring Messages
+Respond to every message within 24 hours, even if it's just to say "Thanks, but not interested."
+
+### Mistake #4: Not Asking for Recommendations
+Request LinkedIn recommendations from former supervisors, peers, and subordinates. They build credibility.
+
+### Mistake #5: Giving Up Too Soon
+Networking takes time. Commit to 6 months of consistent effort before judging results.
+
+## Your 30-Day LinkedIn Action Plan
+
+**Week 1: Profile Optimization**
+- Update profile photo
+- Rewrite headline and About section
+- Add all skills and certifications
+- Request 3 recommendations
+
+**Week 2: Build Connections**
+- Send 10 personalized connection requests daily
+- Follow 20 companies you're interested in
+- Join 5 industry-specific LinkedIn groups
+
+**Week 3: Engage and Create**
+- Comment on 5 posts daily
+- Share 2 articles with your insights
+- Write your first original post
+
+**Week 4: Outreach**
+- Request 3 informational interviews
+- Message 5 recruiters in your industry
+- Apply to 10 jobs through LinkedIn
+
+## The Bottom Line
+
+LinkedIn isn't just a digital resume—it's your networking headquarters. Used strategically, it can open doors that job applications never will.
+
+**Remember:**
+- Optimize your profile for your target role
+- Build connections strategically
+- Engage before you ask
+- Post content consistently
+- Request informational interviews
+- Use LinkedIn Premium (free for veterans)
+- Be patient and persistent
+
+**Most importantly:** Networking isn't about using people—it's about building genuine relationships. Approach every connection with curiosity and a willingness to help others, and opportunities will follow.
+
+**Ready to accelerate your transition?** Our AI-powered career tool provides personalized networking strategies, LinkedIn profile optimization tips, and step-by-step guidance tailored to your MOS and target industry.
+
+**Your network is your net worth. Start building it today.**
+    `
   }
 ];
