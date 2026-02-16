@@ -5,7 +5,13 @@ import { Loader2, UserPlus, FileUp, DollarSign, Download } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ActivityFeed() {
-  const { data: activities, isLoading } = trpc.admin.getRecentActivity.useQuery({ limit: 20 });
+  const { data: activities, isLoading } = trpc.admin.getRecentActivity.useQuery(
+    { limit: 20 },
+    {
+      refetchInterval: 30000, // Auto-refresh every 30 seconds
+      refetchIntervalInBackground: false, // Only refresh when tab is active
+    }
+  );
 
   const getActivityIcon = (type: string) => {
     switch (type) {

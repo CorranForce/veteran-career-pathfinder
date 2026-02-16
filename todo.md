@@ -978,3 +978,5 @@
 - [x] Update redirect URLs from /dashboard to /tools
 
 - [x] Investigate and fix persistent React key warning in PlatformOwnerDashboard (fixed conditional spans in ActivityFeed)
+
+- [x] Implement auto-refresh for Activity Feed (30-second polling)
