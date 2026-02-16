@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
 import ActivityFeed from "@/components/ActivityFeed";
+import { ProductManagement } from "@/components/ProductManagement";
 
 export default function PlatformOwnerDashboard() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -183,6 +184,11 @@ export default function PlatformOwnerDashboard() {
               </Card>
             );
           })}
+        </div>
+
+        {/* Product Management */}
+        <div className="mb-8">
+          <ProductManagement />
         </div>
 
         {/* Activity Feed */}

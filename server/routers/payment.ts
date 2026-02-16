@@ -49,17 +49,23 @@ export const paymentRouter = router({
           product_type: productType,
         },
         line_items: [
-          {
-            price_data: {
-              currency: product.currency,
-              product_data: {
-                name: product.name,
-                description: product.description,
+          // Use Stripe Price ID if available, otherwise use price_data
+          product.priceId && product.priceId !== "price_premium_prompt"
+            ? {
+                price: product.priceId,
+                quantity: 1,
+              }
+            : {
+                price_data: {
+                  currency: product.currency,
+                  product_data: {
+                    name: product.name,
+                    description: product.description,
+                  },
+                  unit_amount: product.amount,
+                },
+                quantity: 1,
               },
-              unit_amount: product.amount,
-            },
-            quantity: 1,
-          },
         ],
         mode: "payment",
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,

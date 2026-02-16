@@ -208,4 +208,101 @@ export const adminRouter = router({
       topCustomers: topCustomersWithDetails,
     };
   }),
+
+  /**
+   * Get current product configuration
+   */
+  getProductConfig: platformOwnerProcedure.query(async () => {
+    const { PRODUCTS } = await import("../products");
+    return PRODUCTS.PREMIUM_PROMPT;
+  }),
+
+  /**
+   * Update product configuration
+   */
+  updateProduct: platformOwnerProcedure
+    .input(
+      z.object({
+        name: z.string().min(1),
+        amount: z.number().min(50), // Stripe minimum $0.50
+        description: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      const { stripe } = await import("../stripe");
+      
+      // Read current products.ts
+      const productsPath = path.join(process.cwd(), "server", "products.ts");
+      const currentContent = await fs.readFile(productsPath, "utf-8");
+      
+      // Extract current Stripe IDs if they exist
+      const priceIdMatch = currentContent.match(/priceId:\s*["']([^"']+)["']/);
+      const productIdMatch = currentContent.match(/productId:\s*["']([^"']+)["']/);
+      
+      let stripeProductId = productIdMatch ? productIdMatch[1] : null;
+      let stripePriceId = priceIdMatch ? priceIdMatch[1] : null;
+      
+      // Create or update Stripe product
+      if (!stripeProductId || stripeProductId === "price_premium_prompt") {
+        // Create new product in Stripe
+        const product = await stripe.products.create({
+          name: input.name,
+          description: input.description,
+        });
+        stripeProductId = product.id;
+        
+        // Create price for the product
+        const price = await stripe.prices.create({
+          product: stripeProductId,
+          unit_amount: input.amount,
+          currency: "usd",
+        });
+        stripePriceId = price.id;
+      } else {
+        // Update existing product
+        await stripe.products.update(stripeProductId, {
+          name: input.name,
+          description: input.description,
+        });
+        
+        // Create new price (Stripe doesn't allow updating prices)
+        const price = await stripe.prices.create({
+          product: stripeProductId,
+          unit_amount: input.amount,
+          currency: "usd",
+        });
+        stripePriceId = price.id;
+      }
+      
+      // Update products.ts file
+      const newContent = `/**
+ * Stripe Products and Pricing Configuration
+ * Define all products and prices here for centralized management
+ */
+
+export const PRODUCTS = {
+  PREMIUM_PROMPT: {
+    name: "${input.name.replace(/"/g, '\\"')}",
+    description: "${input.description.replace(/"/g, '\\"')}",
+    priceId: "${stripePriceId}",
+    productId: "${stripeProductId}",
+    amount: ${input.amount},
+    currency: "usd",
+    type: "one_time" as const,
+  },
+} as const;
+
+export type ProductKey = keyof typeof PRODUCTS;
+`;
+      
+      await fs.writeFile(productsPath, newContent, "utf-8");
+      
+      return {
+        success: true,
+        stripeProductId,
+        stripePriceId,
+      };
+    }),
 });
