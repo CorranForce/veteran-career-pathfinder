@@ -342,47 +342,40 @@ export default function PlatformOwnerDashboard() {
               <div className="space-y-8">
                 {/* LTV Metrics */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">Avg Revenue Per User</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold">
-                        ${((ltvAnalytics?.avgRevenuePerUser || 0) / 100).toFixed(2)}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        From {ltvAnalytics?.totalPayingCustomers || 0} paying customers
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">Repeat Purchase Rate</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold">
-                        {(ltvAnalytics?.repeatPurchaseRate || 0).toFixed(1)}%
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Customers who bought 2+ times
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">Total Paying Customers</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-3xl font-bold">
-                        {ltvAnalytics?.totalPayingCustomers || 0}
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Unique customers with purchases
-                      </p>
-                    </CardContent>
-                  </Card>
+                  {[
+                    {
+                      key: 'avg-revenue',
+                      title: 'Avg Revenue Per User',
+                      value: `$${((ltvAnalytics?.avgRevenuePerUser || 0) / 100).toFixed(2)}`,
+                      subtitle: `From ${ltvAnalytics?.totalPayingCustomers || 0} paying customers`
+                    },
+                    {
+                      key: 'repeat-rate',
+                      title: 'Repeat Purchase Rate',
+                      value: `${(ltvAnalytics?.repeatPurchaseRate || 0).toFixed(1)}%`,
+                      subtitle: 'Customers who bought 2+ times'
+                    },
+                    {
+                      key: 'total-customers',
+                      title: 'Total Paying Customers',
+                      value: ltvAnalytics?.totalPayingCustomers || 0,
+                      subtitle: 'Lifetime value customers'
+                    }
+                  ].map(metric => (
+                    <Card key={metric.key}>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-3xl font-bold">
+                          {metric.value}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {metric.subtitle}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
 
                 {/* Top Customers Table */}
