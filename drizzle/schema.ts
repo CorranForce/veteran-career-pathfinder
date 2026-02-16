@@ -283,3 +283,40 @@ export const activityLogs = mysqlTable("activityLogs", {
 
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type InsertActivityLog = typeof activityLogs.$inferInsert;
+
+
+/**
+ * Products table - multi-tier product management with Stripe integration
+ * Supports active, disabled, and archived states
+ */
+export const products = mysqlTable("products", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Product information
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  features: text("features").notNull(), // JSON array of feature strings
+  
+  // Pricing
+  price: int("price").notNull(), // Price in cents
+  currency: varchar("currency", { length: 10 }).default("usd").notNull(),
+  
+  // Stripe integration
+  stripeProductId: varchar("stripeProductId", { length: 255 }),
+  stripePriceId: varchar("stripePriceId", { length: 255 }),
+  
+  // Product status
+  status: mysqlEnum("status", ["active", "disabled", "archived"]).default("active").notNull(),
+  
+  // Metadata
+  displayOrder: int("displayOrder").default(0).notNull(), // For sorting in UI
+  isRecurring: boolean("isRecurring").default(false).notNull(), // One-time vs subscription
+  billingInterval: varchar("billingInterval", { length: 50 }), // "month", "year", etc. for subscriptions
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  archivedAt: timestamp("archivedAt"),
+});
+
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;

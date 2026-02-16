@@ -1040,3 +1040,104 @@
 ### React Errors
 - [ ] Identify React error in PlatformOwnerDashboard
 - [ ] Fix React error in PlatformOwnerDashboard
+
+
+## SYSTEM UPGRADES - Production Implementation
+
+### 1. Product & Pricing System Upgrade
+- [x] Create database schema for multi-tier products (status: active/disabled/archived)
+- [x] Implement create product tier API
+- [x] Implement edit product tier API
+- [x] Implement archive product (soft delete) API
+- [x] Implement disable/enable product API
+- [ ] Add product management UI in platform-owner dashboard
+- [ ] Update checkout flow to respect product status
+- [ ] Ensure Stripe product/price mapping integrity
+- [ ] Test historical purchases remain intact
+
+### 2. Stripe Purchase Logging
+- [x] Extend webhook handler for payment_intent.succeeded
+- [x] Log purchases in activity feed with full details
+- [x] Implement idempotency for purchase logging (using payment intent ID)
+- [x] Add duplicate prevention logic
+- [x] Implement safe retry handling (non-blocking error handling)
+- [ ] Test webhook with Stripe test events
+
+### 3. Revenue Analytics Dashboard
+- [ ] Create revenue analytics database queries
+- [ ] Implement daily revenue aggregation
+- [ ] Implement weekly revenue aggregation
+- [ ] Implement monthly revenue aggregation
+- [ ] Build revenue dashboard UI with Recharts
+- [ ] Add line/bar chart toggle
+- [ ] Handle timezone-aware aggregation
+- [ ] Add empty state handling
+- [ ] Optimize for large datasets
+
+### 4. User Management System
+- [ ] Create user management UI in platform-owner dashboard
+- [ ] Implement user search functionality
+- [ ] Implement user filtering (by role, status, date)
+- [ ] Add suspend/reactivate user API
+- [ ] Add view purchase history per user
+- [ ] Implement role isolation checks
+- [ ] Add user status indicators
+
+### 5. Referral System
+- [ ] Create referral tracking database schema
+- [ ] Implement generate unique referral link API
+- [ ] Implement track referral clicks
+- [ ] Implement track referral signups
+- [ ] Implement track referral conversions (payment only)
+- [ ] Add query param attribution logic
+- [ ] Prevent self-referrals
+- [ ] Prevent duplicate credit
+- [ ] Add basic abuse prevention
+- [ ] Create referral dashboard UI for users
+- [ ] Test scalability of tracking schema
+
+### 6. Exit-Intent Email Capture Upgrade
+- [ ] Update exit-intent popup with email capture form
+- [ ] Create email capture database schema
+- [ ] Implement store captured email API
+- [ ] Send 20% discount code via SendGrid
+- [ ] Reveal discount only after submission
+- [ ] Handle duplicate email submissions
+- [ ] Add email validation
+- [ ] Implement spam resistance measures
+- [ ] Test SendGrid email delivery
+
+### 7. Navigation & UX Improvements - Admin
+- [ ] Implement breadcrumb navigation in admin dashboard
+- [ ] Create notification bell component
+- [ ] Add real-time notifications for new signups
+- [ ] Add real-time notifications for resume uploads
+- [ ] Add real-time notifications for purchases
+- [ ] Add notification badge counter
+- [ ] Add notification dropdown with action links
+
+### 8. Navigation & UX Improvements - User
+- [ ] Add quick actions section on /tools page
+- [ ] Create "Analyze New Resume" quick action button
+- [ ] Create "Browse Templates" quick action button
+- [ ] Add navbar quick-action dropdown
+- [ ] Add "Upload Resume" to navbar dropdown
+- [ ] Add "View Templates" to navbar dropdown
+
+### 9. Loading States & Feedback
+- [ ] Add loading skeletons for resume analysis
+- [ ] Implement toast notifications for file uploads
+- [ ] Implement toast notifications for upload completion
+- [ ] Add progress indicators for long-running operations
+- [ ] Test all loading states and transitions
+
+### 10. Email Verification (Suggested Follow-up)
+- [ ] Add email verification token to database schema
+- [ ] Implement send verification email API
+- [ ] Create email verification page
+- [ ] Require verification before premium access
+- [ ] Add resend verification email functionality
+
+### 11. Password Reset TypeScript Fix
+- [ ] Fix TypeScript error in emailAuth.ts line 169
+- [ ] Test password reset flow end-to-end

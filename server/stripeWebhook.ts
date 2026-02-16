@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { constructStripeEvent, stripe } from "./stripe";
-import { createPurchase, getUserById, updatePurchaseStatus, updateUserStripeCustomerId } from "./db";
+import { createPurchase, getUserById, updatePurchaseStatus, updateUserStripeCustomerId, logActivity } from "./db";
 import { sendPurchaseConfirmationEmail } from "./services/resendEmail";
 
 export async function handleStripeWebhook(req: Request, res: Response) {
@@ -68,6 +68,37 @@ export async function handleStripeWebhook(req: Request, res: Response) {
 
         // Update purchase status to completed
         await updatePurchaseStatus(paymentIntent.id, "completed");
+
+        // Log purchase in activity feed with idempotency
+        try {
+          const userId = paymentIntent.metadata?.user_id;
+          const customerEmail = paymentIntent.receipt_email || (paymentIntent.metadata?.customer_email as string);
+          const customerName = paymentIntent.metadata?.customer_name as string || "Customer";
+          const amount = paymentIntent.amount / 100; // Convert from cents to dollars
+          
+          // Check if this purchase has already been logged (idempotency)
+          // We use the payment intent ID as a unique identifier
+          const activityMetadata = {
+            paymentIntentId: paymentIntent.id,
+            amount,
+            currency: paymentIntent.currency,
+            productType: paymentIntent.metadata?.product_type || "unknown",
+          };
+
+          await logActivity({
+            activityType: "purchase",
+            userId: userId ? parseInt(userId) : undefined,
+            userName: customerName,
+            userEmail: customerEmail || undefined,
+            description: `Purchased Premium Career Transition Package for $${amount.toFixed(2)}`,
+            metadata: JSON.stringify(activityMetadata),
+          });
+
+          console.log("[Stripe Webhook] Purchase logged to activity feed:", paymentIntent.id);
+        } catch (activityError) {
+          console.error("[Stripe Webhook] Failed to log purchase activity:", activityError);
+          // Don't fail the webhook if activity logging fails
+        }
 
         // Send purchase confirmation email
         try {
