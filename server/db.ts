@@ -699,3 +699,59 @@ export async function getRecentActivity(limit: number = 50) {
     .orderBy(desc(activityLogs.createdAt))
     .limit(limit);
 }
+
+
+/**
+ * Set password reset token for a user
+ */
+export async function setPasswordResetToken(userId: number, resetToken: string, resetTokenExpiry: Date) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot set password reset token: database not available");
+    return;
+  }
+
+  await db
+    .update(users)
+    .set({ resetToken, resetTokenExpiry })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Get user by reset token
+ */
+export async function getUserByResetToken(resetToken: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user by reset token: database not available");
+    return undefined;
+  }
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.resetToken, resetToken))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * Reset user password and clear reset token
+ */
+export async function resetUserPassword(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot reset password: database not available");
+    return;
+  }
+
+  await db
+    .update(users)
+    .set({ 
+      passwordHash, 
+      resetToken: null, 
+      resetTokenExpiry: null 
+    })
+    .where(eq(users.id, userId));
+}

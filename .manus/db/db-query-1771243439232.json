@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, userId, amount, status, createdAt FROM purchases ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, userId, amount, status, createdAt FROM purchases ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "10",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2026-02-14 19:00:00"
+    },
+    {
+      "id": "9",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2026-02-13 19:00:00"
+    },
+    {
+      "id": "8",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2026-02-07 19:00:00"
+    },
+    {
+      "id": "7",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2026-01-24 19:00:00"
+    },
+    {
+      "id": "6",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2026-01-09 19:00:00"
+    },
+    {
+      "id": "5",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2025-12-21 19:00:00"
+    },
+    {
+      "id": "4",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2025-12-04 19:00:00"
+    },
+    {
+      "id": "3",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2025-11-17 19:00:00"
+    },
+    {
+      "id": "2",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2025-11-02 19:00:00"
+    },
+    {
+      "id": "1",
+      "userId": "1",
+      "amount": "29",
+      "status": "completed",
+      "createdAt": "2025-10-14 20:00:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tamount\tstatus\tcreatedAt\n10\t1\t29\tcompleted\t2026-02-14 19:00:00\n9\t1\t29\tcompleted\t2026-02-13 19:00:00\n8\t1\t29\tcompleted\t2026-02-07 19:00:00\n7\t1\t29\tcompleted\t2026-01-24 19:00:00\n6\t1\t29\tcompleted\t2026-01-09 19:00:00\n5\t1\t29\tcompleted\t2025-12-21 19:00:00\n4\t1\t29\tcompleted\t2025-12-04 19:00:00\n3\t1\t29\tcompleted\t2025-11-17 19:00:00\n2\t1\t29\tcompleted\t2025-11-02 19:00:00\n1\t1\t29\tcompleted\t2025-10-14 20:00:00\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

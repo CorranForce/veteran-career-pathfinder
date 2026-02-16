@@ -1015,3 +1015,28 @@
 - [x] Configure OAuth client ID and secret
 - [x] Update login/signup pages with Google OAuth button
 - [ ] Test Google OAuth authentication flow
+
+
+## New Tasks
+
+### Google OAuth Configuration
+- [ ] Add redirect URI to Google Cloud Console authorized redirect URIs
+- [ ] Document the redirect URI for production deployment
+
+### Password Reset Feature
+- [ ] Create password reset request endpoint
+- [ ] Create password reset token generation
+- [ ] Create password reset confirmation endpoint
+- [ ] Create forgot password page UI
+- [ ] Create reset password page UI
+- [ ] Send password reset email with link
+
+### Revenue Display Bugs
+- [ ] Fix revenue showing $0.29 instead of full amount
+- [ ] Fix revenue trend showing $NaN
+- [ ] Analyze test data in database
+- [ ] Fix currency formatting issues
+
+### React Errors
+- [ ] Identify React error in PlatformOwnerDashboard
+- [ ] Fix React error in PlatformOwnerDashboard

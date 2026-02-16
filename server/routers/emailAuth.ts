@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { sdk } from "../_core/sdk";
 import { ENV } from "../_core/env";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import crypto from "crypto";
 
 export const emailAuthRouter = router({
   /**
@@ -139,6 +140,65 @@ export const emailAuthRouter = router({
           name: user.name,
           role: user.role,
         },
-      };
+       };
+    }),
+
+  /**
+   * Request password reset email
+   */
+  requestPasswordReset: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input, ctx }) => {
+      const user = await db.getUserByEmail(input.email);
+      if (!user || !user.passwordHash) {
+        // Don't reveal if user exists for security
+        return { success: true };
+      }
+
+      // Generate reset token (32 random bytes)
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
+
+      // Save token to database
+      await db.setPasswordResetToken(user.id, resetToken, resetTokenExpiry);
+
+      // Send reset email
+      const resetUrl = `${ctx.req.headers.origin}/reset-password?token=${resetToken}`;
+      try {
+        const { sendPasswordResetEmail } = await import("../services/email");
+        await sendPasswordResetEmail(user.email, user.name ?? "User", resetUrl);
+      } catch (emailError) {
+        console.error("[EmailAuth] Failed to send password reset email:", emailError);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send reset email" });
+      }
+
+      return { success: true };
+    }),
+
+  /**
+   * Reset password using token
+   */
+  resetPassword: publicProcedure
+    .input(z.object({ token: z.string(), newPassword: z.string().min(8) }))
+    .mutation(async ({ input }) => {
+      // Find user by reset token
+      const user = await db.getUserByResetToken(input.token);
+
+      if (!user || !user.resetTokenExpiry) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid or expired reset token" });
+      }
+
+      // Check if token is expired
+      if (new Date() > user.resetTokenExpiry) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Reset token has expired" });
+      }
+
+      // Hash new password
+      const passwordHash = await bcrypt.hash(input.newPassword, 10);
+
+      // Update password and clear reset token
+      await db.resetUserPassword(user.id, passwordHash);
+
+      return { success: true };
     }),
 });

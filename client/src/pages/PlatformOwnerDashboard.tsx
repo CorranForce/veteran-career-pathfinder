@@ -235,11 +235,11 @@ export default function PlatformOwnerDashboard() {
                               <div
                                 className="bg-primary h-full flex items-center justify-end pr-2"
                                 style={{
-                                  width: `${Math.min((item.revenue / (revenueAnalytics.totalRevenue || 1)) * 100 * 12, 100)}%`,
+                                  width: `${Math.min(((item.revenue || 0) / (revenueAnalytics.totalRevenue || 1)) * 100 * 12, 100)}%`,
                                 }}
                               >
                                 <span className="text-xs text-primary-foreground font-medium">
-                                  ${(item.revenue / 100).toFixed(0)}
+                                  ${((item.revenue || 0) / 100).toFixed(0)}
                                 </span>
                               </div>
                             </div>

@@ -25,6 +25,10 @@ export const users = mysqlTable("users", {
   
   // Stripe customer ID for payment processing
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  
+  // Password reset tokens
+  resetToken: varchar("resetToken", { length: 255 }),
+  resetTokenExpiry: timestamp("resetTokenExpiry"),
 });
 
 export type User = typeof users.$inferSelect;

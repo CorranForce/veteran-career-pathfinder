@@ -21,6 +21,8 @@ import BlogPost from "./pages/BlogPost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import GoogleCallback from "./pages/GoogleCallback";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -30,6 +32,8 @@ function Router() {
       <Route path={"/login"} component={Login} />
       <Route path={"/signup"} component={Signup} />
       <Route path={"/auth/google/callback"} component={GoogleCallback} />
+      <Route path={"/forgot-password"} component={ForgotPassword} />
+      <Route path={"/reset-password"} component={ResetPassword} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/success"} component={Success} />
       <Route path={"/admin"} component={Admin} />

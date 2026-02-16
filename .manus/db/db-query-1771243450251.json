@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE purchases SET amount = amount * 100 WHERE amount < 1000;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute UPDATE purchases SET amount = amount * 100 WHERE amount < 1000;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}
