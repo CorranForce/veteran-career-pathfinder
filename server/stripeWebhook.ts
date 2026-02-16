@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { constructStripeEvent, stripe } from "./stripe";
 import { createPurchase, getUserById, updatePurchaseStatus, updateUserStripeCustomerId } from "./db";
+import { sendPurchaseConfirmationEmail } from "./services/resendEmail";
 
 export async function handleStripeWebhook(req: Request, res: Response) {
   const signature = req.headers["stripe-signature"];
@@ -67,6 +68,25 @@ export async function handleStripeWebhook(req: Request, res: Response) {
 
         // Update purchase status to completed
         await updatePurchaseStatus(paymentIntent.id, "completed");
+
+        // Send purchase confirmation email
+        try {
+          const customerEmail = paymentIntent.receipt_email || (paymentIntent.metadata?.customer_email as string);
+          const customerName = paymentIntent.metadata?.customer_name as string || "Customer";
+          const amount = paymentIntent.amount / 100; // Convert from cents to dollars
+          
+          if (customerEmail) {
+            await sendPurchaseConfirmationEmail(
+              customerEmail,
+              customerName,
+              "Premium Career Transition Package",
+              amount
+            );
+          }
+        } catch (emailError) {
+          console.error("[Stripe Webhook] Failed to send purchase confirmation email:", emailError);
+          // Don't fail the webhook if email fails
+        }
 
         break;
       }
