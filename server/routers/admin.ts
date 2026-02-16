@@ -20,6 +20,8 @@ export const adminRouter = router({
         name: users.name,
         email: users.email,
         role: users.role,
+        status: users.status,
+        loginMethod: users.loginMethod,
         createdAt: users.createdAt,
         lastSignedIn: users.lastSignedIn,
         stripeCustomerId: users.stripeCustomerId,
@@ -58,6 +60,69 @@ export const adminRouter = router({
         .where(eq(users.id, input.userId));
 
       return { success: true };
+    }),
+
+  /**
+   * Suspend user (platform owner only)
+   */
+  suspendUser: platformOwnerProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.userId === ctx.user.id) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot suspend yourself" });
+      }
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      await db.update(users).set({ status: "suspended" }).where(eq(users.id, input.userId));
+      return { success: true };
+    }),
+
+  /**
+   * Reactivate user (platform owner only)
+   */
+  reactivateUser: platformOwnerProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      await db.update(users).set({ status: "active" }).where(eq(users.id, input.userId));
+      return { success: true };
+    }),
+
+  /**
+   * Delete user (soft delete - platform owner only)
+   */
+  deleteUser: platformOwnerProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.userId === ctx.user.id) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "You cannot delete yourself" });
+      }
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      await db.update(users).set({ status: "deleted" }).where(eq(users.id, input.userId));
+      return { success: true };
+    }),
+
+  /**
+   * Get user purchase history (platform owner only)
+   */
+  getUserPurchases: platformOwnerProcedure
+    .input(z.object({ userId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      const userPurchases = await db
+        .select()
+        .from(purchases)
+        .where(eq(purchases.userId, input.userId))
+        .orderBy(desc(purchases.createdAt));
+      
+      return userPurchases;
     }),
 
   /**

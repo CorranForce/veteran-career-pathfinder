@@ -604,7 +604,8 @@ function getPurchaseConfirmationText(
 /**
  * Send password reset email with reset link
  */
-export async function sendPasswordResetEmail(to: string, name: string, resetUrl: string): Promise<boolean> {
+export async function sendPasswordResetEmail(to: string, name: string | null, resetUrl: string): Promise<boolean> {
+  const userName = name || "User";
   if (!ENV.sendgridApiKey) {
     console.warn("[Email Service] Cannot send email: SendGrid not configured");
     return false;
@@ -616,7 +617,7 @@ export async function sendPasswordResetEmail(to: string, name: string, resetUrl:
   }
 
   try {
-    const firstName = name?.split(" ")[0] || "there";
+    const firstName = userName.split(" ")[0] || "there";
 
     const msg = {
       to,

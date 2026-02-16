@@ -166,7 +166,7 @@ export const emailAuthRouter = router({
       const resetUrl = `${ctx.req.headers.origin}/reset-password?token=${resetToken}`;
       try {
         const { sendPasswordResetEmail } = await import("../services/email");
-        await sendPasswordResetEmail(user.email, user.name ?? "User", resetUrl);
+        await sendPasswordResetEmail(user.email!, user.name, resetUrl);
       } catch (emailError) {
         console.error("[EmailAuth] Failed to send password reset email:", emailError);
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send reset email" });

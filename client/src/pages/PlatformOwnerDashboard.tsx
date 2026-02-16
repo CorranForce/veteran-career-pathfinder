@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -20,6 +21,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Users,
   DollarSign,
   FileText,
@@ -29,8 +46,15 @@ import {
   Home,
   BarChart3,
   Settings,
+  Search,
+  MoreVertical,
+  Ban,
+  CheckCircle,
+  Trash2,
+  Eye,
+  UserCog,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
@@ -40,12 +64,26 @@ import { ProductManagement } from "@/components/ProductManagement";
 export default function PlatformOwnerDashboard() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  
+  // User management state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showPurchasesDialog, setShowPurchasesDialog] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
   // Fetch all users
   const { data: users, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(
     undefined,
     { enabled: isAuthenticated && user?.role === "platform_owner" }
+  );
+
+  // Fetch user purchases for selected user
+  const { data: userPurchases, isLoading: purchasesLoading } = trpc.admin.getUserPurchases.useQuery(
+    { userId: selectedUserId! },
+    { enabled: !!selectedUserId && showPurchasesDialog }
   );
 
   // Fetch site analytics
@@ -66,7 +104,7 @@ export default function PlatformOwnerDashboard() {
     { enabled: isAuthenticated && user?.role === "platform_owner" }
   );
 
-  // Change user role mutation
+  // Mutations
   const changeRole = trpc.admin.changeUserRole.useMutation({
     onSuccess: () => {
       toast.success("User role updated successfully");
@@ -76,6 +114,84 @@ export default function PlatformOwnerDashboard() {
       toast.error(error.message || "Failed to update user role");
     },
   });
+
+  const suspendUser = trpc.admin.suspendUser.useMutation({
+    onSuccess: () => {
+      toast.success("User suspended successfully");
+      refetchUsers();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to suspend user");
+    },
+  });
+
+  const reactivateUser = trpc.admin.reactivateUser.useMutation({
+    onSuccess: () => {
+      toast.success("User reactivated successfully");
+      refetchUsers();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to reactivate user");
+    },
+  });
+
+  const deleteUser = trpc.admin.deleteUser.useMutation({
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      setShowDeleteDialog(false);
+      setUserToDelete(null);
+      refetchUsers();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete user");
+    },
+  });
+
+  // Handler functions
+  const handleRoleChange = (userId: number, newRole: string) => {
+    changeRole.mutate({ userId, role: newRole as "user" | "admin" | "platform_owner" });
+  };
+
+  const handleSuspend = (userId: number) => {
+    suspendUser.mutate({ userId });
+  };
+
+  const handleReactivate = (userId: number) => {
+    reactivateUser.mutate({ userId });
+  };
+
+  const handleDeleteClick = (userId: number) => {
+    setUserToDelete(userId);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (userToDelete) {
+      deleteUser.mutate({ userId: userToDelete });
+    }
+  };
+
+  const handleViewPurchases = (userId: number) => {
+    setSelectedUserId(userId);
+    setShowPurchasesDialog(true);
+  };
+
+  // Filter users based on search and filters
+  const filteredUsers = useMemo(() => {
+    if (!users) return [];
+    
+    return users.filter((u: any) => {
+      const matchesSearch = 
+        searchQuery === "" ||
+        u.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesRole = roleFilter === "all" || u.role === roleFilter;
+      const matchesStatus = statusFilter === "all" || u.status === statusFilter;
+      
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchQuery, roleFilter, statusFilter]);
 
   // Loading state
   if (authLoading) {
@@ -103,10 +219,6 @@ export default function PlatformOwnerDashboard() {
       </div>
     );
   }
-
-  const handleRoleChange = (userId: number, newRole: string) => {
-    changeRole.mutate({ userId, role: newRole as "user" | "admin" | "platform_owner" });
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -152,252 +264,221 @@ export default function PlatformOwnerDashboard() {
               title: 'Resumes Analyzed',
               icon: FileText,
               value: analytics?.totalResumes || 0,
-              subtitle: `+${analytics?.totalResumes || 0} total`
+              subtitle: `+${analytics?.resumesThisMonth || 0} total`
             },
             {
               key: 'avg-ats-score',
               title: 'Avg ATS Score',
               icon: TrendingUp,
-              value: typeof analytics?.averageAtsScore === 'number' ? analytics.averageAtsScore.toFixed(1) : "—",
+              value: analytics?.averageAtsScore ? Math.round(analytics.averageAtsScore) : '—',
               subtitle: 'Platform average'
             }
-          ].map(card => {
-            const Icon = card.icon;
-            return (
-              <Card key={card.key}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  {analyticsLoading ? (
-                    <Loader2 className="h-6 w-6 animate-spin" />
-                  ) : (
-                    <>
-                      <div className="text-2xl font-bold">{card.value}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {card.subtitle}
-                      </p>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+          ].map((card) => (
+            <Card key={card.key}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
+                <card.icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{card.value}</div>
+                <p className="text-xs text-muted-foreground">{card.subtitle}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Product Management */}
-        <div className="mb-8">
-          <ProductManagement />
-        </div>
+        <ProductManagement />
 
         {/* Activity Feed */}
-        <ActivityFeed />
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Live platform activity feed</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ActivityFeed />
+          </CardContent>
+        </Card>
 
-        {/* Revenue Analytics Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Revenue Overview */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Revenue Overview</CardTitle>
-              <CardDescription>Detailed revenue metrics and trends</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {revenueLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        {/* Revenue Overview */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Revenue Overview</CardTitle>
+            <CardDescription>Detailed revenue metrics and trends</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+              {[
+                {
+                  key: 'total-rev',
+                  title: 'Total Revenue',
+                  value: `$${((revenueAnalytics?.totalRevenue || 0) / 100).toFixed(2)}`
+                },
+                {
+                  key: 'monthly-rev',
+                  title: 'This Month',
+                  value: `$${((revenueAnalytics?.monthlyRevenue || 0) / 100).toFixed(2)}`
+                },
+                {
+                  key: 'total-purchases',
+                  title: 'Total Purchases',
+                  value: revenueAnalytics?.totalPurchases || 0
+                },
+                {
+                  key: 'avg-order',
+                  title: 'Avg Order Value',
+                  value: `$${((revenueAnalytics?.avgOrderValue || 0) / 100).toFixed(2)}`
+                }
+              ].map((metric) => (
+                <div key={metric.key} className="space-y-2">
+                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                  <p className="text-2xl font-bold">{metric.value}</p>
                 </div>
-              ) : (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { key: 'total-revenue', label: 'Total Revenue', value: `$${((revenueAnalytics?.totalRevenue || 0) / 100).toFixed(2)}` },
-                      { key: 'monthly-revenue', label: 'This Month', value: `$${((revenueAnalytics?.monthlyRevenue || 0) / 100).toFixed(2)}` },
-                      { key: 'total-purchases', label: 'Total Purchases', value: `${revenueAnalytics?.totalPurchases || 0}` },
-                      { key: 'avg-order', label: 'Avg Order Value', value: `$${((revenueAnalytics?.avgOrderValue || 0) / 100).toFixed(2)}` }
-                    ].map(metric => (
-                      <div key={metric.key}>
-                        <p className="text-sm text-muted-foreground">{metric.label}</p>
-                        <p className="text-2xl font-bold">{metric.value}</p>
-                      </div>
-                    ))}
-                  </div>
+              ))}
+            </div>
 
-                  {/* Revenue by Month Chart */}
-                  {revenueAnalytics?.revenueByMonth && revenueAnalytics.revenueByMonth.length > 0 && (
-                    <div className="mt-6">
-                      <p className="text-sm font-medium mb-4">Revenue Trend (Last 12 Months)</p>
-                      <div className="space-y-2">
-                        {revenueAnalytics.revenueByMonth.map((item: any) => (
-                          <div key={item.month} className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground w-20">{item.month}</span>
-                            <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
-                              <div
-                                className="bg-primary h-full flex items-center justify-end pr-2"
-                                style={{
-                                  width: `${Math.min(((item.revenue || 0) / (revenueAnalytics.totalRevenue || 1)) * 100 * 12, 100)}%`,
-                                }}
-                              >
-                                <span className="text-xs text-primary-foreground font-medium">
-                                  ${((item.revenue || 0) / 100).toFixed(0)}
-                                </span>
-                              </div>
-                            </div>
-                            <span className="text-xs text-muted-foreground w-12 text-right">
-                              {item.count} sales
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            {/* Revenue Chart Placeholder */}
+            <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+              <div className="text-center text-muted-foreground">
+                <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Revenue Trend (Last 12 Months)</p>
+                <p className="text-xs">Chart visualization coming soon</p>
+              </div>
+            </div>
 
-          {/* Recent Purchases */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Purchases</CardTitle>
-              <CardDescription>Latest completed transactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {revenueLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                </div>
-              ) : revenueAnalytics?.recentPurchases && revenueAnalytics.recentPurchases.length > 0 ? (
-                <div className="space-y-4">
-                  {revenueAnalytics.recentPurchases.map((purchase: any) => (
-                    <div key={purchase.id} className="flex items-center justify-between pb-3 border-b last:border-0">
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {purchase.productType === "premium_prompt" ? "Premium Package" : "Pro Subscription"}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(purchase.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-bold">${(purchase.amount / 100).toFixed(2)}</p>
-                        <Badge variant="outline" className="text-xs">
-                          {purchase.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">No purchases yet</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+            {/* Recent Purchases Table */}
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-4">Recent Purchases</h3>
+              <p className="text-sm text-muted-foreground mb-4">Latest completed transactions</p>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {revenueAnalytics?.recentPurchases && revenueAnalytics.recentPurchases.length > 0 ? (
+                      revenueAnalytics.recentPurchases.map((purchase: any) => (
+                        <TableRow key={purchase.id}>
+                          <TableCell className="font-medium">
+                            {purchase.productType === "premium_prompt" ? "Premium Package" : "Pro Subscription"}
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(purchase.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                          </TableCell>
+                          <TableCell>${(purchase.amount / 100).toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Badge variant={purchase.status === "completed" ? "default" : "secondary"}>
+                              {purchase.status}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                          No purchases yet
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Customer Lifetime Value Tracker */}
+        {/* LTV Analytics */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Customer Lifetime Value (LTV) Tracker</CardTitle>
             <CardDescription>Analyze customer value and identify top spenders</CardDescription>
           </CardHeader>
           <CardContent>
-            {ltvLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : (
-              <div className="space-y-8">
-                {/* LTV Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    {
-                      key: 'avg-revenue',
-                      title: 'Avg Revenue Per User',
-                      value: `$${((ltvAnalytics?.avgRevenuePerUser || 0) / 100).toFixed(2)}`,
-                      subtitle: `From ${ltvAnalytics?.totalPayingCustomers || 0} paying customers`
-                    },
-                    {
-                      key: 'repeat-rate',
-                      title: 'Repeat Purchase Rate',
-                      value: `${(ltvAnalytics?.repeatPurchaseRate || 0).toFixed(1)}%`,
-                      subtitle: 'Customers who bought 2+ times'
-                    },
-                    {
-                      key: 'total-customers',
-                      title: 'Total Paying Customers',
-                      value: ltvAnalytics?.totalPayingCustomers || 0,
-                      subtitle: 'Lifetime value customers'
-                    }
-                  ].map(metric => (
-                    <Card key={metric.key}>
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground">{metric.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">
-                          {metric.value}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {metric.subtitle}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              {[
+                {
+                  key: 'avg-revenue-per-user',
+                  title: 'Avg Revenue Per User',
+                  value: `$${((ltvAnalytics?.avgRevenuePerUser || 0) / 100).toFixed(2)}`,
+                  subtitle: `From ${ltvAnalytics?.totalPayingCustomers || 0} paying customers`
+                },
+                {
+                  key: 'repeat-purchase-rate',
+                  title: 'Repeat Purchase Rate',
+                  value: `${((ltvAnalytics?.repeatPurchaseRate || 0) * 100).toFixed(1)}%`,
+                  subtitle: 'Customers who bought 2+ times'
+                },
+                {
+                  key: 'total-paying-customers',
+                  title: 'Total Paying Customers',
+                  value: ltvAnalytics?.totalPayingCustomers || 0,
+                  subtitle: 'Lifetime value customers'
+                }
+              ].map((metric) => (
+                <div key={metric.key} className="space-y-2">
+                  <p className="text-sm text-muted-foreground">{metric.title}</p>
+                  <p className="text-2xl font-bold">{metric.value}</p>
+                  <p className="text-xs text-muted-foreground">{metric.subtitle}</p>
                 </div>
+              ))}
+            </div>
 
-                {/* Top Customers Table */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">Top 10 Customers by Total Spend</h3>
-                  {ltvAnalytics?.topCustomers && ltvAnalytics.topCustomers.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Rank</TableHead>
-                            <TableHead>Customer</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead className="text-right">Total Spent</TableHead>
-                            <TableHead className="text-right">Purchases</TableHead>
-                            <TableHead>First Purchase</TableHead>
-                            <TableHead>Last Purchase</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {ltvAnalytics.topCustomers.map((customer: any, index: number) => (
-                            <TableRow key={customer.userId}>
-                              <TableCell>
-                                <Badge variant={index === 0 ? "default" : "outline"}>
-                                  #{index + 1}
-                                </Badge>
-                              </TableCell>
-                              <TableCell className="font-medium">{customer.name}</TableCell>
-                              <TableCell>{customer.email}</TableCell>
-                              <TableCell className="text-right font-bold">
-                                ${(customer.totalSpent / 100).toFixed(2)}
-                              </TableCell>
-                              <TableCell className="text-right">{customer.purchaseCount}</TableCell>
-                              <TableCell>
-                                {format(new Date(customer.firstPurchase), "MMM d, yyyy")}
-                              </TableCell>
-                              <TableCell>
-                                {format(new Date(customer.lastPurchase), "MMM d, yyyy")}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground text-center py-8">No customer data available yet</p>
-                  )}
-                </div>
+            {/* Top Customers Table */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Top 10 Customers by Total Spend</h3>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Rank</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Total Spent</TableHead>
+                      <TableHead>Purchases</TableHead>
+                      <TableHead>First Purchase</TableHead>
+                      <TableHead>Last Purchase</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ltvAnalytics?.topCustomers && ltvAnalytics.topCustomers.length > 0 ? (
+                      ltvAnalytics.topCustomers.map((customer: any, index: number) => (
+                        <TableRow key={customer.userId}>
+                          <TableCell className="font-medium">#{index + 1}</TableCell>
+                          <TableCell>{customer.name}</TableCell>
+                          <TableCell>{customer.email}</TableCell>
+                          <TableCell className="font-semibold">
+                            ${(customer.totalSpent / 100).toFixed(2)}
+                          </TableCell>
+                          <TableCell>{customer.purchaseCount}</TableCell>
+                          <TableCell>
+                            {format(new Date(customer.firstPurchase), "MMM d, yyyy")}
+                          </TableCell>
+                          <TableCell>
+                            {format(new Date(customer.lastPurchase), "MMM d, yyyy")}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          No customer data available
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
 
-        {/* User Management Table */}
+        {/* User Management */}
         <Card>
           <CardHeader>
             <CardTitle>User Management</CardTitle>
@@ -406,6 +487,60 @@ export default function PlatformOwnerDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Search and Filters */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="platform_owner">Platform Owner</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                  <SelectItem value="deleted">Deleted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* User Statistics */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              <div className="bg-muted/30 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground">Total Users</p>
+                <p className="text-2xl font-bold">{users?.length || 0}</p>
+              </div>
+              <div className="bg-muted/30 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground">Active Users</p>
+                <p className="text-2xl font-bold">
+                  {users?.filter((u: any) => u.status === "active").length || 0}
+                </p>
+              </div>
+              <div className="bg-muted/30 rounded-lg p-4">
+                <p className="text-sm text-muted-foreground">Filtered Results</p>
+                <p className="text-2xl font-bold">{filteredUsers.length}</p>
+              </div>
+            </div>
+
+            {/* Users Table */}
             {usersLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -418,14 +553,16 @@ export default function PlatformOwnerDashboard() {
                       <TableHead>Name</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Role</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Login Method</TableHead>
                       <TableHead>Joined</TableHead>
                       <TableHead>Last Sign In</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users && users.length > 0 ? (
-                      users.map((u: any) => (
+                    {filteredUsers && filteredUsers.length > 0 ? (
+                      filteredUsers.map((u: any) => (
                         <TableRow key={u.id}>
                           <TableCell className="font-medium">{u.name || "—"}</TableCell>
                           <TableCell>{u.email || "—"}</TableCell>
@@ -443,32 +580,86 @@ export default function PlatformOwnerDashboard() {
                             </Badge>
                           </TableCell>
                           <TableCell>
+                            <Badge
+                              variant={
+                                u.status === "active"
+                                  ? "default"
+                                  : u.status === "suspended"
+                                  ? "destructive"
+                                  : "outline"
+                              }
+                            >
+                              {u.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="capitalize">{u.loginMethod || "—"}</TableCell>
+                          <TableCell>
                             {format(new Date(u.createdAt), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell>
                             {format(new Date(u.lastSignedIn), "MMM d, yyyy")}
                           </TableCell>
                           <TableCell>
-                            <Select
-                              value={u.role}
-                              onValueChange={(value) => handleRoleChange(u.id, value)}
-                              disabled={u.id === user.id} // Can't change own role
-                            >
-                              <SelectTrigger className="w-[140px]">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="user">User</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
-                                <SelectItem value="platform_owner">Platform Owner</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <div className="flex items-center gap-2">
+                              {/* Role Selector */}
+                              <Select
+                                value={u.role}
+                                onValueChange={(value) => handleRoleChange(u.id, value)}
+                                disabled={u.id === user.id}
+                              >
+                                <SelectTrigger className="w-[140px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user">User</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="platform_owner">Platform Owner</SelectItem>
+                                </SelectContent>
+                              </Select>
+
+                              {/* Actions Menu */}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" disabled={u.id === user.id}>
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem onClick={() => handleViewPurchases(u.id)}>
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    View Purchases
+                                  </DropdownMenuItem>
+                                  {u.status === "active" && (
+                                    <DropdownMenuItem onClick={() => handleSuspend(u.id)}>
+                                      <Ban className="h-4 w-4 mr-2" />
+                                      Suspend User
+                                    </DropdownMenuItem>
+                                  )}
+                                  {u.status === "suspended" && (
+                                    <DropdownMenuItem onClick={() => handleReactivate(u.id)}>
+                                      <CheckCircle className="h-4 w-4 mr-2" />
+                                      Reactivate User
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteClick(u.id)}
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete User
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                           No users found
                         </TableCell>
                       </TableRow>
@@ -480,6 +671,84 @@ export default function PlatformOwnerDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm User Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this user? This action will mark the user as deleted
+              and they will no longer be able to access the platform.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleteUser.isPending}
+            >
+              {deleteUser.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Delete User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* User Purchases Dialog */}
+      <Dialog open={showPurchasesDialog} onOpenChange={setShowPurchasesDialog}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>User Purchase History</DialogTitle>
+            <DialogDescription>
+              View all purchases made by this user
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[400px] overflow-y-auto">
+            {purchasesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : userPurchases && userPurchases.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {userPurchases.map((purchase: any) => (
+                    <TableRow key={purchase.id}>
+                      <TableCell className="font-medium">
+                        {purchase.productType === "premium_prompt" ? "Premium Package" : "Pro Subscription"}
+                      </TableCell>
+                      <TableCell>${(purchase.amount / 100).toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant={purchase.status === "completed" ? "default" : "secondary"}>
+                          {purchase.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(purchase.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="text-center text-muted-foreground py-12">
+                No purchases found for this user
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
