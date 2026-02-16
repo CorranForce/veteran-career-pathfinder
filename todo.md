@@ -950,3 +950,9 @@
 - [ ] Optimize images (WebP format, lazy loading)
 - [ ] Add performance monitoring
 - [ ] Implement caching strategy for better performance
+
+
+### Stripe Coupon Integration
+- [x] Create 20% discount coupon in Stripe for exit-intent offer (Code: 5zlB9zup)
+- [x] Update checkout flow to apply coupon code automatically
+- [ ] Test coupon application in checkout

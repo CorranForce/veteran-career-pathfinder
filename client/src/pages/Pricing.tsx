@@ -16,6 +16,10 @@ import { SimpleContactButton } from "@/components/LiveChatWidget";
 export default function Pricing() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   
+  // Check if user came from exit-intent popup (offer=exit20 in URL)
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasExitOffer = urlParams.get('offer') === 'exit20';
+  
   const createCheckoutMutation = trpc.payment.createCheckoutSession.useMutation({
     onSuccess: (data) => {
       if (data.url) {
@@ -35,7 +39,9 @@ export default function Pricing() {
       return;
     }
 
-    createCheckoutMutation.mutate({ productKey });
+    // Apply exit-intent coupon if user came from popup
+    const couponCode = hasExitOffer ? '5zlB9zup' : undefined;
+    createCheckoutMutation.mutate({ productKey, couponCode });
   };
 
   return (

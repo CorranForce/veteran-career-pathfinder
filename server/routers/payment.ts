@@ -13,6 +13,7 @@ export const paymentRouter = router({
     .input(
       z.object({
         productKey: z.enum(["PREMIUM_PROMPT"]),
+        couponCode: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -37,8 +38,8 @@ export const paymentRouter = router({
       // Determine product type for metadata
       const productType = "premium_prompt";
 
-      // Create checkout session
-      const session = await stripe.checkout.sessions.create({
+      // Create checkout session with optional coupon
+      const sessionConfig: any = {
         customer: customerId,
         client_reference_id: ctx.user.id.toString(),
         metadata: {
@@ -64,7 +65,14 @@ export const paymentRouter = router({
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/pricing`,
         allow_promotion_codes: true,
-      });
+      };
+
+      // Apply coupon if provided
+      if (input.couponCode) {
+        sessionConfig.discounts = [{ coupon: input.couponCode }];
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionConfig);
 
       return {
         sessionId: session.id,
