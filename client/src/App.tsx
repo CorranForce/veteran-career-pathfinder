@@ -16,6 +16,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ResumeTemplates from "./pages/ResumeTemplates";
 import AdminTemplates from "./pages/AdminTemplates";
 import PlatformOwnerDashboard from "./pages/PlatformOwnerDashboard";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -33,6 +35,8 @@ function Router() {
       <Route path={"/admin/analytics"} component={AdminDashboard} />
       <Route path={"/admin/templates"} component={AdminTemplates} />
       <Route path={"/templates"} component={ResumeTemplates} />
+      <Route path={"/blog"} component={Blog} />
+      <Route path={"/blog/:slug"} component={BlogPost} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

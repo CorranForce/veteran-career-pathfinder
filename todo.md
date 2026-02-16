@@ -845,3 +845,17 @@
 - [x] Provide instructions for Google Search Console submission
 - [x] Test sitemap accessibility at /sitemap.xml
 - [x] Create comprehensive setup guide (GOOGLE_SEARCH_CONSOLE_SETUP.md)
+
+
+## Schema.org Structured Data & Blog Section (COMPLETED)
+- [x] Add Organization schema to homepage
+- [x] Add Product schema for Premium Package
+- [x] Add AggregateRating schema with testimonials data
+- [x] Create blog page component (/blog)
+- [x] Create blog post component (/blog/:slug)
+- [x] Write "Top 10 Civilian Jobs for Infantry Veterans" article (2,500+ words)
+- [x] Write "How to Translate Your MOS to Resume Language" article (2,800+ words)
+- [x] Write "Veteran Career Transition: Complete Guide" article (3,500+ words)
+- [x] Add blog routes to App.tsx
+- [x] Update sitemap.xml with blog URLs (4 new URLs)
+- [ ] Test Schema.org markup with Google Rich Results Test (requires deployment)
