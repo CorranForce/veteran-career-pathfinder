@@ -204,28 +204,17 @@ export default function PlatformOwnerDashboard() {
               ) : (
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Revenue</p>
-                      <p className="text-2xl font-bold">
-                        ${((revenueAnalytics?.totalRevenue || 0) / 100).toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">This Month</p>
-                      <p className="text-2xl font-bold">
-                        ${((revenueAnalytics?.monthlyRevenue || 0) / 100).toFixed(2)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Total Purchases</p>
-                      <p className="text-2xl font-bold">{revenueAnalytics?.totalPurchases || 0}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Avg Order Value</p>
-                      <p className="text-2xl font-bold">
-                        ${((revenueAnalytics?.avgOrderValue || 0) / 100).toFixed(2)}
-                      </p>
-                    </div>
+                    {[
+                      { key: 'total-revenue', label: 'Total Revenue', value: `$${((revenueAnalytics?.totalRevenue || 0) / 100).toFixed(2)}` },
+                      { key: 'monthly-revenue', label: 'This Month', value: `$${((revenueAnalytics?.monthlyRevenue || 0) / 100).toFixed(2)}` },
+                      { key: 'total-purchases', label: 'Total Purchases', value: `${revenueAnalytics?.totalPurchases || 0}` },
+                      { key: 'avg-order', label: 'Avg Order Value', value: `$${((revenueAnalytics?.avgOrderValue || 0) / 100).toFixed(2)}` }
+                    ].map(metric => (
+                      <div key={metric.key}>
+                        <p className="text-sm text-muted-foreground">{metric.label}</p>
+                        <p className="text-2xl font-bold">{metric.value}</p>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Revenue by Month Chart */}
