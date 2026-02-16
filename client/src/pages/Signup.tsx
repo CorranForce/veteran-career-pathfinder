@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, Mail } from "lucide-react";
-import { getLoginUrl } from "@/const";
+
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -32,8 +32,12 @@ export default function Signup() {
     signupMutation.mutate({ name, email, password });
   };
 
+  const getAuthUrl = trpc.googleAuth.getAuthUrl.useQuery();
+
   const handleGoogleSignup = () => {
-    window.location.href = getLoginUrl();
+    if (getAuthUrl.data?.authUrl) {
+      window.location.href = getAuthUrl.data.authUrl;
+    }
   };
 
   return (

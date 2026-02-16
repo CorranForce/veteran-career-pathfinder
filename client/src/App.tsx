@@ -20,6 +20,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import GoogleCallback from "./pages/GoogleCallback";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
       <Route path={"/signup"} component={Signup} />
+      <Route path={"/auth/google/callback"} component={GoogleCallback} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/success"} component={Success} />
       <Route path={"/admin"} component={Admin} />

@@ -133,6 +133,25 @@ export async function createEmailUser(data: { email: string; passwordHash: strin
   return result[0].insertId;
 }
 
+export async function createGoogleUser(data: { email: string; name: string; googleId: string; profilePicture?: string }) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create user: database not available");
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(users).values({
+    email: data.email,
+    name: data.name,
+    openId: data.googleId,
+    loginMethod: "google",
+    role: "user",
+    lastSignedIn: new Date(),
+  });
+
+  return result[0].insertId;
+}
+
 export async function updateUserLastSignIn(userId: number) {
   const db = await getDb();
   if (!db) {
