@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -167,12 +167,12 @@ export function ProductManagement() {
               {product.productId}
             </p>
             {product.priceId && product.priceId !== "price_premium_prompt" && (
-              <>
+              <Fragment key="stripe-price-id">
                 <p className="text-sm font-medium mt-2">Stripe Price ID:</p>
                 <p className="text-sm text-muted-foreground font-mono">
                   {product.priceId}
                 </p>
-              </>
+              </Fragment>
             )}
           </div>
         )}
