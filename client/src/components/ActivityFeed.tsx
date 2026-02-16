@@ -74,10 +74,10 @@ export default function ActivityFeed() {
                   <p className="text-sm font-medium">{activity.description}</p>
                   <div className="flex items-center gap-2 mt-1">
                     {activity.userName && (
-                      <span className="text-xs text-muted-foreground">{activity.userName}</span>
+                      <span key="user-name" className="text-xs text-muted-foreground">{activity.userName}</span>
                     )}
                     {activity.userEmail && (
-                      <span className="text-xs text-muted-foreground">({activity.userEmail})</span>
+                      <span key="user-email" className="text-xs text-muted-foreground">({activity.userEmail})</span>
                     )}
                   </div>
                 </div>

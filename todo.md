@@ -976,3 +976,5 @@
 - [x] Rename /dashboard route to /tools
 - [x] Update all navigation links from /dashboard to /tools
 - [x] Update redirect URLs from /dashboard to /tools
+
+- [x] Investigate and fix persistent React key warning in PlatformOwnerDashboard (fixed conditional spans in ActivityFeed)
