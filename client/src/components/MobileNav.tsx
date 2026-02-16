@@ -59,7 +59,7 @@ export default function MobileNav({ onScrollToPrompt }: MobileNavProps) {
                 className="justify-start text-lg mt-4"
                 asChild
               >
-                <a href="/dashboard" onClick={() => setOpen(false)}>Dashboard</a>
+                <a href="/tools" onClick={() => setOpen(false)}>Dashboard</a>
               </Button>
             ) : (
               <>

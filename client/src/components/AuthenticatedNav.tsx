@@ -44,7 +44,7 @@ export function AuthenticatedNav() {
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/tools", label: "Tools", icon: LayoutDashboard },
     { href: "/templates", label: "Templates", icon: FileText },
     { href: "/downloads", label: "Downloads", icon: Download },
   ];
@@ -139,7 +139,7 @@ export function AuthenticatedNav() {
                 <DropdownMenuSeparator />
               </div>
 
-              <Link href="/dashboard">
+              <Link href="/tools">
                 <DropdownMenuItem className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Profile Settings

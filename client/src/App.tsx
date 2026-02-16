@@ -30,7 +30,7 @@ function Router() {
       <Route path={"/marketing"} component={Marketing} />
       <Route path={"/downloads"} component={Downloads} />
       <Route path={"/profile/edit"} component={ProfileEdit} />
-      <Route path={"/dashboard"} component={Dashboard} />
+      <Route path={"/tools"} component={Dashboard} />
       <Route path={"/admin/dashboard"} component={PlatformOwnerDashboard} />
       <Route path={"/admin/analytics"} component={AdminDashboard} />
       <Route path={"/admin/templates"} component={AdminTemplates} />

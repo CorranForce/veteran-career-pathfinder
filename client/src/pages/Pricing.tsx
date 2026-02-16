@@ -65,7 +65,7 @@ export default function Pricing() {
             </Button>
             {isAuthenticated ? (
               <Button variant="outline" asChild>
-                <a href="/dashboard">Dashboard</a>
+                <a href="/tools">Dashboard</a>
               </Button>
             ) : (
               <Button variant="outline" asChild>
@@ -90,7 +90,7 @@ export default function Pricing() {
                 </Button>
                 {isAuthenticated ? (
                   <Button variant="outline" className="justify-start" asChild>
-                    <a href="/dashboard">Dashboard</a>
+                    <a href="/tools">Dashboard</a>
                   </Button>
                 ) : (
                   <Button variant="outline" className="justify-start" asChild>

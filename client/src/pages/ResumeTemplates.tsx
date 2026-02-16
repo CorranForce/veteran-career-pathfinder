@@ -52,7 +52,7 @@ export default function ResumeTemplates() {
                 <a href="/pricing">Pricing</a>
               </Button>
               <Button asChild>
-                <a href="/dashboard">Dashboard</a>
+                <a href="/tools">Dashboard</a>
               </Button>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function ResumeTemplates() {
             Upload your resume to our AI-powered analyzer for personalized ATS recommendations and career transition guidance
           </p>
           <Button size="lg" variant="secondary" asChild>
-            <a href="/dashboard">Get AI Resume Analysis</a>
+            <a href="/tools">Get AI Resume Analysis</a>
           </Button>
         </div>
       </section>

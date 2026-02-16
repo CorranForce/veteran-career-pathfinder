@@ -96,7 +96,7 @@ export default function PlatformOwnerDashboard() {
           <p className="text-muted-foreground mb-4">
             You don't have permission to access this page
           </p>
-          <Button onClick={() => setLocation("/dashboard")}>
+          <Button onClick={() => setLocation("/tools")}>
             Go to Dashboard
           </Button>
         </div>

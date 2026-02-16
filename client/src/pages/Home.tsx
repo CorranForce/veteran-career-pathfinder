@@ -54,7 +54,7 @@ export default function Home() {
             {isAuthenticated ? (
               <>
                 <Button asChild>
-                  <a href="/dashboard">Dashboard</a>
+                  <a href="/tools">Dashboard</a>
                 </Button>
                 {user?.role === "platform_owner" && (
                   <Button variant="outline" asChild>

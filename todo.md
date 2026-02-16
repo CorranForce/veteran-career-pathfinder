@@ -970,3 +970,9 @@
 
 ### Bug Fixes
 - [x] Fix React key prop warning in PlatformOwnerDashboard (fixed Fragment key in ProductManagement component)
+
+
+### Route Renaming
+- [x] Rename /dashboard route to /tools
+- [x] Update all navigation links from /dashboard to /tools
+- [x] Update redirect URLs from /dashboard to /tools
