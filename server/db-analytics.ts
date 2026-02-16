@@ -93,19 +93,22 @@ export async function getRevenueByMonth() {
     return [];
   }
 
-  const result = await db
-    .select({
-      month: sql<string>`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`.as('month'),
-      revenue: sql<number>`SUM(${purchases.amount})`.as('revenue'),
-      count: sql<number>`COUNT(*)`.as('count'),
-    })
-    .from(purchases)
-    .where(eq(purchases.status, "completed"))
-    .groupBy(sql`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`)
-    .orderBy(desc(sql`DATE_FORMAT(${purchases.createdAt}, '%Y-%m')`))
-    .limit(12);
+  // Use raw SQL to avoid Drizzle ORM issues with DATE_FORMAT in GROUP BY
+  const result = await db.execute(sql`
+    SELECT 
+      DATE_FORMAT(createdAt, '%Y-%m') as month,
+      SUM(amount) as revenue,
+      COUNT(*) as count
+    FROM purchases
+    WHERE status = 'completed'
+    GROUP BY DATE_FORMAT(createdAt, '%Y-%m')
+    ORDER BY DATE_FORMAT(createdAt, '%Y-%m') DESC
+    LIMIT 12
+  `);
 
-  return result.reverse(); // Show oldest to newest
+  // Convert result to expected format
+  const rows = Array.isArray(result) ? result : (result as any).rows || [];
+  return rows.reverse(); // Show oldest to newest
 }
 
 /**
