@@ -980,3 +980,28 @@
 - [x] Investigate and fix persistent React key warning in PlatformOwnerDashboard (fixed conditional spans in ActivityFeed)
 
 - [x] Implement auto-refresh for Activity Feed (30-second polling)
+
+
+### Authentication Enhancements
+- [ ] Implement email/password authentication (alongside Google OAuth)
+- [ ] Create signup page with email/password form
+- [ ] Create login page with email/password form
+- [ ] Add password hashing and validation
+- [ ] Add "Sign Up Free" banner above pricing tiers
+- [ ] Add social proof counter showing "2,847+ veterans already signed up"
+- [ ] Create welcome email template with next steps
+- [ ] Implement automated welcome email on signup
+- [ ] Test email/password signup flow
+- [ ] Test Google OAuth flow
+- [ ] Test welcome email delivery
+
+
+## Authentication Enhancements
+
+- [x] Implement email/password authentication alongside Google OAuth
+- [x] Create /login and /signup pages with both auth options
+- [x] Add "Sign Up Free" banner above pricing tiers
+- [x] Add social proof ("2,847+ veterans signed up") to signup page
+- [x] Create welcome email template with next steps
+- [x] Send automated welcome email after signup
+- [x] Update navigation to show Login/Signup buttons

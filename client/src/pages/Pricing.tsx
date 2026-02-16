@@ -68,9 +68,14 @@ export default function Pricing() {
                 <a href="/tools">Dashboard</a>
               </Button>
             ) : (
-              <Button variant="outline" asChild>
-                <a href={getLoginUrl()}>Login</a>
-              </Button>
+              <>
+                <Button variant="ghost" asChild>
+                  <a href="/login">Login</a>
+                </Button>
+                <Button asChild>
+                  <a href="/signup">Sign Up</a>
+                </Button>
+              </>
             )}
           </div>
           {/* Mobile Navigation */}
@@ -93,9 +98,14 @@ export default function Pricing() {
                     <a href="/tools">Dashboard</a>
                   </Button>
                 ) : (
-                  <Button variant="outline" className="justify-start" asChild>
-                    <a href={getLoginUrl()}>Login</a>
-                  </Button>
+                  <>
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <a href="/login">Login</a>
+                    </Button>
+                    <Button className="justify-start" asChild>
+                      <a href="/signup">Sign Up</a>
+                    </Button>
+                  </>
                 )}
               </div>
             </SheetContent>
@@ -120,6 +130,28 @@ export default function Pricing() {
       {/* Pricing Tiers */}
       <section className="py-12 md:py-20">
         <div className="container mx-auto px-4">
+          {/* Sign Up Free Banner */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <Card className="bg-gradient-to-r from-accent/20 to-primary/20 border-2 border-accent">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="bg-accent text-accent-foreground rounded-full p-3">
+                      <Users className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">Sign Up Free • No Credit Card Required</h3>
+                      <p className="text-sm text-muted-foreground">Join 2,847+ veterans who've started their transition • Takes only 30 seconds</p>
+                    </div>
+                  </div>
+                  <Button size="lg" asChild className="shrink-0">
+                    <a href="/signup">Create Free Account</a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
             {/* Free Tier */}
             <Card className="border-2 relative">

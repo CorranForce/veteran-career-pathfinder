@@ -13,6 +13,11 @@ export interface SendWelcomeEmailParams {
   name?: string;
 }
 
+export interface SendSignupWelcomeEmailParams {
+  to: string;
+  name: string;
+}
+
 /**
  * Send welcome email with Career Transition Checklist to new subscriber
  */
@@ -235,6 +240,142 @@ The Pathfinder Team
 ---
 You're receiving this email because you subscribed to Pathfinder career transition resources.
 Questions? Reply to this email - we're here to help.
+  `.trim();
+}
+
+/**
+ * Send welcome email to new signup users (email/password registration)
+ */
+export async function sendSignupWelcomeEmail({ to, name }: SendSignupWelcomeEmailParams): Promise<boolean> {
+  if (!ENV.sendgridApiKey) {
+    console.warn("[Email Service] Cannot send email: SendGrid not configured");
+    return false;
+  }
+
+  if (!ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send email: FROM email not configured");
+    return false;
+  }
+
+  try {
+    const msg = {
+      to,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject: "Welcome to Pathfinder - Your Career Transition Starts Now",
+      html: getSignupWelcomeEmailTemplate(name),
+      text: getSignupWelcomeEmailText(name),
+      trackingSettings: {
+        clickTracking: {
+          enable: true,
+          enableText: true,
+        },
+        openTracking: {
+          enable: true,
+        },
+      },
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Signup welcome email sent successfully to ${to}`);
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to send signup welcome email:", error.response?.body || error.message);
+    return false;
+  }
+}
+
+function getSignupWelcomeEmailTemplate(name: string): string {
+  const baseUrl = process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space";
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+    <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Pathfinder!</h1>
+  </div>
+  
+  <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+    <p style="font-size: 18px; margin-bottom: 20px;">Hi ${name},</p>
+    
+    <p>Thank you for joining 2,847+ veterans who've already started their career transition journey. You've taken the first step toward translating your military service into a successful civilian career.</p>
+    
+    <h2 style="color: #667eea; margin-top: 30px;">🎯 Your Next Steps:</h2>
+    
+    <div style="background: white; padding: 20px; border-left: 4px solid #667eea; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #333;">1. Browse Resume Templates</h3>
+      <p>Check out our ATS-optimized resume templates designed specifically for veterans.</p>
+      <a href="${baseUrl}/templates" style="display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-top: 10px;">View Templates</a>
+    </div>
+    
+    <div style="background: white; padding: 20px; border-left: 4px solid #764ba2; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #333;">2. Upload Your Resume</h3>
+      <p>Get instant feedback on your resume with our AI-powered analyzer.</p>
+      <a href="${baseUrl}/tools" style="display: inline-block; background: #764ba2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-top: 10px;">Analyze Resume</a>
+    </div>
+    
+    <div style="background: white; padding: 20px; border-left: 4px solid #667eea; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #333;">3. Explore Premium Features</h3>
+      <p>Unlock the full AI career strategist prompt and get personalized career paths for just $29.</p>
+      <a href="${baseUrl}/pricing" style="display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-top: 10px;">View Pricing</a>
+    </div>
+    
+    <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin: 30px 0;">
+      <p style="margin: 0; font-weight: bold; color: #856404;">💡 Pro Tip:</p>
+      <p style="margin: 5px 0 0 0; color: #856404;">Start with our free resume templates and analyzer to get immediate value, then upgrade to Premium when you're ready for personalized career paths and action plans.</p>
+    </div>
+    
+    <p style="margin-top: 30px;">Questions? Just reply to this email - I read every message personally.</p>
+    
+    <p style="margin-top: 20px;">Here to support your mission,<br><strong>The Pathfinder Team</strong></p>
+  </div>
+  
+  <div style="text-align: center; padding: 20px; color: #666; font-size: 12px;">
+    <p>You're receiving this email because you signed up at Pathfinder.</p>
+    <p>Pathfinder - Veteran Career Transition Strategist</p>
+  </div>
+</body>
+</html>
+  `;
+}
+
+function getSignupWelcomeEmailText(name: string): string {
+  const baseUrl = process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space";
+  return `
+Welcome to Pathfinder, ${name}!
+
+Thank you for joining 2,847+ veterans who've already started their career transition journey. You've taken the first step toward translating your military service into a successful civilian career.
+
+Your Next Steps:
+
+1. Browse Resume Templates
+Check out our ATS-optimized resume templates designed specifically for veterans.
+Visit: ${baseUrl}/templates
+
+2. Upload Your Resume
+Get instant feedback on your resume with our AI-powered analyzer.
+Visit: ${baseUrl}/tools
+
+3. Explore Premium Features
+Unlock the full AI career strategist prompt and get personalized career paths for just $29.
+Visit: ${baseUrl}/pricing
+
+Pro Tip: Start with our free resume templates and analyzer to get immediate value, then upgrade to Premium when you're ready for personalized career paths and action plans.
+
+Questions? Just reply to this email - I read every message personally.
+
+Here to support your mission,
+The Pathfinder Team
+
+---
+You're receiving this email because you signed up at Pathfinder.
+Pathfinder - Veteran Career Transition Strategist
   `.trim();
 }
 
