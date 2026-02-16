@@ -1005,3 +1005,8 @@
 - [x] Create welcome email template with next steps
 - [x] Send automated welcome email after signup
 - [x] Update navigation to show Login/Signup buttons
+
+
+## Bug Fixes
+
+- [x] Fix /dashboard 404 error - add redirect to /tools
