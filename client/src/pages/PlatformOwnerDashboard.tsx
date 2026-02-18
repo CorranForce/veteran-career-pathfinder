@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { AdminActivityLog } from "@/components/AdminActivityLog";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,12 +74,19 @@ export default function PlatformOwnerDashboard() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showPurchasesDialog, setShowPurchasesDialog] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
-  // Fetch all users
-  const { data: users, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(
-    undefined,
+  // Fetch all users with pagination
+  const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(
+    { page: currentPage, pageSize },
     { enabled: isAuthenticated && user?.role === "platform_owner" }
   );
+  
+  const users = usersData?.users || [];
+  const pagination = usersData?.pagination;
 
   // Fetch user purchases for selected user
   const { data: userPurchases, isLoading: purchasesLoading } = trpc.admin.getUserPurchases.useQuery(
@@ -668,6 +676,69 @@ export default function PlatformOwnerDashboard() {
                 </Table>
               </div>
             )}
+            
+            {/* Pagination Controls */}
+            {!usersLoading && pagination && pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">
+                    Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, pagination.totalUsers)} of {pagination.totalUsers} users
+                  </span>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Select value={pageSize.toString()} onValueChange={(value) => { setPageSize(Number(value)); setCurrentPage(1); }}>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10 / page</SelectItem>
+                      <SelectItem value="25">25 / page</SelectItem>
+                      <SelectItem value="50">50 / page</SelectItem>
+                      <SelectItem value="100">100 / page</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <div className="flex gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                    >
+                      First
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <span className="flex items-center px-3 text-sm">
+                      Page {currentPage} of {pagination.totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                      disabled={currentPage === pagination.totalPages}
+                    >
+                      Next
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(pagination.totalPages)}
+                      disabled={currentPage === pagination.totalPages}
+                    >
+                      Last
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -749,6 +820,9 @@ export default function PlatformOwnerDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Admin Activity Log */}
+      <AdminActivityLog />
     </div>
   );
 }

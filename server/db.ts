@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog, adminActivityLogs, InsertAdminActivityLog } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { desc } from "drizzle-orm";
 
@@ -754,4 +754,52 @@ export async function resetUserPassword(userId: number, passwordHash: string) {
       resetTokenExpiry: null 
     })
     .where(eq(users.id, userId));
+}
+
+/**
+ * Log an admin action for audit trail
+ */
+export async function logAdminActivity(activity: InsertAdminActivityLog): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot log admin activity: database not available");
+    return;
+  }
+
+  await db.insert(adminActivityLogs).values(activity);
+}
+
+/**
+ * Get recent admin activity logs
+ */
+export async function getAdminActivityLogs(limit: number = 100) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get admin activity logs: database not available");
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(adminActivityLogs)
+    .orderBy(desc(adminActivityLogs.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Get admin activity logs for a specific user
+ */
+export async function getAdminActivityLogsForUser(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get admin activity logs: database not available");
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(adminActivityLogs)
+    .where(eq(adminActivityLogs.targetUserId, userId))
+    .orderBy(desc(adminActivityLogs.createdAt))
+    .limit(limit);
 }

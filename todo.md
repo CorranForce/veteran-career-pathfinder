@@ -1089,7 +1089,11 @@
 - [x] Add user status indicators (active, suspended, deleted)
 - [x] Add status field to database schema
 - [x] Create vitest tests for user management
-- [ ] Add pagination for user list (future enhancement)
+- [x] Add pagination for user list
+- [x] Implement user activity logs for admin actions
+- [x] Create AdminActivityLog component
+- [x] Add activity log display in admin dashboard
+- [x] Create vitest tests for activity logging and pagination
 - [ ] Add bulk user actions (export CSV, bulk delete) (future enhancement)
 
 ### 5. Referral System
@@ -1150,3 +1154,36 @@
 ### 11. Password Reset TypeScript Fix
 - [ ] Fix TypeScript error in emailAuth.ts line 169
 - [ ] Test password reset flow end-to-end
+
+## New Feature Requests & Bug Fixes
+
+### Google OAuth Configuration
+- [ ] Fix Google OAuth app name to display "Pathfinder" instead of "smart-tab"
+
+### Documentation & Tracking
+- [ ] Create FEATURES.md to track all suggested features (implemented and upcoming)
+- [ ] Create BUGFIXES.md to track all bug fixes (completed and in progress)
+- [ ] Add roadmap/changelog card to landing page
+
+### User Activity Logs
+- [ ] Create admin_activity_logs table in database
+- [ ] Implement activity logging for admin actions (suspend, reactivate, delete, role change)
+- [ ] Add activity log viewer in admin dashboard
+- [ ] Track: action type, target user, admin user, timestamp, details
+
+### User List Pagination
+- [ ] Add pagination controls to user management table
+- [ ] Implement server-side pagination API
+- [ ] Add page size selector (10, 25, 50, 100 users per page)
+- [ ] Display pagination info (showing X-Y of Z users)
+- [ ] Maintain filters when changing pages
+
+
+## New Feature Requests & Bug Fixes (Feb 17, 2026)
+- [ ] Fix Google OAuth app name to show "Pathfinder" instead of "smart-tab" (requires manual update in Settings → General)
+- [x] Create FEATURES.md tracking document
+- [x] Create BUGFIXES.md tracking document
+- [x] Add roadmap/changelog section to landing page
+- [x] Implement user activity logs for admin actions
+- [x] Add pagination to user management list
+- [x] Create vitest tests for activity logging and pagination

@@ -321,3 +321,42 @@ export const products = mysqlTable("products", {
 
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = typeof products.$inferInsert;
+
+/**
+ * Admin Activity Logs - tracks all admin actions for audit trail
+ * Records who did what to whom and when
+ */
+export const adminActivityLogs = mysqlTable("admin_activity_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Admin who performed the action
+  adminId: int("adminId").notNull(),
+  adminName: varchar("adminName", { length: 255 }).notNull(),
+  adminEmail: varchar("adminEmail", { length: 320 }).notNull(),
+  
+  // Target user (if applicable)
+  targetUserId: int("targetUserId"),
+  targetUserName: varchar("targetUserName", { length: 255 }),
+  targetUserEmail: varchar("targetUserEmail", { length: 320 }),
+  
+  // Action details
+  actionType: mysqlEnum("actionType", [
+    "suspend_user",
+    "reactivate_user", 
+    "delete_user",
+    "change_role",
+    "view_purchases",
+    "update_product",
+    "other"
+  ]).notNull(),
+  
+  description: text("description").notNull(),
+  
+  // Additional context (JSON string)
+  metadata: text("metadata"),
+  
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AdminActivityLog = typeof adminActivityLogs.$inferSelect;
+export type InsertAdminActivityLog = typeof adminActivityLogs.$inferInsert;

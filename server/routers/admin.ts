@@ -1,6 +1,6 @@
 import { router, platformOwnerProcedure } from "../_core/trpc";
 import { z } from "zod";
-import { getDb } from "../db";
+import { getDb, logAdminActivity, getAdminActivityLogs, getAdminActivityLogsForUser } from "../db";
 import { getTotalRevenue, getMonthlyRevenue, getTotalPurchaseCount, getRecentPurchases, getRevenueByMonth, getAverageOrderValue, getLTVAnalytics } from "../db-analytics";
 import { users, purchases, resumes } from "../../drizzle/schema";
 import { eq, desc, sql } from "drizzle-orm";
@@ -10,27 +10,55 @@ export const adminRouter = router({
   /**
    * Get all users (platform owner only)
    */
-  getAllUsers: platformOwnerProcedure.query(async ({ ctx }) => {
-    const db = await getDb();
-    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
-    
-    const allUsers = await db
-      .select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        role: users.role,
-        status: users.status,
-        loginMethod: users.loginMethod,
-        createdAt: users.createdAt,
-        lastSignedIn: users.lastSignedIn,
-        stripeCustomerId: users.stripeCustomerId,
-      })
-      .from(users)
-      .orderBy(desc(users.createdAt));
+  getAllUsers: platformOwnerProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(10).max(100).default(25),
+      }).optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      const page = input?.page || 1;
+      const pageSize = input?.pageSize || 25;
+      const offset = (page - 1) * pageSize;
+      
+      // Get total count
+      const [countResult] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(users);
+      const totalUsers = countResult?.count || 0;
+      
+      // Get paginated users
+      const allUsers = await db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          status: users.status,
+          loginMethod: users.loginMethod,
+          createdAt: users.createdAt,
+          lastSignedIn: users.lastSignedIn,
+          stripeCustomerId: users.stripeCustomerId,
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt))
+        .limit(pageSize)
+        .offset(offset);
 
-    return allUsers;
-  }),
+      return {
+        users: allUsers,
+        pagination: {
+          page,
+          pageSize,
+          totalUsers,
+          totalPages: Math.ceil(totalUsers / pageSize),
+        },
+      };
+    }),
 
   /**
    * Change user role (platform owner only)
@@ -54,10 +82,29 @@ export const adminRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       
+      // Get target user info for logging
+      const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
+      if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      
+      const oldRole = targetUser.role;
+      
       await db
         .update(users)
         .set({ role: input.role })
         .where(eq(users.id, input.userId));
+
+      // Log the admin action
+      await logAdminActivity({
+        adminId: ctx.user.id,
+        adminName: ctx.user.name || "Unknown",
+        adminEmail: ctx.user.email || "Unknown",
+        targetUserId: input.userId,
+        targetUserName: targetUser.name || "Unknown",
+        targetUserEmail: targetUser.email || "Unknown",
+        actionType: "change_role",
+        description: `Changed user role from ${oldRole} to ${input.role}`,
+        metadata: JSON.stringify({ oldRole, newRole: input.role }),
+      });
 
       return { success: true };
     }),
@@ -74,7 +121,24 @@ export const adminRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       
+      // Get target user info for logging
+      const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
+      if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      
       await db.update(users).set({ status: "suspended" }).where(eq(users.id, input.userId));
+      
+      // Log the admin action
+      await logAdminActivity({
+        adminId: ctx.user.id,
+        adminName: ctx.user.name || "Unknown",
+        adminEmail: ctx.user.email || "Unknown",
+        targetUserId: input.userId,
+        targetUserName: targetUser.name || "Unknown",
+        targetUserEmail: targetUser.email || "Unknown",
+        actionType: "suspend_user",
+        description: `Suspended user ${targetUser.name || targetUser.email}`,
+      });
+      
       return { success: true };
     }),
 
@@ -87,7 +151,24 @@ export const adminRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       
+      // Get target user info for logging
+      const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
+      if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      
       await db.update(users).set({ status: "active" }).where(eq(users.id, input.userId));
+      
+      // Log the admin action
+      await logAdminActivity({
+        adminId: ctx.user.id,
+        adminName: ctx.user.name || "Unknown",
+        adminEmail: ctx.user.email || "Unknown",
+        targetUserId: input.userId,
+        targetUserName: targetUser.name || "Unknown",
+        targetUserEmail: targetUser.email || "Unknown",
+        actionType: "reactivate_user",
+        description: `Reactivated user ${targetUser.name || targetUser.email}`,
+      });
+      
       return { success: true };
     }),
 
@@ -103,7 +184,24 @@ export const adminRouter = router({
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       
+      // Get target user info for logging
+      const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
+      if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      
       await db.update(users).set({ status: "deleted" }).where(eq(users.id, input.userId));
+      
+      // Log the admin action
+      await logAdminActivity({
+        adminId: ctx.user.id,
+        adminName: ctx.user.name || "Unknown",
+        adminEmail: ctx.user.email || "Unknown",
+        targetUserId: input.userId,
+        targetUserName: targetUser.name || "Unknown",
+        targetUserEmail: targetUser.email || "Unknown",
+        actionType: "delete_user",
+        description: `Deleted user ${targetUser.name || targetUser.email}`,
+      });
+      
       return { success: true };
     }),
 
@@ -369,5 +467,25 @@ export type ProductKey = keyof typeof PRODUCTS;
         stripeProductId,
         stripePriceId,
       };
+    }),
+
+  /**
+   * Get admin activity logs (platform owner only)
+   */
+  getAdminActivityLogs: platformOwnerProcedure
+    .input(z.object({ limit: z.number().optional().default(100) }))
+    .query(async ({ input }) => {
+      const logs = await getAdminActivityLogs(input.limit);
+      return logs;
+    }),
+
+  /**
+   * Get admin activity logs for a specific user (platform owner only)
+   */
+  getAdminActivityLogsForUser: platformOwnerProcedure
+    .input(z.object({ userId: z.number(), limit: z.number().optional().default(50) }))
+    .query(async ({ input }) => {
+      const logs = await getAdminActivityLogsForUser(input.userId, input.limit);
+      return logs;
     }),
 });

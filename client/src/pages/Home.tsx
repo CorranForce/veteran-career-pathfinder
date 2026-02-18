@@ -428,6 +428,138 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Roadmap & Changelog Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-4xl font-bold">Roadmap & Recent Updates</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              See what we're building and track our progress. Transparency matters.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Recent Updates */}
+            <Card className="border-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                  Recent Updates
+                </CardTitle>
+                <CardDescription>Latest features and improvements</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
+                    <div>
+                      <p className="font-medium">Enhanced User Management</p>
+                      <p className="text-sm text-muted-foreground">Added comprehensive admin tools with activity logging, pagination, and user status tracking</p>
+                      <p className="text-xs text-muted-foreground mt-1">Feb 17, 2026</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
+                    <div>
+                      <p className="font-medium">Stripe Payment Integration</p>
+                      <p className="text-sm text-muted-foreground">Secure payment processing for Premium and Pro tiers with webhook support</p>
+                      <p className="text-xs text-muted-foreground mt-1">Feb 15, 2026</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
+                    <div>
+                      <p className="font-medium">Email Automation & Segmentation</p>
+                      <p className="text-sm text-muted-foreground">Automated drip campaigns, A/B testing, and subscriber engagement tracking</p>
+                      <p className="text-xs text-muted-foreground mt-1">Feb 10, 2026</p>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
+                    <div>
+                      <p className="font-medium">User Profiles & Career Highlights</p>
+                      <p className="text-sm text-muted-foreground">Veterans can now create detailed profiles showcasing their military experience</p>
+                      <p className="text-xs text-muted-foreground mt-1">Feb 5, 2026</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Upcoming Features */}
+            <Card className="border-2 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-primary" />
+                  Coming Soon
+                </CardTitle>
+                <CardDescription>Features we're actively building</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
+                    <div>
+                      <p className="font-medium">Private Veteran Community</p>
+                      <p className="text-sm text-muted-foreground">Forum for Pro members to connect, share experiences, and network</p>
+                      <Badge variant="outline" className="mt-1">In Development</Badge>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
+                    <div>
+                      <p className="font-medium">Live Career Webinars</p>
+                      <p className="text-sm text-muted-foreground">Monthly expert-led sessions on career transitions and job search strategies</p>
+                      <Badge variant="outline" className="mt-1">Planned Q1 2026</Badge>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
+                    <div>
+                      <p className="font-medium">AI Resume Builder</p>
+                      <p className="text-sm text-muted-foreground">Automatic military-to-civilian resume translation with ATS optimization</p>
+                      <Badge variant="outline" className="mt-1">Planned Q2 2026</Badge>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
+                    <div>
+                      <p className="font-medium">Job Board & Matching</p>
+                      <p className="text-sm text-muted-foreground">Curated veteran-friendly job postings with AI-powered matching</p>
+                      <Badge variant="outline" className="mt-1">Planned Q2 2026</Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-sm text-muted-foreground mb-4">
+              Want to see detailed feature tracking and bug fixes?
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button variant="outline" asChild>
+                <a href="https://github.com/yourusername/pathfinder/blob/main/FEATURES.md" target="_blank" rel="noopener noreferrer">
+                  View Full Roadmap
+                </a>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href="https://github.com/yourusername/pathfinder/blob/main/BUGFIXES.md" target="_blank" rel="noopener noreferrer">
+                  Bug Fix Log
+                </a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto text-center space-y-8">
