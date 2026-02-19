@@ -45,14 +45,31 @@ https://vetcarepath-tzppwpga.manus.space/robots.txt
 ```
 
 ## Pages Included in Sitemap
-- Homepage (/) - Priority: 1.0
-- Pricing (/pricing) - Priority: 0.9
-- Dashboard (/dashboard) - Priority: 0.7
+- Homepage (/) - Priority: 1.0, Updated: Weekly
+- Pricing (/pricing) - Priority: 0.9, Updated: Monthly
+- Blog (/blog) - Priority: 0.8, Updated: Weekly
+- Dashboard (/dashboard) - Priority: 0.7, Updated: Weekly
+- Templates (/templates) - Priority: 0.7, Updated: Monthly
+- Blog Posts (5 articles) - Priority: 0.7, Updated: Monthly
+  - Top 10 Civilian Jobs for Infantry Veterans
+  - How to Translate Your MOS to Resume Language
+  - Veteran Career Transition Complete Guide
+  - Veteran Resume Mistakes to Avoid
+  - Veteran Networking Strategies LinkedIn
+- Login (/login) - Priority: 0.3, Updated: Yearly
+- Signup (/signup) - Priority: 0.3, Updated: Yearly
+
+**Total URLs in Sitemap**: 12 pages
 
 ## Expected Results
-- **Indexing Speed**: 1-3 days for initial crawl
-- **Search Visibility**: 1-2 weeks for ranking improvements
-- **Organic Traffic**: Gradual increase over 30-60 days
+- **Sitemap Processing**: 1-7 days
+- **Initial Indexing**: 1-4 weeks
+- **Search Visibility**: 2-4 weeks for ranking improvements
+- **Performance Data**: Available after 2-3 days of indexing
+- **Organic Traffic**: Gradual increase over 30-90 days
+
+## Sitemap Last Updated
+**February 18, 2026** - All page dates updated to current date
 
 ## Troubleshooting
 - If verification fails, ensure the HTML file or meta tag is accessible

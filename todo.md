@@ -1193,3 +1193,11 @@
 - [x] Reduce homepage keywords from 9 to 5 focused keywords
 - [x] Trim meta description from 166 characters to 129 characters
 - [x] Verify SEO improvements with browser inspection
+
+
+## XML Sitemap & Google Search Console (Feb 18, 2026)
+- [x] Identify all public pages and routes
+- [x] Update sitemap.xml with latest dates and all public pages (12 URLs total)
+- [x] Verify robots.txt has sitemap reference
+- [x] Test sitemap accessibility at /sitemap.xml
+- [x] Update Google Search Console setup guide with latest information
