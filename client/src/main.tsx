@@ -7,6 +7,7 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
+import { initGA4 } from "./lib/analytics";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,9 @@ const trpcClient = trpc.createClient({
     }),
   ],
 });
+
+// Initialize Google Analytics 4
+initGA4();
 
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>

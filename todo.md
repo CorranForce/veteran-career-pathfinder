@@ -1201,3 +1201,32 @@
 - [x] Verify robots.txt has sitemap reference
 - [x] Test sitemap accessibility at /sitemap.xml
 - [x] Update Google Search Console setup guide with latest information
+
+
+## GA4 Integration & Structured Data (Feb 19, 2026)
+- [x] Create GA4 analytics helper library with tracking functions
+- [x] Integrate GA4 initialization in main.tsx
+- [x] Implement event tracking for key user actions (signup, purchase, resume upload)
+- [x] Set up conversion tracking helpers for payment success
+- [x] Create comprehensive GA4 setup documentation
+- [ ] User needs to create GA4 property and provide Measurement ID via webdev_request_secrets
+
+## JSON-LD Structured Data (Feb 19, 2026)
+- [x] Create StructuredData component supporting multiple schema types
+- [x] Implement BlogPosting schema for blog posts
+- [x] Add Organization schema to homepage
+- [x] Add WebSite schema with search action to homepage
+- [ ] Add HowTo schema for guides/tutorials (when applicable)
+- [ ] Add FAQPage schema if FAQ section exists (when applicable)
+- [ ] Validate structured data with Google Rich Results Test (user action)
+
+## Dynamic Announcements System (Feb 19, 2026)
+- [x] Create announcements database table with all required fields
+- [x] Add announcement management APIs (create, update, delete, list, publish, archive)
+- [x] Build AnnouncementManagement component for Platform Owner Dashboard
+- [x] Create AnnouncementsCard component for landing page
+- [x] Implement real-time updates from database to landing page
+- [x] Add announcement types (feature, bugfix, news, maintenance)
+- [x] Add status field (draft, published, archived)
+- [x] Write comprehensive vitest tests for announcement APIs (15 tests passing)
+- [x] Fix adminProcedure to accept both admin and platform_owner roles

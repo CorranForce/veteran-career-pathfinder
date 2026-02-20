@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog, adminActivityLogs, InsertAdminActivityLog } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog, adminActivityLogs, InsertAdminActivityLog, announcements, InsertAnnouncement, Announcement } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { desc } from "drizzle-orm";
 
@@ -802,4 +802,148 @@ export async function getAdminActivityLogsForUser(userId: number, limit: number 
     .where(eq(adminActivityLogs.targetUserId, userId))
     .orderBy(desc(adminActivityLogs.createdAt))
     .limit(limit);
+}
+
+
+/**
+ * Create a new announcement
+ */
+export async function createAnnouncement(announcement: InsertAnnouncement): Promise<Announcement | null> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot create announcement: database not available");
+    return null;
+  }
+
+  const result = await db.insert(announcements).values(announcement);
+  
+  // Fetch and return the created announcement
+  const created = await db
+    .select()
+    .from(announcements)
+    .where(eq(announcements.id, Number(result[0].insertId)))
+    .limit(1);
+  
+  return created.length > 0 ? created[0] : null;
+}
+
+/**
+ * Update an existing announcement
+ */
+export async function updateAnnouncement(id: number, updates: Partial<InsertAnnouncement>): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update announcement: database not available");
+    return;
+  }
+
+  await db
+    .update(announcements)
+    .set(updates)
+    .where(eq(announcements.id, id));
+}
+
+/**
+ * Delete an announcement
+ */
+export async function deleteAnnouncement(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot delete announcement: database not available");
+    return;
+  }
+
+  await db.delete(announcements).where(eq(announcements.id, id));
+}
+
+/**
+ * Get all announcements (for admin)
+ */
+export async function getAllAnnouncements(): Promise<Announcement[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get announcements: database not available");
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(announcements)
+    .orderBy(desc(announcements.priority), desc(announcements.createdAt));
+}
+
+/**
+ * Get published announcements (for public display)
+ */
+export async function getPublishedAnnouncements(limit: number = 10): Promise<Announcement[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get published announcements: database not available");
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(announcements)
+    .where(eq(announcements.status, "published"))
+    .orderBy(desc(announcements.priority), desc(announcements.publishedAt))
+    .limit(limit);
+}
+
+/**
+ * Get announcements by type
+ */
+export async function getAnnouncementsByType(type: "feature" | "bugfix" | "news" | "maintenance"): Promise<Announcement[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get announcements by type: database not available");
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(announcements)
+    .where(and(
+      eq(announcements.type, type),
+      eq(announcements.status, "published")
+    ))
+    .orderBy(desc(announcements.priority), desc(announcements.publishedAt));
+}
+
+/**
+ * Publish an announcement
+ */
+export async function publishAnnouncement(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot publish announcement: database not available");
+    return;
+  }
+
+  await db
+    .update(announcements)
+    .set({ 
+      status: "published",
+      publishedAt: new Date()
+    })
+    .where(eq(announcements.id, id));
+}
+
+/**
+ * Archive an announcement
+ */
+export async function archiveAnnouncement(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot archive announcement: database not available");
+    return;
+  }
+
+  await db
+    .update(announcements)
+    .set({ 
+      status: "archived",
+      archivedAt: new Date()
+    })
+    .where(eq(announcements.id, id));
 }

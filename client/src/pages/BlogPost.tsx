@@ -4,6 +4,7 @@ import { Calendar, Clock, ArrowLeft, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Streamdown } from "streamdown";
+import { StructuredData } from "@/components/StructuredData";
 
 export default function BlogPost() {
   const params = useParams();
@@ -29,6 +30,17 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* SEO: BlogPosting structured data */}
+      <StructuredData
+        type="BlogPosting"
+        headline={post.title}
+        description={post.description}
+        author={post.author}
+        datePublished={post.publishDate}
+        dateModified={post.publishDate}
+        image={post.image}
+        url={`https://vetcarepath-tzppwpga.manus.space/blog/${post.slug}`}
+      />
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between h-16">

@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AuthenticatedNav } from "@/components/AuthenticatedNav";
 import { AdminActivityLog } from "@/components/AdminActivityLog";
+import { AnnouncementManagement } from "@/components/AnnouncementManagement";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -823,6 +824,9 @@ export default function PlatformOwnerDashboard() {
 
       {/* Admin Activity Log */}
       <AdminActivityLog />
+
+      {/* Announcement Management */}
+      <AnnouncementManagement />
     </div>
   );
 }

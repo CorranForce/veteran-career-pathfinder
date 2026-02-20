@@ -360,3 +360,49 @@ export const adminActivityLogs = mysqlTable("admin_activity_logs", {
 
 export type AdminActivityLog = typeof adminActivityLogs.$inferSelect;
 export type InsertAdminActivityLog = typeof adminActivityLogs.$inferInsert;
+
+/**
+ * Announcements - platform-wide announcements for features, bug fixes, and news
+ * Managed by platform owner, displayed on landing page
+ */
+export const announcements = mysqlTable("announcements", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Announcement details
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  
+  // Type of announcement
+  type: mysqlEnum("type", [
+    "feature",    // New feature announcement
+    "bugfix",     // Bug fix announcement
+    "news",       // General news
+    "maintenance" // Maintenance notice
+  ]).notNull(),
+  
+  // Status
+  status: mysqlEnum("status", [
+    "draft",      // Not published yet
+    "published",  // Visible to users
+    "archived"    // No longer displayed
+  ]).default("draft").notNull(),
+  
+  // Priority (higher number = higher priority, affects display order)
+  priority: int("priority").default(0).notNull(),
+  
+  // Optional link for "Learn More"
+  link: varchar("link", { length: 500 }),
+  
+  // Timestamps
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  publishedAt: timestamp("publishedAt"),
+  archivedAt: timestamp("archivedAt"),
+  
+  // Created by
+  createdBy: int("createdBy").notNull(),
+  createdByName: varchar("createdByName", { length: 255 }).notNull(),
+});
+
+export type Announcement = typeof announcements.$inferSelect;
+export type InsertAnnouncement = typeof announcements.$inferInsert;

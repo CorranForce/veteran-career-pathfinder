@@ -21,6 +21,8 @@ import { getLoginUrl, getSignupUrl } from "@/const";
 import Testimonials from "@/components/Testimonials";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { SimpleContactButton } from "@/components/LiveChatWidget";
+import { StructuredData } from "@/components/StructuredData";
+import { AnnouncementsCard } from "@/components/AnnouncementsCard";
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -33,6 +35,29 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* SEO: Organization structured data */}
+      <StructuredData
+        type="Organization"
+        name="Pathfinder"
+        url="https://vetcarepath-tzppwpga.manus.space"
+        logo="https://vetcarepath-tzppwpga.manus.space/logo.png"
+        description="AI-powered career transition platform helping military veterans translate their service into civilian careers with personalized job paths and skills mapping."
+        sameAs={[
+          // Add social media URLs when available
+        ]}
+      />
+      {/* SEO: WebSite structured data with search */}
+      <StructuredData
+        type="WebSite"
+        name="Pathfinder - Veteran Career Transition Strategist"
+        url="https://vetcarepath-tzppwpga.manus.space"
+        description="AI-powered tool helping veterans translate military service into civilian careers with personalized job paths and skills mapping."
+        potentialAction={{
+          type: 'SearchAction',
+          target: 'https://vetcarepath-tzppwpga.manus.space/blog?q={search_term_string}',
+          queryInput: 'required name=search_term_string',
+        }}
+      />
       <ExitIntentPopup />
       <SimpleContactButton />
       {/* Navigation */}
@@ -439,55 +464,8 @@ export default function Home() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Recent Updates */}
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  Recent Updates
-                </CardTitle>
-                <CardDescription>Latest features and improvements</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
-                    <div>
-                      <p className="font-medium">Enhanced User Management</p>
-                      <p className="text-sm text-muted-foreground">Added comprehensive admin tools with activity logging, pagination, and user status tracking</p>
-                      <p className="text-xs text-muted-foreground mt-1">Feb 17, 2026</p>
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
-                    <div>
-                      <p className="font-medium">Stripe Payment Integration</p>
-                      <p className="text-sm text-muted-foreground">Secure payment processing for Premium and Pro tiers with webhook support</p>
-                      <p className="text-xs text-muted-foreground mt-1">Feb 15, 2026</p>
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
-                    <div>
-                      <p className="font-medium">Email Automation & Segmentation</p>
-                      <p className="text-sm text-muted-foreground">Automated drip campaigns, A/B testing, and subscriber engagement tracking</p>
-                      <p className="text-xs text-muted-foreground mt-1">Feb 10, 2026</p>
-                    </div>
-                  </div>
-                  <Separator />
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-2 h-2 rounded-full bg-green-600 mt-2"></div>
-                    <div>
-                      <p className="font-medium">User Profiles & Career Highlights</p>
-                      <p className="text-sm text-muted-foreground">Veterans can now create detailed profiles showcasing their military experience</p>
-                      <p className="text-xs text-muted-foreground mt-1">Feb 5, 2026</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Dynamic Announcements from Database */}
+            <AnnouncementsCard />
 
             {/* Upcoming Features */}
             <Card className="border-2 border-primary/20">
