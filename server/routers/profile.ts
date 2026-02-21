@@ -8,6 +8,12 @@ import {
   updateCareerHighlight,
   deleteCareerHighlight,
 } from "../db";
+import { getDb } from "../db";
+import { users } from "../../drizzle/schema";
+import * as schema from "../../drizzle/schema";
+import { eq } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
+import bcrypt from "bcryptjs";
 
 export const profileRouter = router({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -83,5 +89,157 @@ export const profileRouter = router({
     .input(z.object({ highlightId: z.number() }))
     .mutation(async ({ ctx, input }) => {
       return await deleteCareerHighlight(input.highlightId);
+    }),
+
+  /**
+   * Get user's personal information (name, email, profile picture)
+   */
+  getPersonalInfo: protectedProcedure.query(async ({ ctx }) => {
+    const dbInstance = await getDb();
+    if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+    
+    const db = dbInstance as any;
+    const user = await db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      profilePicture: users.profilePicture,
+      loginMethod: users.loginMethod,
+      role: users.role,
+      createdAt: users.createdAt,
+      lastSignedIn: users.lastSignedIn,
+    }).from(users).where(eq(users.id, ctx.user.id)).limit(1).then((rows: any) => rows[0]);
+    
+    if (!user) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+
+    return user;
+  }),
+
+  /**
+   * Update user's personal information (name)
+   */
+  updatePersonalInfo: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1, "Name is required").max(255),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      const db = dbInstance as any;
+      await db.update(users).set({ name: input.name }).where(eq(users.id, ctx.user.id));
+
+      return { success: true, message: "Personal information updated successfully" };
+    }),
+
+  /**
+   * Change password (only for email/password users)
+   */
+  changePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1, "Current password is required"),
+        newPassword: z
+          .string()
+          .min(8, "Password must be at least 8 characters")
+          .max(100, "Password is too long"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      const db = dbInstance as any;
+      
+      // Check if user uses email/password authentication
+      if (ctx.user.loginMethod !== "email") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Password change is only available for email/password accounts",
+        });
+      }
+
+      // Get user with password hash
+      const user = await db.select({
+        id: users.id,
+        passwordHash: users.passwordHash,
+      }).from(users).where(eq(users.id, ctx.user.id)).limit(1).then((rows: any) => rows[0]);
+
+      if (!user || !user.passwordHash) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found or no password set",
+        });
+      }
+
+      // Verify current password
+      const isValidPassword = await bcrypt.compare(
+        input.currentPassword,
+        user.passwordHash
+      );
+
+      if (!isValidPassword) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Current password is incorrect",
+        });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+
+      // Update password
+      await db
+        .update(users)
+        .set({ passwordHash: hashedPassword })
+        .where(eq(users.id, ctx.user.id));
+
+      return { success: true, message: "Password changed successfully" };
+    }),
+
+  /**
+   * Upload profile picture to S3 and update user profile
+   */
+  uploadProfilePicture: protectedProcedure
+    .input(
+      z.object({
+        imageData: z.string(), // Base64 encoded image
+        mimeType: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const dbInstance = await getDb();
+      if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+      
+      const db = dbInstance as any;
+      const { storagePut } = await import("../storage");
+
+      // Convert base64 to buffer
+      const base64Data = input.imageData.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(7);
+      const extension = input.mimeType.split("/")[1];
+      const fileKey = `profile-pictures/${ctx.user.id}-${timestamp}-${randomSuffix}.${extension}`;
+
+      // Upload to S3
+      const { url } = await storagePut(fileKey, buffer, input.mimeType);
+
+      // Update user profile with new picture URL
+      await db
+        .update(users)
+        .set({ profilePicture: url })
+        .where(eq(users.id, ctx.user.id));
+
+      return { success: true, url, message: "Profile picture uploaded successfully" };
     }),
 });

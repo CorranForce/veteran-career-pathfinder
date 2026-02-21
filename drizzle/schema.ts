@@ -30,6 +30,9 @@ export const users = mysqlTable("users", {
   // Password reset tokens
   resetToken: varchar("resetToken", { length: 255 }),
   resetTokenExpiry: timestamp("resetTokenExpiry"),
+  
+  // Profile picture URL (stored in S3)
+  profilePicture: varchar("profilePicture", { length: 512 }),
 });
 
 export type User = typeof users.$inferSelect;

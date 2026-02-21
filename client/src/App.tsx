@@ -11,6 +11,7 @@ import Admin from "./pages/Admin";
 import Marketing from "./pages/Marketing";
 import Downloads from "./pages/Downloads";
 import ProfileEdit from "./pages/ProfileEdit";
+import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ResumeTemplates from "./pages/ResumeTemplates";
@@ -39,6 +40,7 @@ function Router() {
       <Route path={"/admin"} component={Admin} />
       <Route path={"/marketing"} component={Marketing} />
       <Route path={"/downloads"} component={Downloads} />
+      <Route path={"/profile"} component={Profile} />
       <Route path={"/profile/edit"} component={ProfileEdit} />
       <Route path={"/dashboard"}>
         <Redirect to="/tools" />

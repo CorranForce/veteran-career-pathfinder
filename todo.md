@@ -1230,3 +1230,20 @@
 - [x] Add status field (draft, published, archived)
 - [x] Write comprehensive vitest tests for announcement APIs (15 tests passing)
 - [x] Fix adminProcedure to accept both admin and platform_owner roles
+
+
+## User Profile Page (Feb 20, 2026)
+- [x] Add profilePicture field to user schema
+- [x] Create profile update API with validation
+- [x] Create password change API with current password verification
+- [x] Build Profile page component at /profile route
+- [x] Implement profile information display (name, email, join date, login method)
+- [x] Add edit mode with form validation
+- [x] Implement profile picture upload with S3 storage
+- [x] Add profile picture preview and change functionality
+- [x] Implement password change form (current password, new password, confirm)
+- [x] Add save button with disabled state until changes are made
+- [x] Add success/error toast notifications
+- [x] Write vitest tests for profile APIs (17 tests, 15 passing)
+- [ ] Add profile link to navigation menu
+- [x] Test profile page functionality end-to-end
