@@ -78,6 +78,9 @@ export default function Home() {
             </Button>
             {isAuthenticated ? (
               <>
+                <Button variant="ghost" asChild>
+                  <a href="/profile">Profile</a>
+                </Button>
                 <Button asChild>
                   <a href="/tools">Dashboard</a>
                 </Button>

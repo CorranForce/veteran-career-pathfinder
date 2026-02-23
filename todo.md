@@ -1247,3 +1247,19 @@
 - [x] Write vitest tests for profile APIs (17 tests, 15 passing)
 - [ ] Add profile link to navigation menu
 - [x] Test profile page functionality end-to-end
+
+
+## Profile Enhancements (Feb 21, 2026)
+- [x] Add profile link to main navigation menu (Home page for authenticated users)
+- [x] Add profile link to user dropdown menu (DashboardLayout)
+- [x] Add email change token fields to user schema (newEmail, emailChangeToken, emailChangeTokenExpiry)
+- [x] Create email change request API with token generation
+- [x] Create email verification API with token validation
+- [x] Send email verification link to new email address
+- [x] Build email change UI with form and confirmation flow
+- [x] Handle email verification from URL parameter
+- [x] Create account deletion API with confirmation and soft delete
+- [x] Add data export before deletion (JSON download)
+- [x] Build account deletion UI with danger zone and confirmation dialog
+- [x] Write vitest tests for email change and account deletion (15 tests, all passing)
+- [x] Test all features end-to-end

@@ -767,3 +767,173 @@ If you didn't request a password reset, you can safely ignore this email. Your p
 Pathfinder - Veteran Career Transition
   `;
 }
+
+
+/**
+ * Send email change verification email with verification link
+ */
+export async function sendEmailChangeVerification(to: string, name: string, token: string): Promise<boolean> {
+  if (!ENV.sendgridApiKey) {
+    console.warn("[Email Service] Cannot send email: SendGrid not configured");
+    return false;
+  }
+
+  if (!ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send email: FROM email not configured");
+    return false;
+  }
+
+  const baseUrl = process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space";
+  const verificationUrl = `${baseUrl}/profile?verify_email=${token}`;
+
+  try {
+    const firstName = name.split(" ")[0] || "there";
+
+    const msg = {
+      to,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject: "Verify Your New Email Address",
+      html: getEmailChangeVerificationTemplate(firstName, verificationUrl),
+      text: getEmailChangeVerificationText(firstName, verificationUrl),
+      trackingSettings: {
+        clickTracking: {
+          enable: true,
+          enableText: true,
+        },
+        openTracking: {
+          enable: true,
+        },
+      },
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Email change verification sent successfully to ${to}`);
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to send email change verification:", error.response?.body || error.message);
+    return false;
+  }
+}
+
+/**
+ * HTML email template for email change verification
+ */
+function getEmailChangeVerificationTemplate(firstName: string, verificationUrl: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your New Email</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    .button {
+      display: inline-block;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      margin: 20px 0;
+    }
+    .warning {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🎯 Pathfinder</div>
+      <h1 style="color: #1f2937; margin: 0;">Verify Your New Email</h1>
+    </div>
+
+    <p>Hi ${firstName},</p>
+
+    <p>We received a request to change your email address for your Pathfinder account. Click the button below to verify your new email address:</p>
+
+    <div style="text-align: center;">
+      <a href="${verificationUrl}" class="button">Verify Email Address</a>
+    </div>
+
+    <div class="warning">
+      <strong>⏰ This link expires in 24 hours</strong><br>
+      For security reasons, this verification link will only work for the next 24 hours.
+    </div>
+
+    <p>If you didn't request an email change, you can safely ignore this email. Your email address will remain unchanged.</p>
+
+    <p>If the button doesn't work, copy and paste this link into your browser:</p>
+    <p style="word-break: break-all; color: #2563eb;">${verificationUrl}</p>
+
+    <div class="footer">
+      <p>This is an automated email from Pathfinder - Veteran Career Transition</p>
+      <p>If you need help, reply to this email and we'll assist you.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Plain text version of email change verification email
+ */
+function getEmailChangeVerificationText(firstName: string, verificationUrl: string): string {
+  return `
+Hi ${firstName},
+
+We received a request to change your email address for your Pathfinder account.
+
+Click this link to verify your new email address:
+${verificationUrl}
+
+⏰ This link expires in 24 hours
+
+If you didn't request an email change, you can safely ignore this email. Your email address will remain unchanged.
+
+---
+Pathfinder - Veteran Career Transition
+  `;
+}

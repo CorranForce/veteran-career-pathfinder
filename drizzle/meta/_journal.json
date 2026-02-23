@@ -127,6 +127,13 @@
       "when": 1771681610974,
       "tag": "0017_same_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1771783052923,
+      "tag": "0018_skinny_silver_samurai",
+      "breakpoints": true
     }
   ]
 }

@@ -31,6 +31,11 @@ export const users = mysqlTable("users", {
   resetToken: varchar("resetToken", { length: 255 }),
   resetTokenExpiry: timestamp("resetTokenExpiry"),
   
+  // Email change tokens
+  newEmail: varchar("newEmail", { length: 320 }),
+  emailChangeToken: varchar("emailChangeToken", { length: 255 }),
+  emailChangeTokenExpiry: timestamp("emailChangeTokenExpiry"),
+  
   // Profile picture URL (stored in S3)
   profilePicture: varchar("profilePicture", { length: 512 }),
 });

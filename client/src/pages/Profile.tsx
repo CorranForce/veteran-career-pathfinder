@@ -7,14 +7,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Camera, User, Mail, Calendar, Shield, Key } from "lucide-react";
+import { Loader2, Camera, User, Mail, Calendar, Shield, Key, AlertTriangle, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { toast as showToast } from "sonner";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 
 export default function Profile() {
   const { user, loading: authLoading } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const toast = (options: { title: string; description: string; variant?: string }) => {
     if (options.variant === "destructive") {
       showToast.error(options.title, { description: options.description });
@@ -39,6 +52,14 @@ export default function Profile() {
 
   // Profile picture state
   const [uploadingPicture, setUploadingPicture] = useState(false);
+
+  // Email change state
+  const [showEmailChangeForm, setShowEmailChangeForm] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+
+  // Account deletion state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   const updatePersonalInfoMutation = trpc.profile.updatePersonalInfo.useMutation({
     onSuccess: () => {
@@ -98,11 +119,91 @@ export default function Profile() {
     },
   });
 
+  const requestEmailChangeMutation = trpc.profile.requestEmailChange.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Verification email sent to your new email address. Please check your inbox.",
+      });
+      setShowEmailChangeForm(false);
+      setNewEmail("");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to request email change",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const verifyEmailChangeMutation = trpc.profile.verifyEmailChange.useMutation({
+    onSuccess: () => {
+      toast({
+        title: "Email Updated",
+        description: "Your email address has been successfully updated.",
+      });
+      refetch();
+      // Remove token from URL
+      window.history.replaceState({}, document.title, "/profile");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to verify email change",
+        variant: "destructive",
+      });
+      // Remove token from URL
+      window.history.replaceState({}, document.title, "/profile");
+    },
+  });
+
+  const deleteAccountMutation = trpc.profile.deleteAccount.useMutation({
+    onSuccess: (data) => {
+      // Download user data export
+      const dataStr = JSON.stringify(data.dataExport, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `pathfinder-data-export-${Date.now()}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Account Deleted",
+        description: "Your account has been deleted and your data has been downloaded.",
+      });
+
+      // Redirect to home page after a short delay
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete account",
+        variant: "destructive",
+      });
+    },
+  });
+
   useEffect(() => {
     if (personalInfo) {
       setName(personalInfo.name || "");
     }
   }, [personalInfo]);
+
+  // Handle email verification from URL parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const verifyToken = urlParams.get("verify_email");
+    
+    if (verifyToken && user) {
+      verifyEmailChangeMutation.mutate({ token: verifyToken });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (personalInfo) {
@@ -185,6 +286,32 @@ export default function Profile() {
       setUploadingPicture(false);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleEmailChange = () => {
+    if (!newEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter a new email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    requestEmailChangeMutation.mutate({ newEmail });
+  };
+
+  const handleDeleteAccount = () => {
+    if (deleteConfirmation !== "DELETE") {
+      toast({
+        title: "Error",
+        description: "Please type DELETE to confirm",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    deleteAccountMutation.mutate({ confirmation: deleteConfirmation });
   };
 
   if (authLoading || infoLoading) {
@@ -386,6 +513,74 @@ export default function Profile() {
             </CardContent>
           </Card>
 
+          {/* Email Change Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Change Email Address
+                </div>
+              </CardTitle>
+              <CardDescription>Update your email address with verification</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!showEmailChangeForm ? (
+                <Button onClick={() => setShowEmailChangeForm(true)} variant="outline">
+                  Change Email
+                </Button>
+              ) : (
+                <div className="space-y-4">
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Email Verification Required</AlertTitle>
+                    <AlertDescription>
+                      We'll send a verification link to your new email address. You must click the link to complete the change.
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="new-email">New Email Address</Label>
+                    <Input
+                      id="new-email"
+                      type="email"
+                      value={newEmail}
+                      onChange={(e) => setNewEmail(e.target.value)}
+                      disabled={requestEmailChangeMutation.isPending}
+                      placeholder="Enter your new email address"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      onClick={handleEmailChange}
+                      disabled={!newEmail || requestEmailChangeMutation.isPending}
+                    >
+                      {requestEmailChangeMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        "Send Verification Email"
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowEmailChangeForm(false);
+                        setNewEmail("");
+                      }}
+                      variant="outline"
+                      disabled={requestEmailChangeMutation.isPending}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Password Change Card (only for email/password users) */}
           {personalInfo.loginMethod === "email" && (
             <Card>
@@ -476,8 +671,103 @@ export default function Profile() {
               </CardContent>
             </Card>
           )}
+
+          {/* Danger Zone - Account Deletion */}
+          <Card className="border-destructive">
+            <CardHeader>
+              <CardTitle className="text-destructive">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Danger Zone
+                </div>
+              </CardTitle>
+              <CardDescription>
+                Permanently delete your account and all associated data
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Warning</AlertTitle>
+                <AlertDescription>
+                  This action cannot be undone. All your data will be permanently deleted, including your profile, resumes, and purchase history.
+                </AlertDescription>
+              </Alert>
+
+              <Button
+                onClick={() => setShowDeleteDialog(true)}
+                variant="destructive"
+                className="mt-4"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Account
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Account</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. Your data will be exported and downloaded before deletion.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Final Warning</AlertTitle>
+              <AlertDescription>
+                All your data will be permanently deleted. We'll download a copy of your data before deletion.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-2">
+              <Label htmlFor="delete-confirmation">
+                Type <strong>DELETE</strong> to confirm
+              </Label>
+              <Input
+                id="delete-confirmation"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                placeholder="DELETE"
+                disabled={deleteAccountMutation.isPending}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setDeleteConfirmation("");
+              }}
+              variant="outline"
+              disabled={deleteAccountMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteAccount}
+              variant="destructive"
+              disabled={deleteConfirmation !== "DELETE" || deleteAccountMutation.isPending}
+            >
+              {deleteAccountMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete My Account"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
