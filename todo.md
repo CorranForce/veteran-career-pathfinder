@@ -1263,3 +1263,21 @@
 - [x] Build account deletion UI with danger zone and confirmation dialog
 - [x] Write vitest tests for email change and account deletion (15 tests, all passing)
 - [x] Test all features end-to-end
+
+
+## AI Research Agent & Blog Subscription (Feb 23, 2026)
+- [ ] Conduct deep research on veteran resume tips and best practices
+- [ ] Research interview strategies specifically for military-to-civilian transitions
+- [ ] Research job search tactics and networking for veterans
+- [ ] Compile research findings into comprehensive blog post
+- [ ] Create blog post with actionable tips and resources
+- [ ] Add blog subscription database schema (email, subscribed_at, preferences)
+- [ ] Create subscription APIs (subscribe, unsubscribe, manage preferences)
+- [ ] Implement email notification system for new blog posts
+- [ ] Build subscription form component for blog pages
+- [ ] Add subscription confirmation email with double opt-in
+- [ ] Create unsubscribe functionality with one-click links
+- [ ] Integrate subscription with announcement system
+- [ ] Add subscription management page for users
+- [ ] Write vitest tests for subscription APIs
+- [ ] Test subscription flow end-to-end

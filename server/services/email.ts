@@ -937,3 +937,232 @@ If you didn't request an email change, you can safely ignore this email. Your em
 Pathfinder - Veteran Career Transition
   `;
 }
+
+
+/**
+ * Send blog subscription verification email
+ */
+export async function sendBlogSubscriptionVerification(email: string, token: string): Promise<boolean> {
+  const verificationUrl = `${process.env.VITE_APP_URL || 'https://vetcarepath-tzppwpga.manus.space'}/blog/verify?token=${token}`;
+  
+  const htmlContent = getBlogSubscriptionVerificationHTML(verificationUrl);
+  const textContent = getBlogSubscriptionVerificationText(verificationUrl);
+
+  if (!ENV.sendgridApiKey || !ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send blog subscription verification: SendGrid not configured");
+    return false;
+  }
+
+  try {
+    const msg = {
+      to: email,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject: "Verify Your Blog Subscription - Pathfinder",
+      html: htmlContent,
+      text: textContent,
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Blog subscription verification sent to ${email}`);
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to send blog subscription verification:", error.response?.body || error.message);
+    return false;
+  }
+}
+
+/**
+ * HTML version of blog subscription verification email
+ */
+function getBlogSubscriptionVerificationHTML(verificationUrl: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background-color: #f9fafb; padding: 30px; border-radius: 10px; }
+    .header { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
+    .button { display: inline-block; padding: 14px 32px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 14px; color: #6b7280; text-align: center; }
+    .info { background-color: #eff6ff; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0;">📬 Verify Your Subscription</h1>
+      <p style="margin: 10px 0 0 0; opacity: 0.95;">Pathfinder - Veteran Career Transition</p>
+    </div>
+
+    <p>Thank you for subscribing to Pathfinder updates!</p>
+
+    <p>Click the button below to confirm your subscription and start receiving:</p>
+
+    <ul>
+      <li>🎯 New blog posts with veteran career tips</li>
+      <li>✨ Feature releases and platform updates</li>
+      <li>🔧 Bug fixes and improvements</li>
+    </ul>
+
+    <div style="text-align: center;">
+      <a href="${verificationUrl}" class="button">Verify Subscription</a>
+    </div>
+
+    <div class="info">
+      <strong>⏰ This link expires in 24 hours</strong><br>
+      Please verify your subscription within 24 hours to start receiving updates.
+    </div>
+
+    <p>If you didn't subscribe to Pathfinder updates, you can safely ignore this email.</p>
+
+    <p>If the button doesn't work, copy and paste this link into your browser:</p>
+    <p style="word-break: break-all; color: #2563eb;">${verificationUrl}</p>
+
+    <div class="footer">
+      <p>This is an automated email from Pathfinder - Veteran Career Transition</p>
+      <p>If you need help, reply to this email and we'll assist you.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Plain text version of blog subscription verification email
+ */
+function getBlogSubscriptionVerificationText(verificationUrl: string): string {
+  return `
+Thank you for subscribing to Pathfinder updates!
+
+Click this link to confirm your subscription:
+${verificationUrl}
+
+You'll receive:
+- New blog posts with veteran career tips
+- Feature releases and platform updates
+- Bug fixes and improvements
+
+⏰ This link expires in 24 hours
+
+If you didn't subscribe to Pathfinder updates, you can safely ignore this email.
+
+---
+Pathfinder - Veteran Career Transition
+  `;
+}
+
+/**
+ * Send blog update notification to subscribers
+ */
+export async function sendBlogUpdateNotification(
+  email: string,
+  title: string,
+  excerpt: string,
+  link: string,
+  unsubscribeToken: string
+): Promise<boolean> {
+  const fullLink = `${process.env.VITE_APP_URL || 'https://vetcarepath-tzppwpga.manus.space'}${link}`;
+  const unsubscribeUrl = `${process.env.VITE_APP_URL || 'https://vetcarepath-tzppwpga.manus.space'}/blog/unsubscribe?token=${unsubscribeToken}`;
+  
+  const htmlContent = getBlogUpdateNotificationHTML(title, excerpt, fullLink, unsubscribeUrl);
+  const textContent = getBlogUpdateNotificationText(title, excerpt, fullLink, unsubscribeUrl);
+
+  if (!ENV.sendgridApiKey || !ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send blog update notification: SendGrid not configured");
+    return false;
+  }
+
+  try {
+    const msg = {
+      to: email,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject: `New from Pathfinder: ${title}`,
+      html: htmlContent,
+      text: textContent,
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Blog update notification sent to ${email}`);
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to send blog update notification:", error.response?.body || error.message);
+    return false;
+  }
+}
+
+/**
+ * HTML version of blog update notification email
+ */
+function getBlogUpdateNotificationHTML(title: string, excerpt: string, link: string, unsubscribeUrl: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .container { background-color: #f9fafb; padding: 30px; border-radius: 10px; }
+    .header { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center; }
+    .button { display: inline-block; padding: 14px 32px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+    .excerpt { background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; font-style: italic; }
+    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 14px; color: #6b7280; text-align: center; }
+    .unsubscribe { font-size: 12px; color: #9ca3af; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 style="margin: 0;">📰 New Update from Pathfinder</h1>
+      <p style="margin: 10px 0 0 0; opacity: 0.95;">Veteran Career Transition</p>
+    </div>
+
+    <h2>${title}</h2>
+
+    <div class="excerpt">
+      ${excerpt}
+    </div>
+
+    <div style="text-align: center;">
+      <a href="${link}" class="button">Read More</a>
+    </div>
+
+    <div class="footer">
+      <p>This is an automated email from Pathfinder - Veteran Career Transition</p>
+      <p>You're receiving this because you subscribed to our updates.</p>
+      <div class="unsubscribe">
+        <a href="${unsubscribeUrl}" style="color: #9ca3af;">Unsubscribe from these emails</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Plain text version of blog update notification email
+ */
+function getBlogUpdateNotificationText(title: string, excerpt: string, link: string, unsubscribeUrl: string): string {
+  return `
+New Update from Pathfinder
+
+${title}
+
+${excerpt}
+
+Read more: ${link}
+
+---
+You're receiving this because you subscribed to Pathfinder updates.
+Unsubscribe: ${unsubscribeUrl}
+
+Pathfinder - Veteran Career Transition
+  `;
+}

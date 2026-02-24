@@ -134,6 +134,13 @@
       "when": 1771783052923,
       "tag": "0018_skinny_silver_samurai",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1771857415333,
+      "tag": "0019_dear_reavers",
+      "breakpoints": true
     }
   ]
 }

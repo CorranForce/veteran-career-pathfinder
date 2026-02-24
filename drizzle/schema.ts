@@ -414,3 +414,44 @@ export const announcements = mysqlTable("announcements", {
 
 export type Announcement = typeof announcements.$inferSelect;
 export type InsertAnnouncement = typeof announcements.$inferInsert;
+
+
+/**
+ * Blog Subscribers - email subscribers for blog updates, features, and bug fixes
+ * Allows visitors to subscribe without creating an account
+ */
+export const blogSubscribers = mysqlTable("blog_subscribers", {
+  id: int("id").autoincrement().primaryKey(),
+  
+  // Subscriber details
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  
+  // Subscription preferences
+  subscribeToNewPosts: boolean("subscribeToNewPosts").default(true).notNull(),
+  subscribeToFeatures: boolean("subscribeToFeatures").default(true).notNull(),
+  subscribeToBugFixes: boolean("subscribeToBugFixes").default(true).notNull(),
+  
+  // Status
+  status: mysqlEnum("status", [
+    "active",      // Receiving emails
+    "unsubscribed", // Opted out
+    "bounced"      // Email bounced
+  ]).default("active").notNull(),
+  
+  // Verification
+  isVerified: boolean("isVerified").default(false).notNull(),
+  verificationToken: varchar("verificationToken", { length: 255 }),
+  verificationTokenExpiry: timestamp("verificationTokenExpiry"),
+  
+  // Unsubscribe token
+  unsubscribeToken: varchar("unsubscribeToken", { length: 255 }).notNull(),
+  
+  // Timestamps
+  subscribedAt: timestamp("subscribedAt").defaultNow().notNull(),
+  verifiedAt: timestamp("verifiedAt"),
+  unsubscribedAt: timestamp("unsubscribedAt"),
+  lastEmailSentAt: timestamp("lastEmailSentAt"),
+});
+
+export type BlogSubscriber = typeof blogSubscribers.$inferSelect;
+export type InsertBlogSubscriber = typeof blogSubscribers.$inferInsert;
