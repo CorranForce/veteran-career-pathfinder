@@ -16,8 +16,10 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const signupMutation = trpc.emailAuth.signup.useMutation({
-    onSuccess: () => {
+  const signupMutation = trpc.customAuth.signup.useMutation({
+    onSuccess: (data) => {
+      // Set session cookie
+      document.cookie = `manus_session=${data.sessionToken}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
       // Redirect to tools page after successful signup
       window.location.href = "/tools";
     },

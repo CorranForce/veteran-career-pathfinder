@@ -30,7 +30,9 @@ export default function GoogleCallback() {
     handleCallback.mutate(
       { code },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          // Set session cookie
+          document.cookie = `manus_session=${data.sessionToken}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
           // Redirect to tools page after successful login
           setLocation("/tools");
         },

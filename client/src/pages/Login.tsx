@@ -15,8 +15,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const loginMutation = trpc.emailAuth.login.useMutation({
-    onSuccess: () => {
+  const loginMutation = trpc.customAuth.login.useMutation({
+    onSuccess: (data) => {
+      // Set session cookie
+      document.cookie = `manus_session=${data.sessionToken}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
       // Redirect to tools page after successful login
       window.location.href = "/tools";
     },

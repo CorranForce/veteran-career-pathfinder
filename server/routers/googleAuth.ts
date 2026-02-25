@@ -4,8 +4,7 @@ import { publicProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { OAuth2Client } from "google-auth-library";
 import { ENV } from "../_core/env";
-import { sdk } from "../_core/sdk";
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { createSessionToken } from "../_core/session";
 
 // Initialize Google OAuth client
 const getGoogleOAuthClient = () => {
@@ -118,24 +117,16 @@ export const googleAuthRouter = router({
         }
 
         // Create session token
-        const sessionToken = await sdk.createSessionToken(`google:${user.id}`, {
-          name: user.name || "",
-          expiresInMs: ONE_YEAR_MS,
+        const sessionToken = await createSessionToken({
+          userId: user.id,
+          email: user.email!,
+          name: user.name,
+          role: user.role,
         });
-
-        // Set cookie
-        if (ctx.res) {
-          const cookieOptions = {
-            httpOnly: true,
-            secure: true,
-            sameSite: "lax" as const,
-            maxAge: ONE_YEAR_MS,
-          };
-          ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
-        }
 
         return {
           success: true,
+          sessionToken,
           user: {
             id: user.id,
             email: user.email,

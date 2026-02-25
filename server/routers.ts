@@ -13,6 +13,7 @@ import { templatesRouter } from "./routers/templates";
 import { adminRouter } from "./routers/admin";
 import { emailAuthRouter } from "./routers/emailAuth";
 import { googleAuthRouter } from "./routers/googleAuth";
+import { authRouter } from "./routers/auth";
 import { productManagementRouter } from "./routers/productManagement";
 import { announcementsRouter } from "./routers/announcements";
 import { blogSubscriptionRouter } from "./routers/blogSubscription";
@@ -33,6 +34,7 @@ export const appRouter = router({
 
   emailAuth: emailAuthRouter,
   googleAuth: googleAuthRouter,
+  customAuth: authRouter,
 
   payment: paymentRouter,
   email: emailRouter,
