@@ -36,6 +36,11 @@ export const users = mysqlTable("users", {
   emailChangeToken: varchar("emailChangeToken", { length: 255 }),
   emailChangeTokenExpiry: timestamp("emailChangeTokenExpiry"),
   
+  // Email verification
+  emailVerified: boolean("emailVerified").default(false).notNull(),
+  emailVerificationToken: varchar("emailVerificationToken", { length: 255 }),
+  emailVerificationTokenExpiry: timestamp("emailVerificationTokenExpiry"),
+  
   // Profile picture URL (stored in S3)
   profilePicture: varchar("profilePicture", { length: 512 }),
 });
@@ -278,7 +283,7 @@ export const activityLogs = mysqlTable("activityLogs", {
   id: int("id").autoincrement().primaryKey(),
   
   // Activity details
-  activityType: mysqlEnum("activityType", ["user_signup", "resume_upload", "purchase", "template_download"]).notNull(),
+  activityType: mysqlEnum("activityType", ["user_signup", "resume_upload", "purchase", "template_download", "password_reset", "email_verification"]).notNull(),
   userId: int("userId"),
   userName: varchar("userName", { length: 255 }),
   userEmail: varchar("userEmail", { length: 320 }),

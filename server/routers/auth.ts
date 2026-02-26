@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import * as db from "../db";
 import { publicProcedure, router } from "../_core/trpc";
 import { createSessionToken } from "../_core/session";
@@ -38,6 +39,22 @@ export const authRouter = router({
         passwordHash,
         name,
       });
+
+      // Generate email verification token
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+      const verificationTokenExpiry = new Date(Date.now() + 86400000); // 24 hours from now
+
+      // Save verification token to database
+      await db.updateUserEmailVerificationToken(userId, verificationToken, verificationTokenExpiry);
+
+      // Send verification email
+      try {
+        const { sendEmailVerificationEmail } = await import("../services/email");
+        await sendEmailVerificationEmail(email, name, verificationToken);
+      } catch (emailError) {
+        console.error("[Signup] Failed to send verification email:", emailError);
+        // Don't block signup if email fails
+      }
 
       // Log signup activity
       await db.logActivity({

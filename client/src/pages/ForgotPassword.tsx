@@ -12,7 +12,7 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const requestResetMutation = trpc.emailAuth.requestPasswordReset.useMutation({
+  const requestResetMutation = trpc.passwordReset.requestReset.useMutation({
     onSuccess: () => {
       setSubmitted(true);
     },

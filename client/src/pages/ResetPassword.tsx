@@ -27,7 +27,7 @@ export default function ResetPassword() {
     }
   }, []);
 
-  const resetPasswordMutation = trpc.emailAuth.resetPassword.useMutation({
+  const resetPasswordMutation = trpc.passwordReset.confirmReset.useMutation({
     onSuccess: () => {
       setSuccess(true);
       // Redirect to login after 3 seconds

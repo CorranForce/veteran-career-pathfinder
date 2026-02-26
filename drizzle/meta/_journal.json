@@ -141,6 +141,20 @@
       "when": 1771857415333,
       "tag": "0019_dear_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1772029700200,
+      "tag": "0020_busy_warstar",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1772029805865,
+      "tag": "0021_living_talisman",
+      "breakpoints": true
     }
   ]
 }

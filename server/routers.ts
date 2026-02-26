@@ -14,6 +14,9 @@ import { adminRouter } from "./routers/admin";
 import { emailAuthRouter } from "./routers/emailAuth";
 import { googleAuthRouter } from "./routers/googleAuth";
 import { authRouter } from "./routers/auth";
+import { passwordResetRouter } from "./routers/passwordReset";
+import { emailVerificationRouter } from "./routers/emailVerification";
+import { accountSettingsRouter } from "./routers/accountSettings";
 import { productManagementRouter } from "./routers/productManagement";
 import { announcementsRouter } from "./routers/announcements";
 import { blogSubscriptionRouter } from "./routers/blogSubscription";
@@ -35,6 +38,9 @@ export const appRouter = router({
   emailAuth: emailAuthRouter,
   googleAuth: googleAuthRouter,
   customAuth: authRouter,
+  passwordReset: passwordResetRouter,
+  emailVerification: emailVerificationRouter,
+  accountSettings: accountSettingsRouter,
 
   payment: paymentRouter,
   email: emailRouter,

@@ -604,7 +604,7 @@ function getPurchaseConfirmationText(
 /**
  * Send password reset email with reset link
  */
-export async function sendPasswordResetEmail(to: string, name: string | null, resetUrl: string): Promise<boolean> {
+export async function sendPasswordResetEmail(to: string, name: string | null, resetToken: string): Promise<boolean> {
   const userName = name || "User";
   if (!ENV.sendgridApiKey) {
     console.warn("[Email Service] Cannot send email: SendGrid not configured");
@@ -618,6 +618,7 @@ export async function sendPasswordResetEmail(to: string, name: string | null, re
 
   try {
     const firstName = userName.split(" ")[0] || "there";
+    const resetUrl = `${process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space"}/reset-password?token=${resetToken}`;
 
     const msg = {
       to,
@@ -1164,5 +1165,163 @@ You're receiving this because you subscribed to Pathfinder updates.
 Unsubscribe: ${unsubscribeUrl}
 
 Pathfinder - Veteran Career Transition
+  `;
+}
+
+
+/**
+ * Send email verification email with verification link
+ */
+export async function sendEmailVerificationEmail(to: string, name: string, verificationToken: string): Promise<boolean> {
+  if (!ENV.sendgridApiKey) {
+    console.warn("[Email Service] Cannot send email: SendGrid not configured");
+    return false;
+  }
+
+  if (!ENV.sendgridFromEmail) {
+    console.warn("[Email Service] Cannot send email: FROM email not configured");
+    return false;
+  }
+
+  try {
+    const firstName = name.split(" ")[0] || "there";
+    const verificationUrl = `${process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space"}/verify-email?token=${verificationToken}`;
+
+    const msg = {
+      to,
+      from: {
+        email: ENV.sendgridFromEmail,
+        name: "Pathfinder - Veteran Career Transition",
+      },
+      subject: "Verify Your Email Address",
+      html: getEmailVerificationTemplate(firstName, verificationUrl),
+      text: getEmailVerificationText(firstName, verificationUrl),
+      trackingSettings: {
+        clickTracking: {
+          enable: true,
+          enableText: true,
+        },
+        openTracking: {
+          enable: true,
+        },
+      },
+    };
+
+    await sgMail.send(msg);
+    console.log(`[Email Service] Email verification sent successfully to ${to}`);
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to send email verification:", error.response?.body || error.message);
+    return false;
+  }
+}
+
+function getEmailVerificationTemplate(firstName: string, verificationUrl: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1e40af;
+    }
+    .button {
+      display: inline-block;
+      padding: 14px 28px;
+      background-color: #1e40af;
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      margin: 20px 0;
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🧭 Pathfinder</div>
+    </div>
+    
+    <h2>Welcome to Pathfinder!</h2>
+    
+    <p>Hi ${firstName},</p>
+    
+    <p>Thanks for signing up! Please verify your email address to activate your account and access all features:</p>
+    
+    <div style="text-align: center;">
+      <a href="${verificationUrl}" class="button">Verify Email Address</a>
+    </div>
+    
+    <p><strong>This link will expire in 24 hours.</strong></p>
+    
+    <p>Once verified, you'll have full access to:</p>
+    <ul>
+      <li>AI-powered career path recommendations</li>
+      <li>Military-to-civilian skills translation</li>
+      <li>Resume building tools</li>
+      <li>Career transition resources</li>
+    </ul>
+    
+    <div class="footer">
+      <p>Best regards,<br>The Pathfinder Team</p>
+      <p style="font-size: 12px; color: #999;">If the button doesn't work, copy and paste this link into your browser:<br>${verificationUrl}</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+function getEmailVerificationText(firstName: string, verificationUrl: string): string {
+  return `
+Hi ${firstName},
+
+Thanks for signing up! Please verify your email address to activate your account.
+
+Click the link below to verify:
+${verificationUrl}
+
+This link will expire in 24 hours.
+
+Once verified, you'll have full access to:
+- AI-powered career path recommendations
+- Military-to-civilian skills translation
+- Resume building tools
+- Career transition resources
+
+Best regards,
+The Pathfinder Team
   `;
 }

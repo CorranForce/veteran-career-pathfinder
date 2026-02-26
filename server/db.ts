@@ -947,3 +947,43 @@ export async function archiveAnnouncement(id: number): Promise<void> {
     })
     .where(eq(announcements.id, id));
 }
+
+
+export async function updateUserEmailVerificationToken(userId: number, emailVerificationToken: string, emailVerificationTokenExpiry: Date) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update email verification token: database not available");
+    return;
+  }
+
+  await db.update(users)
+    .set({ emailVerificationToken, emailVerificationTokenExpiry })
+    .where(eq(users.id, userId));
+}
+
+export async function getUserByEmailVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function markEmailAsVerified(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot mark email as verified: database not available");
+    return;
+  }
+
+  await db.update(users)
+    .set({ 
+      emailVerified: true, 
+      emailVerificationToken: null, 
+      emailVerificationTokenExpiry: null 
+    })
+    .where(eq(users.id, userId));
+}

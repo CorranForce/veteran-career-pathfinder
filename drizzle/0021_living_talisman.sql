@@ -1,0 +1,1 @@
+ALTER TABLE `activityLogs` MODIFY COLUMN `activityType` enum('user_signup','resume_upload','purchase','template_download','password_reset','email_verification') NOT NULL;

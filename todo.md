@@ -1281,3 +1281,17 @@
 - [ ] Add subscription management page for users
 - [ ] Write vitest tests for subscription APIs
 - [ ] Test subscription flow end-to-end
+
+
+## Authentication Enhancements (New)
+
+- [x] Password reset functionality with email verification
+- [x] Email verification on signup
+- [x] Account settings page with password change
+- [x] Profile management in account settings
+- [x] OAuth account management (view connected accounts)
+- [x] Password reset token generation and storage
+- [x] Password reset email template
+- [x] Email verification token generation
+- [x] Email verification confirmation page
+- [x] Account security settings UI
