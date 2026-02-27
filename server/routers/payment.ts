@@ -12,12 +12,12 @@ export const paymentRouter = router({
   createCheckoutSession: protectedProcedure
     .input(
       z.object({
-        productKey: z.enum(["PREMIUM_PROMPT"]),
+        productId: z.enum(["PREMIUM", "PRO"]),
         couponCode: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const product = PRODUCTS[input.productKey];
+      const product = PRODUCTS[input.productId];
       const origin = ctx.req.headers.origin || `${ctx.req.protocol}://${ctx.req.get("host")}`;
 
       // Create or retrieve Stripe customer
@@ -36,7 +36,7 @@ export const paymentRouter = router({
       }
 
       // Determine product type for metadata
-      const productType = "premium_prompt";
+      const productType = input.productId.toLowerCase();
 
       // Create checkout session with optional coupon
       const sessionConfig: any = {
@@ -50,9 +50,9 @@ export const paymentRouter = router({
         },
         line_items: [
           // Use Stripe Price ID if available, otherwise use price_data
-          product.priceId && product.priceId !== "price_premium_prompt"
+          "stripePriceId" in product && product.stripePriceId
             ? {
-                price: product.priceId,
+                price: product.stripePriceId,
                 quantity: 1,
               }
             : {
@@ -62,12 +62,15 @@ export const paymentRouter = router({
                     name: product.name,
                     description: product.description,
                   },
-                  unit_amount: product.amount,
+                  unit_amount: product.price,
+                  ...("type" in product && product.type === "subscription"
+                    ? { recurring: { interval: product.interval } }
+                    : {}),
                 },
                 quantity: 1,
               },
         ],
-        mode: "payment",
+        mode: "type" in product && product.type === "subscription" ? "subscription" : "payment",
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/pricing`,
         allow_promotion_codes: true,

@@ -155,6 +155,13 @@
       "when": 1772029805865,
       "tag": "0021_living_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "5",
+      "when": 1772195809148,
+      "tag": "0022_sparkling_leopardon",
+      "breakpoints": true
     }
   ]
 }

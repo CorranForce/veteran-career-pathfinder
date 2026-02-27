@@ -1,24 +1,16 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { UrgencyBanner } from "@/components/UrgencyBanner";
-import { SocialProof } from "@/components/SocialProof";
-import Testimonials from "@/components/Testimonials";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Loader2, Shield, Users, Zap, Menu } from "lucide-react";
+import { CheckCircle2, Loader2, Shield, Menu, Star } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
-import { getLoginUrl, getSignupUrl } from "@/const";
-import { ExitIntentPopup } from "@/components/ExitIntentPopup";
-import { SimpleContactButton } from "@/components/LiveChatWidget";
+import { getSignupUrl } from "@/const";
+import { PRODUCTS, formatPrice } from "@shared/products";
 
-export default function Pricing() {
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
-  
-  // Check if user came from exit-intent popup (offer=exit20 in URL)
-  const urlParams = new URLSearchParams(window.location.search);
-  const hasExitOffer = urlParams.get('offer') === 'exit20';
+export default function PricingNew() {
+  const { user, isAuthenticated } = useAuth();
   
   const createCheckoutMutation = trpc.payment.createCheckoutSession.useMutation({
     onSuccess: (data) => {
@@ -32,22 +24,18 @@ export default function Pricing() {
     },
   });
 
-  const handleCheckout = (productKey: "PREMIUM_PROMPT") => {
+  const handleCheckout = (productId: "PREMIUM" | "PRO") => {
     if (!isAuthenticated) {
       toast.info("Please sign up or log in to continue");
       window.location.href = getSignupUrl();
       return;
     }
 
-    // Apply exit-intent coupon if user came from popup
-    const couponCode = hasExitOffer ? '5zlB9zup' : undefined;
-    createCheckoutMutation.mutate({ productKey, couponCode });
+    createCheckoutMutation.mutate({ productId });
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <ExitIntentPopup />
-      <SimpleContactButton />
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -113,139 +101,86 @@ export default function Pricing() {
         </div>
       </nav>
 
-      {/* Urgency Banner */}
-      <UrgencyBanner />
-
-      {/* Pricing Hero */}
+      {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-background via-secondary/30 to-background">
         <div className="container mx-auto text-center space-y-6">
-          <Badge className="bg-accent text-accent-foreground">Flexible Pricing</Badge>
-          <h1 className="text-5xl font-bold">Choose Your Mission</h1>
+          <Badge className="bg-accent text-accent-foreground">Simple, Transparent Pricing</Badge>
+          <h1 className="text-5xl md:text-6xl font-bold">
+            Choose Your Path Forward
+          </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start with the essentials or go all-in with ongoing support. Every veteran deserves the right tools for transition.
+            Start free, upgrade when you're ready. All plans include our veteran-focused career transition tools.
           </p>
         </div>
       </section>
 
       {/* Pricing Tiers */}
-      <section className="py-12 md:py-20">
-        <div className="container mx-auto px-4">
-          {/* Sign Up Free Banner */}
-          <div className="max-w-4xl mx-auto mb-12">
-            <Card className="bg-gradient-to-r from-accent/20 to-primary/20 border-2 border-accent">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-accent text-accent-foreground rounded-full p-3">
-                      <Users className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">Sign Up Free • No Credit Card Required</h3>
-                      <p className="text-sm text-muted-foreground">Join 2,847+ veterans who've started their transition • Takes only 30 seconds</p>
-                    </div>
-                  </div>
-                  <Button size="lg" asChild className="shrink-0">
-                    <a href="/signup">Create Free Account</a>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto">
+      <section className="py-20">
+        <div className="container mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            
             {/* Free Tier */}
-            <Card className="border-2 relative">
+            <Card className="border-2">
               <CardHeader>
-                <CardTitle className="text-2xl">Free Preview</CardTitle>
-                <CardDescription>Get a taste of what's possible</CardDescription>
-                <div className="pt-4">
-                  <span className="text-4xl font-bold">$0</span>
+                <CardTitle className="text-2xl">{PRODUCTS.FREE.name}</CardTitle>
+                <CardDescription>{PRODUCTS.FREE.description}</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">{formatPrice(PRODUCTS.FREE.price)}</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Basic prompt overview</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Limited career path examples</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">General transition guidance</span>
-                  </div>
+                  {PRODUCTS.FREE.features.map((feature: string, index: number) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
               <CardFooter>
-                <Button variant="outline" className="w-full" asChild>
-                  <a href="/#prompt-section">View Free Version</a>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  asChild
+                >
+                  <a href={isAuthenticated ? "/tools" : "/signup"}>
+                    Get Started Free
+                  </a>
                 </Button>
               </CardFooter>
             </Card>
 
-            {/* Premium Tier */}
-            <Card className="border-2 border-primary shadow-xl relative order-first md:order-none">
+            {/* Premium Tier - Most Popular */}
+            <Card className="border-4 border-primary relative shadow-xl">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-4 py-1">Most Popular</Badge>
+                <Badge className="bg-primary text-primary-foreground px-4 py-1">
+                  <Star className="h-3 w-3 mr-1 inline" />
+                  Most Popular
+                </Badge>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">Premium Package</CardTitle>
-                <CardDescription>Everything you need for a successful transition</CardDescription>
-                <div className="pt-4">
-                  <span className="text-4xl font-bold">$29</span>
+                <CardTitle className="text-2xl">{PRODUCTS.PREMIUM.name}</CardTitle>
+                <CardDescription>{PRODUCTS.PREMIUM.description}</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">{formatPrice(PRODUCTS.PREMIUM.price)}</span>
                   <span className="text-muted-foreground ml-2">one-time</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium">Full optimized AI prompt</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">3-4 detailed career paths with salary data</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Skills gap analysis & certification roadmap</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">30-day action plan with weekly milestones</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Bonus: Resume translation templates</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Lifetime access & updates</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium">Monthly live career transition webinars</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium">Private veteran community access (Skool)</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium">Q&A sessions with career experts</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                    <span className="text-sm font-medium">Job posting board & networking</span>
-                  </div>
+                  {PRODUCTS.PREMIUM.features.map((feature: string, index: number) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-sm font-medium">{feature}</span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
               <CardFooter>
                 <Button 
                   className="w-full" 
-                  onClick={() => handleCheckout("PREMIUM_PROMPT")}
+                  onClick={() => handleCheckout("PREMIUM")}
                   disabled={createCheckoutMutation.isPending}
                 >
                   {createCheckoutMutation.isPending ? (
@@ -254,15 +189,50 @@ export default function Pricing() {
                       Processing...
                     </>
                   ) : (
-                    <>
-                      <Zap className="mr-2 h-4 w-4" />
-                      Get Premium Access
-                    </>
+                    "Get Premium Access"
                   )}
                 </Button>
               </CardFooter>
             </Card>
 
+            {/* Pro Tier */}
+            <Card className="border-2 border-accent">
+              <CardHeader>
+                <CardTitle className="text-2xl">{PRODUCTS.PRO.name}</CardTitle>
+                <CardDescription>{PRODUCTS.PRO.description}</CardDescription>
+                <div className="mt-4">
+                  <span className="text-4xl font-bold">{formatPrice(PRODUCTS.PRO.price)}</span>
+                  <span className="text-muted-foreground ml-2">/month</span>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  {PRODUCTS.PRO.features.map((feature: string, index: number) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                      <span className="text-sm font-medium">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  variant="outline"
+                  className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground" 
+                  onClick={() => handleCheckout("PRO")}
+                  disabled={createCheckoutMutation.isPending}
+                >
+                  {createCheckoutMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Start Pro Membership"
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
 
           </div>
 
@@ -283,62 +253,77 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <SocialProof />
-
-      {/* Testimonials Section */}
-      <Testimonials />
-
       {/* FAQ Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto max-w-3xl">
           <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-lg mb-2">What if I'm not satisfied?</h3>
+              <h3 className="font-semibold text-lg mb-2">What's the difference between Premium and Pro?</h3>
               <p className="text-muted-foreground">
-                We offer a 30-day money-back guarantee. If the prompt doesn't help you gain clarity on your career transition, 
-                we'll refund your purchase—no questions asked.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-2">How do I use the prompt?</h3>
-              <p className="text-muted-foreground">
-                After purchase, you'll get instant access to the full prompt. Copy it and use it with any AI assistant 
-                (ChatGPT, Claude, Gemini, etc.). Just provide your military background and the AI will guide you through your transition.
+                Premium gives you lifetime access to our complete career transition toolkit with a one-time payment. 
+                Pro adds ongoing support with monthly webinars, community access, and resume reviews for active job seekers.
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-lg mb-2">Can I upgrade from Premium to Pro later?</h3>
               <p className="text-muted-foreground">
-                Absolutely! You can upgrade to Pro membership at any time to access the community and monthly webinars.
+                Yes! You can upgrade to Pro membership at any time. Your Premium purchase gives you all the core materials, 
+                and Pro adds the community and ongoing support.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-lg mb-2">Is this only for recent veterans?</h3>
+              <h3 className="font-semibold text-lg mb-2">What if I'm not satisfied?</h3>
               <p className="text-muted-foreground">
-                No! Whether you separated last month or 10 years ago, the prompt is designed to help any veteran translate 
-                their military experience into civilian career opportunities.
+                We offer a 30-day money-back guarantee on all purchases. If our tools don't help you gain clarity on your 
+                career transition, we'll refund your purchase—no questions asked.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-2">Do you offer military/veteran discounts?</h3>
+              <p className="text-muted-foreground">
+                Our pricing is already designed with veterans in mind. We occasionally offer special promotions—sign up 
+                for our newsletter to be notified of any discounts.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-2">Can I cancel my Pro membership?</h3>
+              <p className="text-muted-foreground">
+                Yes, you can cancel your Pro membership at any time from your account settings. You'll retain access 
+                until the end of your current billing period.
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto text-center space-y-8">
+          <h2 className="text-4xl font-bold">Ready to Start Your Transition?</h2>
+          <p className="text-xl max-w-2xl mx-auto opacity-90">
+            Join thousands of veterans who've successfully transitioned to civilian careers with Pathfinder.
+          </p>
+          <Button 
+            size="lg" 
+            variant="secondary"
+            asChild
+          >
+            <a href={isAuthenticated ? "#pricing" : "/signup"}>
+              Get Started Now
+            </a>
+          </Button>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="py-12 border-t bg-card">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <span className="font-semibold">Pathfinder</span>
-            </div>
-            <p className="text-sm text-muted-foreground text-center">
-              Empowering veterans to translate their service into successful civilian careers
-            </p>
-            <p className="text-sm text-muted-foreground">
-              © 2025 Pathfinder. All rights reserved.
-            </p>
+      <footer className="py-12 border-t bg-muted/30">
+        <div className="container mx-auto text-center text-sm text-muted-foreground">
+          <p>&copy; 2024 Pathfinder. Built by veterans, for veterans.</p>
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a>
+            <a href="/refund-policy" className="hover:text-foreground transition-colors">Refund Policy</a>
           </div>
         </div>
       </footer>

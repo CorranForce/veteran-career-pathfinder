@@ -377,7 +377,7 @@ export const adminRouter = router({
    */
   getProductConfig: platformOwnerProcedure.query(async () => {
     const { PRODUCTS } = await import("../products");
-    return PRODUCTS.PREMIUM_PROMPT;
+    return PRODUCTS.PREMIUM;
   }),
 
   /**

@@ -283,7 +283,7 @@ export const activityLogs = mysqlTable("activityLogs", {
   id: int("id").autoincrement().primaryKey(),
   
   // Activity details
-  activityType: mysqlEnum("activityType", ["user_signup", "resume_upload", "purchase", "template_download", "password_reset", "email_verification"]).notNull(),
+  activityType: mysqlEnum("activityType", ["user_signup", "resume_upload", "purchase", "template_download", "password_reset", "email_verification", "page_view", "prompt_copy", "cta_click", "scroll_depth", "signup", "login", "checkout_start", "checkout_complete"]).notNull(),
   userId: int("userId"),
   userName: varchar("userName", { length: 255 }),
   userEmail: varchar("userEmail", { length: 320 }),

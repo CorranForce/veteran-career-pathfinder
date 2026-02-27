@@ -37,7 +37,7 @@ export function ProductManagement() {
   // Initialize form with current product data
   useEffect(() => {
     if (product) {
-      const priceInDollars = (product.amount / 100).toFixed(2);
+      const priceInDollars = (product.price / 100).toFixed(2);
       setProductName(product.name);
       setProductPrice(priceInDollars);
       setProductDescription(product.description);
@@ -160,17 +160,17 @@ export function ProductManagement() {
         </div>
 
         {/* Current Stripe Info */}
-        {product?.productId && product.productId !== "price_premium_prompt" && (
+        {product?.id && (
           <div className="rounded-lg bg-muted p-4 space-y-1">
             <p className="text-sm font-medium">Stripe Product ID:</p>
             <p className="text-sm text-muted-foreground font-mono">
-              {product.productId}
+              {product.id}
             </p>
-            {product.priceId && product.priceId !== "price_premium_prompt" && (
+            {"stripePriceId" in product && product.stripePriceId && (
               <Fragment key="stripe-price-id">
                 <p className="text-sm font-medium mt-2">Stripe Price ID:</p>
                 <p className="text-sm text-muted-foreground font-mono">
-                  {product.priceId}
+                  {product.stripePriceId}
                 </p>
               </Fragment>
             )}

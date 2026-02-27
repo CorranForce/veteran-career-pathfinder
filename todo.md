@@ -1295,3 +1295,25 @@
 - [x] Email verification token generation
 - [x] Email verification confirmation page
 - [x] Account security settings UI
+
+
+## Current Sprint Tasks (Stripe & Analytics)
+
+### Stripe Integration
+- [x] Add Stripe feature using webdev_add_feature
+- [x] Define pricing products in code (Free, Premium $29, Pro $9.99/month)
+- [x] Create Stripe checkout session endpoints
+- [x] Build pricing page UI with tier comparison
+- [x] Create checkout success page
+- [x] Implement webhook handlers for payment events
+- [x] Add payment history page for users
+- [ ] Test payment flow end-to-end
+
+### Analytics Setup
+- [x] Configure built-in Manus analytics
+- [x] Add event tracking for key user actions
+- [x] Create admin analytics dashboard
+- [x] Track conversion events (signup, payment, prompt copy)
+- [x] Add user activity tracking
+- [x] Create analytics database queries
+- [ ] Build analytics visualization components
