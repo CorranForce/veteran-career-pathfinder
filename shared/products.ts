@@ -34,7 +34,7 @@ export const PRODUCTS = {
       "Salary negotiation tips",
       "Lifetime access to purchased content",
     ],
-    stripePriceId: process.env.STRIPE_PREMIUM_PRICE_ID || "",
+    stripePriceId: "", // Set at runtime on the server via ENV
   },
   PRO: {
     id: "pro",
@@ -54,7 +54,7 @@ export const PRODUCTS = {
       "Exclusive networking events",
       "Early access to new tools and resources",
     ],
-    stripePriceId: process.env.STRIPE_PRO_PRICE_ID || "",
+    stripePriceId: "", // Set at runtime on the server via ENV
   },
 } as const;
 
