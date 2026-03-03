@@ -1317,3 +1317,22 @@
 - [x] Add user activity tracking
 - [x] Create analytics database queries
 - [ ] Build analytics visualization components
+
+## Stripe Price IDs & Content Gating
+- [x] Set STRIPE_PREMIUM_PRICE_ID secret
+- [x] Set STRIPE_PRO_PRICE_ID secret
+- [x] Add tRPC procedure to check user purchase status (getAccessLevel)
+- [x] Gate prompt page content behind Premium/Pro purchase
+- [x] Show upgrade CTA with locked content preview for free users
+- [x] Show full content for Premium/Pro users
+
+## Product Management & Stripe Health
+- [x] Stripe product CRUD backend (create, read, update, archive via Stripe API)
+- [x] Sync Stripe products to local DB for fast reads
+- [x] Bi-directional Stripe verification (account + webhook + price IDs)
+- [x] 15-minute heartbeat ping scheduler (server-side setInterval)
+- [x] Persist last ping result and latency in DB
+- [x] Stripe Health card UI (status, latency, last checked)
+- [x] Manual ping button with toast notification
+- [x] Product Management admin UI (list, create, edit, archive)
+- [x] Wire ContentGate into Home.tsx prompt section

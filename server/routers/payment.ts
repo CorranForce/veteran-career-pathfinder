@@ -110,6 +110,20 @@ export const paymentRouter = router({
     }),
 
   /**
+   * Returns the user's highest access level: 'pro' | 'premium' | 'free'
+   * Used to gate content on the prompt/content pages.
+   */
+  getAccessLevel: protectedProcedure.query(async ({ ctx }) => {
+    const [hasPro, hasPremium] = await Promise.all([
+      hasUserPurchased(ctx.user.id, "pro_subscription"),
+      hasUserPurchased(ctx.user.id, "premium_prompt"),
+    ]);
+    if (hasPro) return { level: "pro" as const };
+    if (hasPremium) return { level: "premium" as const };
+    return { level: "free" as const };
+  }),
+
+  /**
    * Get user's downloadable digital assets from purchases
    */
   getUserDownloads: protectedProcedure

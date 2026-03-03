@@ -80,6 +80,10 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    // Start Stripe heartbeat after server is up
+    import("../stripeHeartbeat").then(({ startStripeHeartbeat }) => {
+      startStripeHeartbeat();
+    }).catch((err) => console.error("[Server] Failed to start Stripe heartbeat:", err));
   });
 }
 

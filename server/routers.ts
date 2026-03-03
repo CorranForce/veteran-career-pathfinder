@@ -20,6 +20,7 @@ import { accountSettingsRouter } from "./routers/accountSettings";
 import { productManagementRouter } from "./routers/productManagement";
 import { announcementsRouter } from "./routers/announcements";
 import { blogSubscriptionRouter } from "./routers/blogSubscription";
+import { stripeProductsRouter } from "./routers/stripeProducts";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -54,6 +55,7 @@ export const appRouter = router({
   productManagement: productManagementRouter,
   announcements: announcementsRouter,
   blogSubscription: blogSubscriptionRouter,
+  stripeProducts: stripeProductsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -48,6 +48,7 @@ import {
   Home,
   BarChart3,
   Settings,
+  Package,
   Search,
   MoreVertical,
   Ban,
@@ -62,6 +63,7 @@ import { format } from "date-fns";
 import { useLocation } from "wouter";
 import ActivityFeed from "@/components/ActivityFeed";
 import { ProductManagement } from "@/components/ProductManagement";
+import { StripeHealthCard } from "@/components/StripeHealthCard";
 
 export default function PlatformOwnerDashboard() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -297,7 +299,18 @@ export default function PlatformOwnerDashboard() {
         </div>
 
         {/* Product Management */}
-        <ProductManagement />
+        <div className="mb-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Product Management</h2>
+              <p className="text-sm text-muted-foreground">Manage products, pricing, and Stripe integration</p>
+            </div>
+            <Button onClick={() => setLocation("/admin/products")}>
+              <Package className="h-4 w-4 mr-2" /> Manage Products
+            </Button>
+          </div>
+          <StripeHealthCard />
+        </div>
 
         {/* Activity Feed */}
         <Card className="mb-8">

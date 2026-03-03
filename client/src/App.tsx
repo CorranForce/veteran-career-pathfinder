@@ -26,6 +26,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import AccountSettings from "./pages/AccountSettings";
+import ProductManagementPage from "./pages/ProductManagementPage";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -53,6 +54,7 @@ function Router() {
       <Route path={"/admin/dashboard"} component={PlatformOwnerDashboard} />
       <Route path={"/admin/analytics"} component={AdminDashboard} />
       <Route path={"/admin/templates"} component={AdminTemplates} />
+      <Route path={"/admin/products"} component={ProductManagementPage} />
       <Route path={"/templates"} component={ResumeTemplates} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogPost} />

@@ -418,6 +418,25 @@ export const announcements = mysqlTable("announcements", {
 });
 
 export type Announcement = typeof announcements.$inferSelect;
+
+/**
+ * Stripe Health Pings - persists heartbeat check results for the admin dashboard
+ */
+export const stripeHealthPings = mysqlTable("stripe_health_pings", {
+  id: int("id").autoincrement().primaryKey(),
+  status: mysqlEnum("status", ["ok", "degraded", "error"]).notNull(),
+  latencyMs: int("latencyMs").notNull(),
+  accountId: varchar("accountId", { length: 255 }),
+  webhookConfigured: boolean("webhookConfigured").default(false).notNull(),
+  premiumPriceValid: boolean("premiumPriceValid").default(false).notNull(),
+  proPriceValid: boolean("proPriceValid").default(false).notNull(),
+  errorMessage: text("errorMessage"),
+  triggeredBy: mysqlEnum("triggeredBy", ["heartbeat", "manual"]).default("heartbeat").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StripeHealthPing = typeof stripeHealthPings.$inferSelect;
+export type InsertStripeHealthPing = typeof stripeHealthPings.$inferInsert;
 export type InsertAnnouncement = typeof announcements.$inferInsert;
 
 

@@ -23,6 +23,7 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { SimpleContactButton } from "@/components/LiveChatWidget";
 import { StructuredData } from "@/components/StructuredData";
 import { AnnouncementsCard } from "@/components/AnnouncementsCard";
+import { ContentGate } from "@/components/ContentGate";
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -364,45 +365,69 @@ export default function Home() {
               </p>
             </div>
 
-            <Card className="border-2 shadow-xl">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Pathfinder Prompt</CardTitle>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      navigator.clipboard.writeText(promptText);
-                      alert('Prompt copied to clipboard!');
-                    }}
-                  >
-                    Copy Prompt
-                  </Button>
-                </div>
-                <CardDescription>
-                  A comprehensive AI prompt designed to translate military experience into civilian career opportunities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-muted/50 rounded-lg p-6 max-h-96 overflow-y-auto">
-                  <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed">
+            <ContentGate
+              requiredTier="premium"
+              lockTitle="Unlock the Full Pathfinder Prompt"
+              lockDescription="Get the complete AI Veteran Career Transition Strategist prompt — the exact system used to translate military experience into civilian career paths."
+              teaser={
+                <Card className="border-2 shadow-xl">
+                  <CardHeader>
+                    <CardTitle>Pathfinder Prompt — Preview</CardTitle>
+                    <CardDescription>
+                      A comprehensive AI prompt designed to translate military experience into civilian career opportunities
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted/50 rounded-lg p-6 max-h-48 overflow-hidden relative">
+                      <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed">
+{promptText.slice(0, 600)}...
+                      </pre>
+                      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-muted/80 to-transparent" />
+                    </div>
+                  </CardContent>
+                </Card>
+              }
+            >
+              <Card className="border-2 shadow-xl">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Pathfinder Prompt</CardTitle>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        navigator.clipboard.writeText(promptText);
+                        alert('Prompt copied to clipboard!');
+                      }}
+                    >
+                      Copy Prompt
+                    </Button>
+                  </div>
+                  <CardDescription>
+                    A comprehensive AI prompt designed to translate military experience into civilian career opportunities
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted/50 rounded-lg p-6 max-h-96 overflow-y-auto">
+                    <pre className="text-sm whitespace-pre-wrap font-mono leading-relaxed">
 {promptText}
-                  </pre>
-                </div>
-              </CardContent>
-            </Card>
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
 
-            <div className="text-center">
-              <Button 
-                size="lg" 
-                onClick={() => {
-                  navigator.clipboard.writeText(promptText);
-                  alert('Prompt copied to clipboard!');
-                }}
-                className="text-lg"
-              >
-                Copy Full Prompt <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
+              <div className="text-center">
+                <Button 
+                  size="lg" 
+                  onClick={() => {
+                    navigator.clipboard.writeText(promptText);
+                    alert('Prompt copied to clipboard!');
+                  }}
+                  className="text-lg"
+                >
+                  Copy Full Prompt <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            </ContentGate>
           </div>
         </div>
       </section>
