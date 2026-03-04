@@ -125,7 +125,7 @@ export default function Dashboard() {
               className="w-full"
               size="lg"
               onClick={() => {
-                window.location.href = getLoginUrl();
+                window.location.href = "/login";
               }}
             >
               Sign In

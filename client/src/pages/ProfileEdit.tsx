@@ -71,7 +71,7 @@ export default function ProfileEdit() {
         <h1 className="text-2xl font-bold">Sign In Required</h1>
         <p className="text-muted-foreground">Please sign in to edit your profile</p>
         <Button asChild>
-          <a href={getLoginUrl()}>Sign In</a>
+          <a href="/login">Sign In</a>
         </Button>
       </div>
     );

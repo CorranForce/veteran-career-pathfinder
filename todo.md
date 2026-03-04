@@ -1336,3 +1336,9 @@
 - [x] Manual ping button with toast notification
 - [x] Product Management admin UI (list, create, edit, archive)
 - [x] Wire ContentGate into Home.tsx prompt section
+
+## Bug Fix: Login Loop (Mar 3, 2026)
+- [x] Diagnose login redirect loop
+- [x] Remove residual Manus OAuth redirects
+- [x] Fix auth guards in useAuth hook and protected routes
+- [x] Verify login/signup pages are accessible without redirect

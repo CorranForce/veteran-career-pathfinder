@@ -94,7 +94,7 @@ export default function Home() {
             ) : (
               <>
                 <Button variant="outline" asChild>
-                  <a href={getLoginUrl()}>Login</a>
+                  <a href="/login">Login</a>
                 </Button>
                 <Button asChild>
                   <a href="/pricing">Get Started</a>
