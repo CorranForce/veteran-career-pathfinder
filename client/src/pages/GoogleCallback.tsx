@@ -12,6 +12,9 @@ export default function GoogleCallback() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
+    // Read intended destination stored before Google redirect
+    const nextPath = sessionStorage.getItem("loginNext") || "/tools";
+    sessionStorage.removeItem("loginNext");
     const errorParam = urlParams.get("error");
 
     if (errorParam) {
@@ -26,15 +29,13 @@ export default function GoogleCallback() {
       return;
     }
 
-    // Handle the OAuth callback
+    // Handle the OAuth callback — the server sets the httpOnly session cookie directly
     handleCallback.mutate(
       { code },
       {
-        onSuccess: (data) => {
-          // Set session cookie
-          document.cookie = `manus_session=${data.sessionToken}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
-          // Redirect to tools page after successful login
-          setLocation("/tools");
+        onSuccess: () => {
+          // Cookie is already set server-side; just navigate to the intended destination
+          setLocation(nextPath);
         },
         onError: (err) => {
           setError(err.message || "Failed to complete authentication");

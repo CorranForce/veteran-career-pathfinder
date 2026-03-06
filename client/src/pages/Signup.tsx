@@ -4,10 +4,16 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, Mail } from "lucide-react";
-
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -16,12 +22,13 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const signupMutation = trpc.customAuth.signup.useMutation({
-    onSuccess: (data) => {
-      // Set session cookie
-      document.cookie = `manus_session=${data.sessionToken}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
-      // Redirect to tools page after successful signup
-      window.location.href = "/tools";
+  // Read ?next= param to redirect after signup
+  const nextPath = new URLSearchParams(window.location.search).get("next") || "/tools";
+
+  const signupMutation = trpc.emailAuth.signup.useMutation({
+    onSuccess: () => {
+      // Cookie is set server-side (httpOnly). Navigate to the intended destination.
+      window.location.href = nextPath;
     },
     onError: (err) => {
       setError(err.message);
@@ -38,6 +45,8 @@ export default function Signup() {
 
   const handleGoogleSignup = () => {
     if (getAuthUrl.data?.authUrl) {
+      // Store intended destination so GoogleCallback can redirect there
+      sessionStorage.setItem("loginNext", nextPath);
       window.location.href = getAuthUrl.data.authUrl;
     }
   };
@@ -48,7 +57,7 @@ export default function Signup() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Create Your Account</CardTitle>
           <CardDescription className="text-center">
-            Join 2,847+ veterans who've already started their career transition
+            Join veterans who've already started their career transition
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -56,7 +65,7 @@ export default function Signup() {
           <div className="bg-accent/50 rounded-lg p-4 border border-accent">
             <div className="flex items-center gap-2 text-sm">
               <CheckCircle2 className="h-5 w-5 text-green-500" />
-              <span className="font-medium">Free account • No credit card required • 30-second signup</span>
+              <span className="font-medium">Free account · No credit card required · 30-second signup</span>
             </div>
           </div>
 
@@ -72,6 +81,7 @@ export default function Signup() {
             variant="outline"
             className="w-full"
             onClick={handleGoogleSignup}
+            disabled={!getAuthUrl.data?.authUrl}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -168,7 +178,10 @@ export default function Signup() {
         <CardFooter className="flex flex-col space-y-2">
           <p className="text-sm text-muted-foreground text-center">
             Already have an account?{" "}
-            <a href="/login" className="text-primary hover:underline font-medium">
+            <a
+              href={`/login${nextPath !== "/tools" ? `?next=${encodeURIComponent(nextPath)}` : ""}`}
+              className="text-primary hover:underline font-medium"
+            >
               Log in
             </a>
           </p>

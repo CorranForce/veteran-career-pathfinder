@@ -3,10 +3,7 @@ import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import * as db from "../db";
-import { users } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
-import { sdk } from "../_core/sdk";
-import { ENV } from "../_core/env";
+import { createSessionToken } from "../_core/session";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import crypto from "crypto";
 
@@ -52,24 +49,31 @@ export const emailAuthRouter = router({
         metadata: JSON.stringify({ loginMethod: "email" }),
       });
 
-      // Create session token using SDK (same as OAuth flow)
-      const sessionToken = await sdk.createSessionToken(`email:${userId}`, {
+      // Create session token using custom session helper
+      const sessionToken = await createSessionToken({
+        userId,
+        email: input.email,
         name: input.name,
-        expiresInMs: ONE_YEAR_MS,
+        role: "user",
       });
 
       // Set cookie
       if (ctx.res) {
-        const cookieOptions = { httpOnly: true, secure: true, sameSite: "lax" as const, maxAge: ONE_YEAR_MS };
+        const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax" as const,
+          maxAge: ONE_YEAR_MS,
+        };
         ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
       }
 
       // Send welcome email
       try {
         const { sendSignupWelcomeEmail } = await import("../services/email");
-        await sendSignupWelcomeEmail({ 
-          to: input.email, 
-          name: input.name 
+        await sendSignupWelcomeEmail({
+          to: input.email,
+          name: input.name,
         });
       } catch (emailError) {
         console.error("[EmailAuth] Failed to send welcome email:", emailError);
@@ -120,15 +124,22 @@ export const emailAuthRouter = router({
       // Update last signed in
       await db.updateUserLastSignIn(user.id);
 
-      // Create session token using SDK
-      const sessionToken = await sdk.createSessionToken(`email:${user.id}`, {
-        name: user.name || "",
-        expiresInMs: ONE_YEAR_MS,
+      // Create session token using custom session helper
+      const sessionToken = await createSessionToken({
+        userId: user.id,
+        email: user.email!,
+        name: user.name,
+        role: user.role,
       });
 
       // Set cookie
       if (ctx.res) {
-        const cookieOptions = { httpOnly: true, secure: true, sameSite: "lax" as const, maxAge: ONE_YEAR_MS };
+        const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax" as const,
+          maxAge: ONE_YEAR_MS,
+        };
         ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
       }
 
@@ -140,7 +151,7 @@ export const emailAuthRouter = router({
           name: user.name,
           role: user.role,
         },
-       };
+      };
     }),
 
   /**
@@ -169,7 +180,10 @@ export const emailAuthRouter = router({
         await sendPasswordResetEmail(user.email!, user.name, resetUrl);
       } catch (emailError) {
         console.error("[EmailAuth] Failed to send password reset email:", emailError);
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to send reset email" });
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to send reset email",
+        });
       }
 
       return { success: true };
@@ -185,12 +199,18 @@ export const emailAuthRouter = router({
       const user = await db.getUserByResetToken(input.token);
 
       if (!user || !user.resetTokenExpiry) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid or expired reset token" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid or expired reset token",
+        });
       }
 
       // Check if token is expired
       if (new Date() > user.resetTokenExpiry) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Reset token has expired" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Reset token has expired",
+        });
       }
 
       // Hash new password

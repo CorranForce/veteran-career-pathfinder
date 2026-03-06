@@ -5,6 +5,7 @@ import * as db from "../db";
 import { OAuth2Client } from "google-auth-library";
 import { ENV } from "../_core/env";
 import { createSessionToken } from "../_core/session";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 // Initialize Google OAuth client
 const getGoogleOAuthClient = () => {
@@ -116,7 +117,7 @@ export const googleAuthRouter = router({
           });
         }
 
-        // Create session token
+        // Create session token and set it as an httpOnly cookie server-side
         const sessionToken = await createSessionToken({
           userId: user.id,
           email: user.email!,
@@ -124,9 +125,17 @@ export const googleAuthRouter = router({
           role: user.role,
         });
 
+        if (ctx.res) {
+          ctx.res.cookie(COOKIE_NAME, sessionToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: ONE_YEAR_MS,
+          });
+        }
+
         return {
           success: true,
-          sessionToken,
           user: {
             id: user.id,
             email: user.email,

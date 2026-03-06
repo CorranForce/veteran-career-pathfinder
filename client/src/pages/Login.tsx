@@ -4,10 +4,16 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, LogIn } from "lucide-react";
-
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -15,12 +21,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const loginMutation = trpc.customAuth.login.useMutation({
-    onSuccess: (data) => {
-      // Set session cookie
-      document.cookie = `manus_session=${data.sessionToken}; path=/; max-age=${365 * 24 * 60 * 60}; SameSite=Lax`;
-      // Redirect to tools page after successful login
-      window.location.href = "/tools";
+  // Read ?next= param to redirect after login
+  const nextPath = new URLSearchParams(window.location.search).get("next") || "/tools";
+
+  const loginMutation = trpc.emailAuth.login.useMutation({
+    onSuccess: () => {
+      // Cookie is set server-side (httpOnly). Navigate to the intended destination.
+      window.location.href = nextPath;
     },
     onError: (err) => {
       setError(err.message);
@@ -37,6 +44,11 @@ export default function Login() {
 
   const handleGoogleLogin = () => {
     if (getAuthUrl.data?.authUrl) {
+      // Append ?next= to the Google OAuth state so callback can redirect correctly
+      const url = new URL(getAuthUrl.data.authUrl);
+      // Pass next path via state or a custom param — we'll encode it in the redirect_uri
+      // For now, store in sessionStorage so GoogleCallback can read it
+      sessionStorage.setItem("loginNext", nextPath);
       window.location.href = getAuthUrl.data.authUrl;
     }
   };
@@ -63,6 +75,7 @@ export default function Login() {
             variant="outline"
             className="w-full"
             onClick={handleGoogleLogin}
+            disabled={!getAuthUrl.data?.authUrl}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -149,7 +162,10 @@ export default function Login() {
         <CardFooter className="flex flex-col space-y-2">
           <p className="text-sm text-muted-foreground text-center">
             Don't have an account?{" "}
-            <a href="/signup" className="text-primary hover:underline font-medium">
+            <a
+              href={`/signup${nextPath !== "/tools" ? `?next=${encodeURIComponent(nextPath)}` : ""}`}
+              className="text-primary hover:underline font-medium"
+            >
               Sign up for free
             </a>
           </p>

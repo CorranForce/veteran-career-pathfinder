@@ -66,7 +66,10 @@ export function useAuth(options?: UseAuthOptions) {
     if (window.location.pathname === "/login") return;
     if (window.location.pathname === "/signup") return;
 
-    window.location.href = redirectPath;
+    // Append ?next= so login page can redirect back to the intended page
+    const currentPath = window.location.pathname + window.location.search;
+    const loginUrl = `${redirectPath}?next=${encodeURIComponent(currentPath)}`;
+    window.location.href = loginUrl;
   }, [
     redirectOnUnauthenticated,
     redirectPath,

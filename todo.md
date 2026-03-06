@@ -1342,3 +1342,15 @@
 - [x] Remove residual Manus OAuth redirects
 - [x] Fix auth guards in useAuth hook and protected routes
 - [x] Verify login/signup pages are accessible without redirect
+
+## Auth Cleanup & Improvements (Mar 5, 2026)
+- [x] Remove dead Manus OAuth server route (server/_core/oauth.ts)
+- [x] Remove unused Manus SDK dependency
+- [x] Add redirect-after-login flow with ?next= query param
+- [x] Update Login.tsx to read ?next= and redirect after success
+- [x] Update Signup.tsx to read ?next= and redirect after success
+- [x] Update useAuth.ts to pass ?next= when redirecting unauthenticated users
+- [x] Verify Google OAuth callback flow end-to-end
+- [x] Fix Google OAuth session cookie (now set server-side via httpOnly cookie)
+- [x] Fix emailAuth.ts to use custom session.ts instead of Manus SDK
+- [x] Set FRONTEND_URL secret for correct Google OAuth redirect URI
