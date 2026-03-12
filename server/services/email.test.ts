@@ -1,34 +1,49 @@
-import { describe, it, expect } from "vitest";
-import sgMail from "@sendgrid/mail";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ENV } from "../_core/env";
 
+// Mock @sendgrid/mail so no real emails are sent in tests
+vi.mock("@sendgrid/mail", () => ({
+  default: {
+    setApiKey: vi.fn(),
+    send: vi.fn().mockResolvedValue([{ statusCode: 202 }, {}]),
+  },
+}));
+
 describe("SendGrid Email Service", () => {
-  it("should have valid SendGrid API credentials configured", async () => {
-    // Check that credentials are set
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should have SendGrid credentials configured in ENV", () => {
     expect(ENV.sendgridApiKey).toBeTruthy();
     expect(ENV.sendgridFromEmail).toBeTruthy();
-    expect(ENV.sendgridFromEmail).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/); // Valid email format
-
-    // Initialize SendGrid
-    sgMail.setApiKey(ENV.sendgridApiKey);
-
-    // Test API key validity by attempting to verify it
-    // Note: We're not actually sending an email to avoid consuming quota
-    // Instead, we validate the API key format and configuration
+    expect(ENV.sendgridFromEmail).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
     expect(ENV.sendgridApiKey.length).toBeGreaterThan(20);
-    expect(ENV.sendgridApiKey).toMatch(/^SG\./); // SendGrid API keys start with "SG."
-  }, 10000);
+    expect(ENV.sendgridApiKey).toMatch(/^SG\./);
+  });
 
-  it("should send a test welcome email", async () => {
+  it("should call sendWelcomeEmail without throwing", async () => {
     const { sendWelcomeEmail } = await import("./email");
 
-    // Send test email to the configured FROM address (so it goes to yourself)
+    // With the mocked SendGrid, this should succeed
     const result = await sendWelcomeEmail({
-      to: ENV.sendgridFromEmail,
+      to: "test@example.com",
       name: "Test User",
     });
 
-    // Email should send successfully
+    // The function should return true on success
     expect(result).toBe(true);
-  }, 15000);
+  }, 10000);
+
+  it("should call sendPasswordResetEmail without throwing", async () => {
+    const { sendPasswordResetEmail } = await import("./email");
+
+    const result = await sendPasswordResetEmail({
+      to: "test@example.com",
+      name: "Test User",
+      resetUrl: "https://example.com/reset?token=abc123",
+    });
+
+    expect(result).toBe(true);
+  }, 10000);
 });

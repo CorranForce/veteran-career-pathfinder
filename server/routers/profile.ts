@@ -210,8 +210,11 @@ export const profileRouter = router({
   uploadProfilePicture: protectedProcedure
     .input(
       z.object({
-        imageData: z.string(), // Base64 encoded image
-        mimeType: z.string(),
+        imageData: z.string().min(1, "Image data is required"), // Base64 encoded image
+        mimeType: z.string().refine(
+          (v) => ["image/png", "image/jpeg", "image/gif", "image/webp"].includes(v),
+          { message: "Unsupported image format. Use PNG, JPEG, GIF, or WebP" }
+        ),
       })
     )
     .mutation(async ({ ctx, input }) => {

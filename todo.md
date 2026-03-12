@@ -1354,3 +1354,18 @@
 - [x] Fix Google OAuth session cookie (now set server-side via httpOnly cookie)
 - [x] Fix emailAuth.ts to use custom session.ts instead of Manus SDK
 - [x] Set FRONTEND_URL secret for correct Google OAuth redirect URI
+
+## SendGrid Test Fix (Mar 11, 2026)
+- [x] Rewrite email.test.ts to mock @sendgrid/mail so no real network calls are made
+- [x] All 128 tests passing (13 test files)
+
+## Remaining Verification Tasks
+- [x] Verify STRIPE_PREMIUM_PRICE_ID uses price_... (not prod_...) value
+- [x] Verify STRIPE_PRO_PRICE_ID uses price_... (not prod_...) value
+- [x] Switched to live mode Stripe keys (sk_live_... / pk_live_...)
+- [x] API test: signup with email/password → HTTP 200
+- [x] API test: login and session persistence → auth.me returns user
+- [x] API test: logout clears session → auth.me returns null
+- [x] API test: content gating returns { level: 'free' } for unpaid users
+- [ ] Browser test: Google OAuth flow end-to-end (requires manual test)
+- [ ] Verify Google OAuth redirect URI registered in Google Cloud Console (manual step)

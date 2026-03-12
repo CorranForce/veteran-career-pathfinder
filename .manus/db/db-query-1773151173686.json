@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, name, email, loginMethod, role FROM users LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, name, email, loginMethod, role FROM users LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "  Allen Davis  ",
+      "email": "deleted_1_1773151059893@deleted.local",
+      "loginMethod": "google",
+      "role": "platform_owner"
+    },
+    {
+      "id": "870089",
+      "name": "Test User",
+      "email": "test-user-1771258326859@example.com",
+      "loginMethod": "email",
+      "role": "user"
+    },
+    {
+      "id": "1470001",
+      "name": "Test User",
+      "email": "test-user-1772109167383@example.com",
+      "loginMethod": "email",
+      "role": "admin"
+    },
+    {
+      "id": "1500001",
+      "name": "Test User",
+      "email": "test-user-1772550945494@example.com",
+      "loginMethod": "email",
+      "role": "admin"
+    },
+    {
+      "id": "1500002",
+      "name": "Test User",
+      "email": "test-user-1772550961961@example.com",
+      "loginMethod": "email",
+      "role": "admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tloginMethod\trole\n1\t  Allen Davis  \tdeleted_1_1773151059893@deleted.local\tgoogle\tplatform_owner\n870089\tTest User\ttest-user-1771258326859@example.com\temail\tuser\n1470001\tTest User\ttest-user-1772109167383@example.com\temail\tadmin\n1500001\tTest User\ttest-user-1772550945494@example.com\temail\tadmin\n1500002\tTest User\ttest-user-1772550961961@example.com\temail\tadmin\n",
+  "stderr": "",
+  "execution_time_ms": 403
+}
