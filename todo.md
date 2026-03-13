@@ -1367,5 +1367,10 @@
 - [x] API test: login and session persistence → auth.me returns user
 - [x] API test: logout clears session → auth.me returns null
 - [x] API test: content gating returns { level: 'free' } for unpaid users
-- [ ] Browser test: Google OAuth flow end-to-end (requires manual test)
-- [ ] Verify Google OAuth redirect URI registered in Google Cloud Console (manual step)
+- [x] Browser test: Google OAuth flow end-to-end — identified client_id mismatch
+- [x] Verified Google OAuth redirect URI: https://pathfinder.casa/auth/google/callback
+- [x] Updated GOOGLE_CLIENT_ID to 1094942786746-... (matching Google Cloud Console)
+- [x] Updated GOOGLE_CLIENT_SECRET to match new client
+- [x] Added googleAuth.credentials.test.ts — all 4 tests pass
+- [ ] Publish new checkpoint so live server picks up updated Google credentials
+- [ ] Re-test Continue with Google button after publish
