@@ -1372,5 +1372,6 @@
 - [x] Updated GOOGLE_CLIENT_ID to 1094942786746-... (matching Google Cloud Console)
 - [x] Updated GOOGLE_CLIENT_SECRET to match new client
 - [x] Added googleAuth.credentials.test.ts — all 4 tests pass
-- [ ] Publish new checkpoint so live server picks up updated Google credentials
-- [ ] Re-test Continue with Google button after publish
+- [x] Publish new checkpoint so live server picks up updated Google credentials
+- [x] Re-test Continue with Google button after publish — SUCCESS (full OAuth flow completed end-to-end)
+- [x] Removed debug credentials endpoint from googleAuth router (security cleanup)

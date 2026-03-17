@@ -22,19 +22,6 @@ const getGoogleOAuthClient = () => {
 
 export const googleAuthRouter = router({
   /**
-   * Temporary debug: check what Google credentials are loaded (safe - only shows last 6 chars)
-   */
-  debugCredentials: publicProcedure.query(() => {
-    const clientId = process.env.GOOGLE_CLIENT_ID || '';
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET || '';
-    return {
-      clientIdSuffix: clientId.slice(-20),
-      clientSecretSuffix: clientSecret.slice(-6),
-      clientSecretLength: clientSecret.length,
-    };
-  }),
-
-  /**
    * Get Google OAuth authorization URL
    */
   getAuthUrl: publicProcedure.query(() => {
