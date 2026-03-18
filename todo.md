@@ -1375,3 +1375,13 @@
 - [x] Publish new checkpoint so live server picks up updated Google credentials
 - [x] Re-test Continue with Google button after publish — SUCCESS (full OAuth flow completed end-to-end)
 - [x] Removed debug credentials endpoint from googleAuth router (security cleanup)
+
+## Legal Pages (Mar 18, 2026)
+- [x] Create /privacy page (Privacy Policy) with full content
+- [x] Create /terms page (Terms of Service) with full content
+- [x] Create /refund page (Refund Policy — 30-day money-back guarantee)
+- [x] Register /privacy, /terms, /refund routes in App.tsx
+- [x] Add legal footer links to Home.tsx footer
+- [x] Fix Refund Policy link in Pricing.tsx footer (/refund-policy → /refund)
+- [x] Update copyright year to dynamic {new Date().getFullYear()} in both footers
+- [x] All 135 tests still passing after legal page additions
