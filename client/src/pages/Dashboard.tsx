@@ -29,6 +29,7 @@ import { useLocation } from "wouter";
 import ResumeUpload from "@/components/ResumeUpload";
 import ResumeList from "@/components/ResumeList";
 import PurchaseHistory from "@/components/PurchaseHistory";
+import SubscriptionStatusCard from "@/components/SubscriptionStatusCard";
 
 export default function Dashboard() {
   const { user, loading: authLoading, isAuthenticated, logout } = useAuth();
@@ -157,6 +158,9 @@ export default function Dashboard() {
             Manage your account settings and profile information.
           </p>
         </div>
+
+        {/* Subscription Status Card */}
+        <SubscriptionStatusCard />
 
         {/* Account Information Card */}
         <Card className="mb-6">

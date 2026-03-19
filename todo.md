@@ -1385,3 +1385,16 @@
 - [x] Fix Refund Policy link in Pricing.tsx footer (/refund-policy → /refund)
 - [x] Update copyright year to dynamic {new Date().getFullYear()} in both footers
 - [x] All 135 tests still passing after legal page additions
+
+## Dashboard Subscription Status (Mar 19, 2026)
+- [x] Add getSubscriptionStatus tRPC procedure to payment router
+- [x] Fetch live Stripe subscription data (period_end via items.data[0], cancel_at_period_end, status) for Pro tier
+- [x] Return lifetime access info for Premium one-time purchase tier
+- [x] Return free tier defaults for unauthenticated/unpaid users
+- [x] Fix TypeScript error: current_period_end is on SubscriptionItem not Subscription
+- [x] Create SubscriptionStatusCard component with tier-specific UI (Free/Premium/Pro)
+- [x] Show next billing date, cancel status, amount paid, and member since date
+- [x] Add Manage Billing / Upgrade CTA buttons
+- [x] Integrate SubscriptionStatusCard into Dashboard page
+- [x] Write subscriptionStatus.test.ts with 15 unit tests covering all tiers
+- [x] All 147 tests passing across 16 test files

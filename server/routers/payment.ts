@@ -2,8 +2,11 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { stripe } from "../stripe";
 import { PRODUCTS } from "../products";
-import { createPurchase, getUserPurchases, hasUserPurchased, updateUserStripeCustomerId } from "../db";
+import { createPurchase, getUserPurchases, hasUserPurchased, updateUserStripeCustomerId, getUserById } from "../db";
 import { getUserDownloads } from "../services/purchaseFulfillment";
+import { and, eq, desc } from "drizzle-orm";
+import { getDb } from "../db";
+import { purchases } from "../../drizzle/schema";
 
 export const paymentRouter = router({
   /**
@@ -121,6 +124,113 @@ export const paymentRouter = router({
     if (hasPro) return { level: "pro" as const };
     if (hasPremium) return { level: "premium" as const };
     return { level: "free" as const };
+  }),
+
+  /**
+   * Get the user's current subscription/plan status.
+   * - For Pro (subscription): fetches live data from Stripe for billing period and cancellation info.
+   * - For Premium (one-time): returns purchase date and lifetime access.
+   * - For Free: returns free tier info.
+   */
+  getSubscriptionStatus: protectedProcedure.query(async ({ ctx }) => {
+    // Check for Pro subscription first (highest tier)
+    const db = await getDb();
+    if (!db) return { tier: "free" as const, planName: "Free", status: "active" as const };
+
+    // Find the most recent completed pro subscription purchase
+    const proRows = await db
+      .select()
+      .from(purchases)
+      .where(
+        and(
+          eq(purchases.userId, ctx.user.id),
+          eq(purchases.productType, "pro_subscription"),
+          eq(purchases.status, "completed")
+        )
+      )
+      .orderBy(desc(purchases.createdAt))
+      .limit(1);
+
+    if (proRows.length > 0 && proRows[0].stripeSubscriptionId) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(proRows[0].stripeSubscriptionId);
+        // current_period_end is on SubscriptionItem in this Stripe SDK version
+        const firstItem = sub.items?.data?.[0];
+        const periodEnd: number | null = firstItem?.current_period_end ?? null;
+        const nextBillingDate = periodEnd
+          ? new Date(periodEnd * 1000).toISOString()
+          : null;
+        const cancelAtPeriodEnd = sub.cancel_at_period_end ?? false;
+        const subStatus = sub.status; // active, past_due, canceled, etc.
+
+        return {
+          tier: "pro" as const,
+          planName: "Pro Membership",
+          status: subStatus as string,
+          nextBillingDate,
+          cancelAtPeriodEnd,
+          purchasedAt: proRows[0].createdAt.toISOString(),
+          amount: proRows[0].amount,
+          currency: proRows[0].currency,
+          stripeSubscriptionId: proRows[0].stripeSubscriptionId,
+        };
+      } catch (err) {
+        // Stripe lookup failed — fall back to DB data
+        console.warn("[getSubscriptionStatus] Stripe subscription lookup failed:", err);
+        return {
+          tier: "pro" as const,
+          planName: "Pro Membership",
+          status: "active" as string,
+          nextBillingDate: null,
+          cancelAtPeriodEnd: false,
+          purchasedAt: proRows[0].createdAt.toISOString(),
+          amount: proRows[0].amount,
+          currency: proRows[0].currency,
+          stripeSubscriptionId: proRows[0].stripeSubscriptionId,
+        };
+      }
+    }
+
+    // Check for Premium one-time purchase
+    const premiumRows = await db
+      .select()
+      .from(purchases)
+      .where(
+        and(
+          eq(purchases.userId, ctx.user.id),
+          eq(purchases.productType, "premium_prompt"),
+          eq(purchases.status, "completed")
+        )
+      )
+      .orderBy(desc(purchases.createdAt))
+      .limit(1);
+
+    if (premiumRows.length > 0) {
+      return {
+        tier: "premium" as const,
+        planName: "Premium Prompt Access",
+        status: "active" as string,
+        nextBillingDate: null,
+        cancelAtPeriodEnd: false,
+        purchasedAt: premiumRows[0].createdAt.toISOString(),
+        amount: premiumRows[0].amount,
+        currency: premiumRows[0].currency,
+        stripeSubscriptionId: null,
+      };
+    }
+
+    // Free tier
+    return {
+      tier: "free" as const,
+      planName: "Free",
+      status: "active" as string,
+      nextBillingDate: null,
+      cancelAtPeriodEnd: false,
+      purchasedAt: null,
+      amount: 0,
+      currency: "usd",
+      stripeSubscriptionId: null,
+    };
   }),
 
   /**
