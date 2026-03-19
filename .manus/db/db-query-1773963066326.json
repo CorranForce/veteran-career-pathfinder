@@ -1,0 +1,100 @@
+{
+  "query": "SELECT id, email, name, loginMethod, LEFT(passwordHash, 10) as hash_prefix, emailVerified, createdAt FROM users ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, email, name, loginMethod, LEFT(passwordHash, 10) as hash_prefix, emailVerified, createdAt FROM users ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "1800004",
+      "email": "test-user-1773956479794@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-19 21:41:20"
+    },
+    {
+      "id": "1800003",
+      "email": "test-user-1773955898150@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-19 21:31:38"
+    },
+    {
+      "id": "1800002",
+      "email": "test-user-1773955853785@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-19 21:30:53"
+    },
+    {
+      "id": "1800001",
+      "email": "test-user-1773955843477@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-19 21:30:43"
+    },
+    {
+      "id": "1770002",
+      "email": "test-user-1773917813235@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-19 10:56:53"
+    },
+    {
+      "id": "1770001",
+      "email": "test-user-1773917788129@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-19 10:56:28"
+    },
+    {
+      "id": "1740001",
+      "email": "test-user-1773831337675@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-18 10:55:37"
+    },
+    {
+      "id": "1710002",
+      "email": "test-user-1773745235726@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-17 11:00:36"
+    },
+    {
+      "id": "1710001",
+      "email": "pathfinder.casa@gmail.com",
+      "name": "Allen Davis",
+      "loginMethod": "google",
+      "hash_prefix": "NULL",
+      "emailVerified": "0",
+      "createdAt": "2026-03-17 10:58:39"
+    },
+    {
+      "id": "1680004",
+      "email": "testvet_browser@mailinator.com",
+      "name": "Test Veteran",
+      "loginMethod": "email",
+      "hash_prefix": "$2b$10$zZY",
+      "emailVerified": "0",
+      "createdAt": "2026-03-12 18:42:18"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\thash_prefix\temailVerified\tcreatedAt\n1800004\ttest-user-1773956479794@example.com\tTest User\temail\tNULL\t0\t2026-03-19 21:41:20\n1800003\ttest-user-1773955898150@example.com\tTest User\temail\tNULL\t0\t2026-03-19 21:31:38\n1800002\ttest-user-1773955853785@example.com\tTest User\temail\tNULL\t0\t2026-03-19 21:30:53\n1800001\ttest-user-1773955843477@example.com\tTest User\temail\tNULL\t0\t2026-03-19 21:30:43\n1770002\ttest-user-1773917813235@example.com\tTest User\temail\tNULL\t0\t2026-03-19 10:56:53\n1770001\ttest-user-1773917788129@example.com\tTest User\temail\tNULL\t0\t2026-03-19 10:56:28\n1740001\ttest-user-1773831337675@example.com\tTest User\temail\tNULL\t0\t2026-03-18 10:55:37\n1710002\ttest-user-1773745235726@example.com\tTest User\temail\tNULL\t0\t2026-03-17 11:00:36\n1710001\tpathfinder.casa@gmail.com\tAllen Davis\tgoogle\tNULL\t0\t2026-03-17 10:58:39\n1680004\ttestvet_browser@mailinator.com\tTest Veteran\temail\t$2b$10$zZY\t0\t2026-03-12 18:42:18\n",
+  "stderr": "",
+  "execution_time_ms": 234
+}

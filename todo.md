@@ -1417,3 +1417,4 @@
 - [x] Added canonical link pointing to https://pathfinder.casa
 - [x] Added H2 in hero section: "AI-Powered Veteran Career Transition & Military-to-Civilian Job Pathfinder"
 - [x] All 157 tests still passing
+- [x] Fix "Invalid email or password" error on /login page

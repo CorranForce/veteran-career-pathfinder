@@ -1,0 +1,9 @@
+{
+  "query": "SELECT id, email, name, loginMethod, passwordHash IS NULL as hash_is_null, createdAt FROM users WHERE loginMethod = 'email' AND passwordHash IS NULL AND email NOT LIKE '%test-user%' ORDER BY createdAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, email, name, loginMethod, passwordHash IS NULL as hash_is_null, createdAt FROM users WHERE loginMethod = 'email' AND passwordHash IS NULL AND email NOT LIKE '%test-user%' ORDER BY createdAt DESC LIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 53
+}

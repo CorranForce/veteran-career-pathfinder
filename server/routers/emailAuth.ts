@@ -104,10 +104,22 @@ export const emailAuthRouter = router({
       // Find user by email
       const user = await db.getUserByEmail(input.email);
 
-      if (!user || !user.passwordHash) {
+      if (!user) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email or password",
+        });
+      }
+
+      // User exists but has no password — they signed up via Google OAuth
+      if (!user.passwordHash) {
+        const loginMethod = user.loginMethod || "a social account";
+        const isGoogle = loginMethod === "google";
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: isGoogle
+            ? "This account was created with Google. Please use the \"Continue with Google\" button to sign in."
+            : `This account uses ${loginMethod} login. Please use the appropriate sign-in method.`,
         });
       }
 
