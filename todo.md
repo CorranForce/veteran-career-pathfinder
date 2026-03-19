@@ -1407,3 +1407,13 @@
 - [x] Added loading spinner ("Opening Portal…") while session is being created
 - [x] Write portalSession.test.ts with 10 unit tests covering all scenarios
 - [x] All 157 tests passing across 17 test files
+
+## SEO Fixes — Homepage (Mar 19, 2026)
+- [x] Installed react-helmet-async and added HelmetProvider to main.tsx
+- [x] Added <Helmet> to Home.tsx with title (45 chars): "Pathfinder — Veteran Career Transition Strategist"
+- [x] Added meta description (143 chars) with veteran career transition keywords
+- [x] Added meta keywords: veteran career transition, military to civilian jobs, MOS translator, etc.
+- [x] Added Open Graph tags (og:title, og:description, og:url, og:type)
+- [x] Added canonical link pointing to https://pathfinder.casa
+- [x] Added H2 in hero section: "AI-Powered Veteran Career Transition & Military-to-Civilian Job Pathfinder"
+- [x] All 157 tests still passing

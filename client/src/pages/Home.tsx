@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { Helmet } from "react-helmet-async";
 import EmailCaptureForm from "@/components/EmailCaptureForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Pathfinder — Veteran Career Transition Strategist</title>
+        <meta name="description" content="AI-powered tool helping military veterans translate their service into civilian careers. Get personalized job paths, skills mapping, and a 30-day action plan." />
+        <meta name="keywords" content="veteran career transition, military to civilian jobs, MOS translator, veteran employment, AI career advisor, military skills translation, veteran job search" />
+        <meta property="og:title" content="Pathfinder — Veteran Career Transition Strategist" />
+        <meta property="og:description" content="AI-powered tool helping military veterans translate their service into civilian careers. Get personalized job paths, skills mapping, and a 30-day action plan." />
+        <meta property="og:url" content="https://pathfinder.casa" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://pathfinder.casa" />
+      </Helmet>
       {/* SEO: Organization structured data */}
       <StructuredData
         type="Organization"
@@ -117,6 +128,9 @@ export default function Home() {
                 <h1 className="text-5xl md:text-6xl font-bold leading-tight">
                   Translate Your Service Into Your Next Mission
                 </h1>
+                <h2 className="text-xl font-semibold text-primary">
+                  AI-Powered Veteran Career Transition &amp; Military-to-Civilian Job Pathfinder
+                </h2>
                 <p className="text-xl text-muted-foreground leading-relaxed">
                   An AI specialist designed to help military veterans navigate the civilian job market with confidence. 
                   Get clear career paths, actionable plans, and the clarity you deserve.
