@@ -6,6 +6,11 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import {
+  loginRateLimiter,
+  signupRateLimiter,
+  passwordResetRateLimiter,
+} from "./rateLimiter";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -53,6 +58,15 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+  // ── Auth rate limiters ────────────────────────────────────────────────────
+  // These must be registered BEFORE the tRPC middleware so they run first.
+  // The URL pattern is /api/trpc/<routerName>.<procedureName>
+  app.use("/api/trpc/emailAuth.login", loginRateLimiter);
+  app.use("/api/trpc/emailAuth.signup", signupRateLimiter);
+  app.use("/api/trpc/emailAuth.requestPasswordReset", passwordResetRateLimiter);
+  app.use("/api/trpc/emailAuth.resetPassword", passwordResetRateLimiter);
+
   // tRPC API
   app.use(
     "/api/trpc",

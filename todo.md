@@ -1418,3 +1418,10 @@
 - [x] Added H2 in hero section: "AI-Powered Veteran Career Transition & Military-to-Civilian Job Pathfinder"
 - [x] All 157 tests still passing
 - [x] Fix "Invalid email or password" error on /login page
+- [x] Install express-rate-limit package
+- [x] Create rate limiting middleware for auth endpoints
+- [x] Apply rate limiter to login endpoint (5 attempts / 15 min per IP)
+- [x] Apply rate limiter to signup endpoint (10 attempts / hour per IP)
+- [x] Apply rate limiter to password reset endpoint (5 attempts / hour per IP)
+- [x] Return clear 429 error messages to the client
+- [x] Write vitest tests for rate limiting logic
