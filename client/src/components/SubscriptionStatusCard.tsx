@@ -76,14 +76,24 @@ export default function SubscriptionStatusCard() {
   const [, setLocation] = useLocation();
   const { data: subscription, isLoading } = trpc.payment.getSubscriptionStatus.useQuery();
 
+  const createPortalSession = trpc.payment.createPortalSession.useMutation({
+    onSuccess: (data) => {
+      // Open the Stripe Customer Portal in a new tab
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    },
+    onError: (err) => {
+      console.error("[SubscriptionStatusCard] Portal session error:", err);
+      toast.error("Unable to open billing portal. Please try again.");
+    },
+  });
+
   const handleUpgrade = () => {
     setLocation("/pricing");
   };
 
   const handleManageBilling = () => {
-    // Open Stripe customer portal or pricing page
-    toast.info("To manage your subscription, please contact support or visit the pricing page.");
-    setLocation("/pricing");
+    toast.info("Opening Stripe billing portal…");
+    createPortalSession.mutate();
   };
 
   return (
@@ -260,9 +270,19 @@ export default function SubscriptionStatusCard() {
             <Separator />
 
             <div className="flex items-center justify-end">
-              <Button variant="outline" size="sm" onClick={handleManageBilling} className="gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Manage Billing
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleManageBilling}
+                disabled={createPortalSession.isPending}
+                className="gap-2"
+              >
+                {createPortalSession.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ExternalLink className="h-4 w-4" />
+                )}
+                {createPortalSession.isPending ? "Opening Portal…" : "Manage Billing"}
               </Button>
             </div>
           </div>

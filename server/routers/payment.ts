@@ -234,6 +234,35 @@ export const paymentRouter = router({
   }),
 
   /**
+   * Create a Stripe Customer Portal session so the user can manage their billing.
+   * Returns a URL to redirect the user to the Stripe-hosted portal.
+   */
+  createPortalSession: protectedProcedure.mutation(async ({ ctx }) => {
+    // Ensure the user has a Stripe customer ID
+    let customerId = ctx.user.stripeCustomerId;
+
+    if (!customerId) {
+      // Create a Stripe customer record if one doesn't exist yet
+      const customer = await stripe.customers.create({
+        email: ctx.user.email || undefined,
+        name: ctx.user.name || undefined,
+        metadata: { userId: ctx.user.id.toString() },
+      });
+      customerId = customer.id;
+      await updateUserStripeCustomerId(ctx.user.id, customerId);
+    }
+
+    const origin = ctx.req.headers.origin || `${ctx.req.protocol}://${ctx.req.get("host")}`;
+
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: `${origin}/dashboard`,
+    });
+
+    return { url: session.url };
+  }),
+
+  /**
    * Get user's downloadable digital assets from purchases
    */
   getUserDownloads: protectedProcedure

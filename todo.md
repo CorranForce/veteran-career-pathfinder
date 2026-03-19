@@ -1398,3 +1398,12 @@
 - [x] Integrate SubscriptionStatusCard into Dashboard page
 - [x] Write subscriptionStatus.test.ts with 15 unit tests covering all tiers
 - [x] All 147 tests passing across 16 test files
+
+## Stripe Customer Portal (Mar 19, 2026)
+- [x] Add createPortalSession tRPC procedure to payment router
+- [x] Creates Stripe customer if user has no stripeCustomerId yet
+- [x] Returns portal session URL with return_url pointing back to /dashboard
+- [x] Update SubscriptionStatusCard Manage Billing button to call the procedure and open portal in new tab
+- [x] Added loading spinner ("Opening Portal…") while session is being created
+- [x] Write portalSession.test.ts with 10 unit tests covering all scenarios
+- [x] All 157 tests passing across 17 test files
