@@ -987,3 +987,51 @@ export async function markEmailAsVerified(userId: number) {
     })
     .where(eq(users.id, userId));
 }
+
+/**
+ * Log a rate-limit block event to the admin activity log.
+ * Uses adminId = 0 / adminName = "System" to indicate an automated security event.
+ */
+export async function logRateLimitEvent(params: {
+  ip: string;
+  endpoint: string;
+  userAgent?: string;
+}): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot log rate-limit event: database not available");
+    return;
+  }
+  try {
+    await db.insert(adminActivityLogs).values({
+      adminId: 0,
+      adminName: "System",
+      adminEmail: "system@pathfinder",
+      actionType: "rate_limit_blocked",
+      description: `Rate limit exceeded on ${params.endpoint} from IP ${params.ip}`,
+      metadata: JSON.stringify({
+        ip: params.ip,
+        endpoint: params.endpoint,
+        userAgent: params.userAgent ?? "unknown",
+        timestamp: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    // Never let logging failures break the request
+    console.error("[RateLimit] Failed to log event:", err);
+  }
+}
+
+/**
+ * Get recent rate-limit block events from the admin activity log.
+ */
+export async function getRateLimitEvents(limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(adminActivityLogs)
+    .where(eq(adminActivityLogs.actionType, "rate_limit_blocked"))
+    .orderBy(desc(adminActivityLogs.createdAt))
+    .limit(limit);
+}

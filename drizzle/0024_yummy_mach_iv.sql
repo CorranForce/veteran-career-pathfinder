@@ -1,0 +1,1 @@
+ALTER TABLE `admin_activity_logs` MODIFY COLUMN `actionType` enum('suspend_user','reactivate_user','delete_user','change_role','view_purchases','update_product','rate_limit_blocked','other') NOT NULL;

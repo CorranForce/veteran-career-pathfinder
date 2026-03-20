@@ -1425,3 +1425,8 @@
 - [x] Apply rate limiter to password reset endpoint (5 attempts / hour per IP)
 - [x] Return clear 429 error messages to the client
 - [x] Write vitest tests for rate limiting logic
+- [x] Extend admin_activity_logs schema to support rate_limit_blocked event type
+- [x] Add logRateLimitEvent DB helper
+- [x] Wire rate limiter handler to log 429 events (IP, endpoint, timestamp)
+- [x] Add admin dashboard section to display rate-limit events
+- [x] Write vitest tests for rate-limit logging

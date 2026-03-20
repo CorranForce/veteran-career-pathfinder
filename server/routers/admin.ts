@@ -488,4 +488,14 @@ export type ProductKey = keyof typeof PRODUCTS;
       const logs = await getAdminActivityLogsForUser(input.userId, input.limit);
       return logs;
     }),
+
+  /**
+   * Get rate-limit block events for the security log (platform owner only)
+   */
+  getRateLimitEvents: platformOwnerProcedure
+    .input(z.object({ limit: z.number().optional().default(100) }))
+    .query(async ({ input }) => {
+      const { getRateLimitEvents } = await import("../db");
+      return getRateLimitEvents(input.limit);
+    }),
 });

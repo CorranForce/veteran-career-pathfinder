@@ -355,11 +355,12 @@ export const adminActivityLogs = mysqlTable("admin_activity_logs", {
   // Action details
   actionType: mysqlEnum("actionType", [
     "suspend_user",
-    "reactivate_user", 
+    "reactivate_user",
     "delete_user",
     "change_role",
     "view_purchases",
     "update_product",
+    "rate_limit_blocked",
     "other"
   ]).notNull(),
   
