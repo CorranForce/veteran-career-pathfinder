@@ -1,0 +1,190 @@
+{
+  "query": "SELECT id, email, name, loginMethod, role, passwordHash IS NOT NULL AS hasPassword, mustChangePassword FROM users ORDER BY id LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, email, name, loginMethod, role, passwordHash IS NOT NULL AS hasPassword, mustChangePassword FROM users ORDER BY id LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "deleted_1_1773972855238@deleted.local",
+      "name": "  Allen Davis  ",
+      "loginMethod": "google",
+      "role": "platform_owner",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "870089",
+      "email": "test-user-1771258326859@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "user",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1470001",
+      "email": "test-user-1772109167383@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1500001",
+      "email": "test-user-1772550945494@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1500002",
+      "email": "test-user-1772550961961@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1530001",
+      "email": "test-user-1772811252006@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1530002",
+      "email": "test-user-1772811261350@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1560001",
+      "email": "test-user-1772815815784@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1590001",
+      "email": "testvet_e2e@example.com",
+      "name": "Test Veteran",
+      "loginMethod": "email",
+      "role": "user",
+      "hasPassword": "1",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1590002",
+      "email": "test-user-1773055560128@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1590003",
+      "email": "test-user-1773055572700@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620001",
+      "email": "test-user-1773151057979@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620002",
+      "email": "test-user-1773151344327@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620003",
+      "email": "test-user-1773151391674@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620004",
+      "email": "test-user-1773151411592@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620005",
+      "email": "test-user-1773151480765@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620006",
+      "email": "test-user-1773151495632@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1620007",
+      "email": "test-user-1773151540732@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1650001",
+      "email": "test-user-1773237685377@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    },
+    {
+      "id": "1680001",
+      "email": "test-user-1773340744914@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "role": "admin",
+      "hasPassword": "0",
+      "mustChangePassword": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\trole\thasPassword\tmustChangePassword\n1\tdeleted_1_1773972855238@deleted.local\t  Allen Davis  \tgoogle\tplatform_owner\t0\t0\n870089\ttest-user-1771258326859@example.com\tTest User\temail\tuser\t0\t0\n1470001\ttest-user-1772109167383@example.com\tTest User\temail\tadmin\t0\t0\n1500001\ttest-user-1772550945494@example.com\tTest User\temail\tadmin\t0\t0\n1500002\ttest-user-1772550961961@example.com\tTest User\temail\tadmin\t0\t0\n1530001\ttest-user-1772811252006@example.com\tTest User\temail\tadmin\t0\t0\n1530002\ttest-user-1772811261350@example.com\tTest User\temail\tadmin\t0\t0\n1560001\ttest-user-1772815815784@example.com\tTest User\temail\tadmin\t0\t0\n1590001\ttestvet_e2e@example.com\tTest Veteran\temail\tuser\t1\t0\n1590002\ttest-user-1773055560128@example.com\tTest User\temail\tadmin\t0\t0\n1590003\ttest-user-1773055572700@example.com\tTest User\temail\tadmin\t0\t0\n1620001\ttest-user-1773151057979@example.com\tTest User\temail\tadmin\t0\t0\n1620002\ttest-user-1773151344327@example.com\tTest User\temail\tadmin\t0\t0\n1620003\ttest-user-1773151391674@example.com\tTest User\temail\tadmin\t0\t0\n1620004\ttest-user-1773151411592@example.com\tTest User\temail\tadmin\t0\t0\n1620005\ttest-user-1773151480765@example.com\tTest User\temail\tadmin\t0\t0\n1620006\ttest-user-1773151495632@example.com\tTest User\temail\tadmin\t0\t0\n1620007\ttest-user-1773151540732@example.com\tTest User\temail\tadmin\t0\t0\n1650001\ttest-user-1773237685377@example.com\tTest User\temail\tadmin\t0\t0\n1680001\ttest-user-1773340744914@example.com\tTest User\temail\tadmin\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

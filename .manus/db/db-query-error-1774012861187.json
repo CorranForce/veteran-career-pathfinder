@@ -1,0 +1,8 @@
+{
+  "query": "UPDATE users SET password_hash = '$2b$10$4AExXBb7fm/eW2gHywCUEekjiAbnaD1jQMIJtDQSWSnWX3y8gswWO', must_change_password = FALSE WHERE email = 'corranforce@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute UPDATE users SET password_hash = '$2b$10$4AExXBb7fm/eW2gHywCUEekjiAbnaD1jQMIJtDQSWSnWX3y8gswWO', must_change_password = FALSE WHERE email = 'corranforce@gmail.com';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'password_hash' in 'field list'"
+  ]
+}

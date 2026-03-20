@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE users SET email = 'corranforce@gmail.com', passwordHash = '$2b$10$tBwNF/QfOMbOzOTL/a3wU.l1GQZHXc7rAHtKqorsF7bvtO3XRqDRG', mustChangePassword = FALSE, loginMethod = 'email' WHERE id = 1 AND role = 'platform_owner';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute UPDATE users SET email = 'corranforce@gmail.com', passwordHash = '$2b$10$tBwNF/QfOMbOzOTL/a3wU.l1GQZHXc7rAHtKqorsF7bvtO3XRqDRG', mustChangePassword = FALSE, loginMethod = 'email' WHERE id = 1 AND role = 'platform_owner';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 60
+}

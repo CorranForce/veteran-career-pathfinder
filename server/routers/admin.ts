@@ -85,6 +85,14 @@ export const adminRouter = router({
       // Get target user info for logging
       const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
       if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+
+      // Guard: platform_owner accounts cannot have their role changed
+      if (targetUser.role === "platform_owner") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "The platform owner account role cannot be changed.",
+        });
+      }
       
       const oldRole = targetUser.role;
       
@@ -124,6 +132,14 @@ export const adminRouter = router({
       // Get target user info for logging
       const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
       if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+
+      // Guard: platform_owner accounts cannot be suspended
+      if (targetUser.role === "platform_owner") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "The platform owner account cannot be suspended.",
+        });
+      }
       
       await db.update(users).set({ status: "suspended" }).where(eq(users.id, input.userId));
       
@@ -187,6 +203,14 @@ export const adminRouter = router({
       // Get target user info for logging
       const [targetUser] = await db.select().from(users).where(eq(users.id, input.userId)).limit(1);
       if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+
+      // Guard: platform_owner accounts cannot be deleted or anonymized
+      if (targetUser.role === "platform_owner") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "The platform owner account cannot be deleted.",
+        });
+      }
       
       await db.update(users).set({ status: "deleted" }).where(eq(users.id, input.userId));
       

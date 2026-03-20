@@ -1457,3 +1457,4 @@
 - [ ] Log failed login attempts (email not found) to admin_activity_logs
 - [ ] Log failed login attempts (wrong password) to admin_activity_logs
 - [ ] Surface failed login attempts in admin Security Events tab
+- [x] Add platform_owner guard to admin router to block delete/anonymize/suspend/changeRole on platform_owner accounts
