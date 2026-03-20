@@ -1,0 +1,2 @@
+ALTER TABLE `admin_activity_logs` MODIFY COLUMN `actionType` enum('suspend_user','reactivate_user','delete_user','change_role','view_purchases','update_product','rate_limit_blocked','login_failed','other') NOT NULL;--> statement-breakpoint
+ALTER TABLE `users` ADD `mustChangePassword` boolean DEFAULT false NOT NULL;

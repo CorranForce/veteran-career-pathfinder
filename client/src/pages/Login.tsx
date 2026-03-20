@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
 import { Loader2, LogIn } from "lucide-react";
 
 const GoogleIcon = () => (
@@ -40,6 +41,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState("");
   const [failedEmail, setFailedEmail] = useState("");
 
@@ -47,7 +49,12 @@ export default function Login() {
   const nextPath = new URLSearchParams(window.location.search).get("next") || "/tools";
 
   const loginMutation = trpc.emailAuth.login.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // If the user has a temporary password they must change, redirect to change-password page
+      if (data.mustChangePassword) {
+        window.location.href = "/account?tab=security&mustChange=1";
+        return;
+      }
       // Cookie is set server-side (httpOnly). Navigate to the intended destination.
       window.location.href = nextPath;
     },
@@ -61,7 +68,7 @@ export default function Login() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    loginMutation.mutate({ email, password });
+    loginMutation.mutate({ email, password, rememberMe });
   };
 
   const getAuthUrl = trpc.googleAuth.getAuthUrl.useQuery();
@@ -171,6 +178,26 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loginMutation.isPending}
+              />
+            </div>
+
+            {/* Remember Me toggle */}
+            <div className="flex items-center justify-between rounded-md border px-3 py-2 bg-muted/30">
+              <div className="space-y-0.5">
+                <Label htmlFor="remember-me" className="text-sm font-medium cursor-pointer">
+                  Remember me
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {rememberMe
+                    ? "Stay signed in for 1 year"
+                    : "Session expires after 24 hours"}
+                </p>
+              </div>
+              <Switch
+                id="remember-me"
+                checked={rememberMe}
+                onCheckedChange={setRememberMe}
                 disabled={loginMutation.isPending}
               />
             </div>

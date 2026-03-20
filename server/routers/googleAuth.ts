@@ -6,6 +6,8 @@ import { OAuth2Client } from "google-auth-library";
 import { ENV } from "../_core/env";
 import { createSessionToken } from "../_core/session";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // Initialize Google OAuth client
 const getGoogleOAuthClient = () => {
@@ -76,12 +78,19 @@ export const googleAuthRouter = router({
         let user = await db.getUserByEmail(email);
 
         if (!user) {
-          // Create new user
+          // Generate a random temporary password so the user can also sign in with email/password
+          // The plain-text password is sent in the welcome email; only the hash is stored.
+          const temporaryPassword = crypto.randomBytes(8).toString("base64url").slice(0, 12);
+          const passwordHash = await bcrypt.hash(temporaryPassword, 10);
+
+          // Create new user with hashed temporary password and mustChangePassword flag
           const userId = await db.createGoogleUser({
             email,
             name: name || email.split("@")[0],
             googleId,
             profilePicture: picture,
+            passwordHash,
+            mustChangePassword: true,
           });
 
           // Log signup activity
@@ -93,12 +102,13 @@ export const googleAuthRouter = router({
             metadata: JSON.stringify({ loginMethod: "google", googleId }),
           });
 
-          // Send welcome email
+          // Send welcome email with the temporary password
           try {
             const { sendSignupWelcomeEmail } = await import("../services/email");
             await sendSignupWelcomeEmail({
               to: email,
               name: name || email.split("@")[0],
+              temporaryPassword,
             });
           } catch (emailError) {
             console.error("[GoogleAuth] Failed to send welcome email:", emailError);

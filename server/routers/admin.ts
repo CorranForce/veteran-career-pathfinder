@@ -498,4 +498,14 @@ export type ProductKey = keyof typeof PRODUCTS;
       const { getRateLimitEvents } = await import("../db");
       return getRateLimitEvents(input.limit);
     }),
+
+  /**
+   * Get failed login events for the security log (platform owner only)
+   */
+  getFailedLoginEvents: platformOwnerProcedure
+    .input(z.object({ limit: z.number().optional().default(100) }))
+    .query(async ({ input }) => {
+      const { getFailedLoginEvents } = await import("../db");
+      return getFailedLoginEvents(input.limit);
+    }),
 });

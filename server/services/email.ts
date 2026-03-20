@@ -16,6 +16,8 @@ export interface SendWelcomeEmailParams {
 export interface SendSignupWelcomeEmailParams {
   to: string;
   name: string;
+  /** If provided, include this auto-generated password in the welcome email body */
+  temporaryPassword?: string;
 }
 
 /**
@@ -246,7 +248,7 @@ Questions? Reply to this email - we're here to help.
 /**
  * Send welcome email to new signup users (email/password registration)
  */
-export async function sendSignupWelcomeEmail({ to, name }: SendSignupWelcomeEmailParams): Promise<boolean> {
+export async function sendSignupWelcomeEmail({ to, name, temporaryPassword }: SendSignupWelcomeEmailParams): Promise<boolean> {
   if (!ENV.sendgridApiKey) {
     console.warn("[Email Service] Cannot send email: SendGrid not configured");
     return false;
@@ -265,8 +267,8 @@ export async function sendSignupWelcomeEmail({ to, name }: SendSignupWelcomeEmai
         name: "Pathfinder - Veteran Career Transition",
       },
       subject: "Welcome to Pathfinder - Your Career Transition Starts Now",
-      html: getSignupWelcomeEmailTemplate(name),
-      text: getSignupWelcomeEmailText(name),
+      html: getSignupWelcomeEmailTemplate(name, temporaryPassword),
+      text: getSignupWelcomeEmailText(name, temporaryPassword),
       trackingSettings: {
         clickTracking: {
           enable: true,
@@ -287,7 +289,7 @@ export async function sendSignupWelcomeEmail({ to, name }: SendSignupWelcomeEmai
   }
 }
 
-function getSignupWelcomeEmailTemplate(name: string): string {
+function getSignupWelcomeEmailTemplate(name: string, temporaryPassword?: string): string {
   const baseUrl = process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space";
   return `
 <!DOCTYPE html>
@@ -326,10 +328,19 @@ function getSignupWelcomeEmailTemplate(name: string): string {
       <a href="${baseUrl}/pricing" style="display: inline-block; background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin-top: 10px;">View Pricing</a>
     </div>
     
+    ${temporaryPassword ? `
+    <div style="background: #fff0f0; border: 2px solid #dc3545; padding: 20px; border-radius: 8px; margin: 30px 0;">
+      <p style="margin: 0 0 8px 0; font-weight: bold; color: #dc3545;">🔐 Your Temporary Password</p>
+      <p style="margin: 0 0 12px 0; color: #333;">We created a password for your account so you can also sign in with email. Please change it after your first login.</p>
+      <div style="background: #fff; border: 1px solid #dc3545; padding: 12px 16px; border-radius: 4px; font-family: monospace; font-size: 18px; letter-spacing: 2px; color: #333; display: inline-block;">${temporaryPassword}</div>
+      <p style="margin: 12px 0 0 0; font-size: 13px; color: #666;">You can update your password anytime in Account Settings.</p>
+    </div>
+    ` : `
     <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin: 30px 0;">
       <p style="margin: 0; font-weight: bold; color: #856404;">💡 Pro Tip:</p>
       <p style="margin: 5px 0 0 0; color: #856404;">Start with our free resume templates and analyzer to get immediate value, then upgrade to Premium when you're ready for personalized career paths and action plans.</p>
     </div>
+    `}
     
     <p style="margin-top: 30px;">Questions? Just reply to this email - I read every message personally.</p>
     
@@ -345,7 +356,7 @@ function getSignupWelcomeEmailTemplate(name: string): string {
   `;
 }
 
-function getSignupWelcomeEmailText(name: string): string {
+function getSignupWelcomeEmailText(name: string, temporaryPassword?: string): string {
   const baseUrl = process.env.FRONTEND_URL || "https://vetcarepath-tzppwpga.manus.space";
   return `
 Welcome to Pathfinder, ${name}!
@@ -366,7 +377,7 @@ Visit: ${baseUrl}/tools
 Unlock the full AI career strategist prompt and get personalized career paths for just $29.
 Visit: ${baseUrl}/pricing
 
-Pro Tip: Start with our free resume templates and analyzer to get immediate value, then upgrade to Premium when you're ready for personalized career paths and action plans.
+${temporaryPassword ? `TEMPORARY PASSWORD: ${temporaryPassword}\nPlease change this password after your first login in Account Settings.` : `Pro Tip: Start with our free resume templates and analyzer to get immediate value, then upgrade to Premium when you're ready for personalized career paths and action plans.`}
 
 Questions? Just reply to this email - I read every message personally.
 

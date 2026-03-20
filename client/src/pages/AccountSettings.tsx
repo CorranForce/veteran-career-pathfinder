@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert } from "lucide-react";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 
 
@@ -29,6 +29,10 @@ export default function AccountSettings() {
 
   const settingsQuery = trpc.accountSettings.getSettings.useQuery();
   const connectedAccountsQuery = trpc.accountSettings.getConnectedAccounts.useQuery();
+
+  // Detect ?mustChange=1 from login redirect
+  const mustChangeFromUrl = new URLSearchParams(window.location.search).get("mustChange") === "1";
+  const showMustChangeBanner = mustChangeFromUrl || (settingsQuery.data?.mustChangePassword ?? false);
 
   const changePasswordMutation = trpc.accountSettings.changePassword.useMutation({
     onSuccess: () => {
@@ -114,6 +118,17 @@ export default function AccountSettings() {
         <h1 className="text-3xl font-bold">Account Settings</h1>
         <p className="text-muted-foreground">Manage your account preferences and security</p>
       </div>
+
+      {/* Temporary password banner */}
+      {showMustChangeBanner && (
+        <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/30">
+          <ShieldAlert className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800 dark:text-amber-200">
+            <strong>Action required:</strong> Your account was created with a temporary password.
+            Please update it below to secure your account.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Account Information */}
       <Card>

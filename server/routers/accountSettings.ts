@@ -24,6 +24,7 @@ export const accountSettingsRouter = router({
       emailVerified: user.emailVerified,
       loginMethod: user.loginMethod,
       hasPassword: !!user.passwordHash,
+      mustChangePassword: user.mustChangePassword ?? false,
     };
   }),
 
@@ -69,8 +70,9 @@ export const accountSettingsRouter = router({
       // Hash new password
       const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
-      // Update password
+      // Update password and clear the mustChangePassword flag
       await db.resetUserPassword(user.id, newPasswordHash);
+      await db.clearMustChangePassword(user.id);
 
       // Log password change activity
       await db.logActivity({

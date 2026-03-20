@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { createSessionToken } from "../_core/session";
-import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS, ONE_DAY_MS } from "@shared/const";
 import crypto from "crypto";
 
 export const emailAuthRouter = router({
@@ -109,13 +109,20 @@ export const emailAuthRouter = router({
       z.object({
         email: z.string().email("Invalid email address"),
         password: z.string().min(1, "Password is required"),
+        /** When false, session expires after 24 hours instead of 1 year */
+        rememberMe: z.boolean().optional().default(true),
       })
     )
     .mutation(async ({ input, ctx }) => {
+      const ip = (ctx.req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || ctx.req.socket?.remoteAddress || "unknown";
+      const userAgent = ctx.req.headers["user-agent"] || "unknown";
+
       // Find user by email
       const user = await db.getUserByEmail(input.email);
 
       if (!user) {
+        // Log failed attempt: email not found
+        db.logFailedLogin({ ip, email: input.email, reason: "email_not_found", userAgent }).catch(() => {});
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email or password",
@@ -126,6 +133,8 @@ export const emailAuthRouter = router({
       if (!user.passwordHash) {
         const loginMethod = user.loginMethod || "a social account";
         const isGoogle = loginMethod === "google";
+        // Log failed attempt: no password set
+        db.logFailedLogin({ ip, email: input.email, reason: "no_password_set", userAgent }).catch(() => {});
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: isGoogle
@@ -138,6 +147,8 @@ export const emailAuthRouter = router({
       const isValidPassword = await bcrypt.compare(input.password, user.passwordHash);
 
       if (!isValidPassword) {
+        // Log failed attempt: wrong password
+        db.logFailedLogin({ ip, email: input.email, reason: "wrong_password", userAgent }).catch(() => {});
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email or password",
@@ -147,13 +158,19 @@ export const emailAuthRouter = router({
       // Update last signed in
       await db.updateUserLastSignIn(user.id);
 
+      // Session duration: 1 year if rememberMe, 24 hours otherwise
+      const sessionDuration = input.rememberMe ? ONE_YEAR_MS : ONE_DAY_MS;
+
       // Create session token using custom session helper
-      const sessionToken = await createSessionToken({
-        userId: user.id,
-        email: user.email!,
-        name: user.name,
-        role: user.role,
-      });
+      const sessionToken = await createSessionToken(
+        {
+          userId: user.id,
+          email: user.email!,
+          name: user.name,
+          role: user.role,
+        },
+        sessionDuration
+      );
 
       // Set cookie
       if (ctx.res) {
@@ -161,13 +178,14 @@ export const emailAuthRouter = router({
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax" as const,
-          maxAge: ONE_YEAR_MS,
+          maxAge: sessionDuration,
         };
         ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
       }
 
       return {
         success: true,
+        mustChangePassword: user.mustChangePassword ?? false,
         user: {
           id: user.id,
           email: user.email,

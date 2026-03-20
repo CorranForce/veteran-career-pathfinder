@@ -183,6 +183,13 @@
       "when": 1773965805436,
       "tag": "0025_nasty_zaladane",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "5",
+      "when": 1773972368751,
+      "tag": "0026_deep_magdalene",
+      "breakpoints": true
     }
   ]
 }

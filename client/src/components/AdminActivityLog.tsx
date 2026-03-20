@@ -15,6 +15,7 @@ import {
   ShieldAlert,
   Globe,
   Lock,
+  KeyRound,
 } from "lucide-react";
 
 const actionIcons = {
@@ -25,6 +26,7 @@ const actionIcons = {
   view_purchases: Eye,
   update_product: Shield,
   rate_limit_blocked: ShieldAlert,
+  login_failed: KeyRound,
   other: AlertCircle,
 };
 
@@ -36,6 +38,7 @@ const actionColors = {
   view_purchases: "outline",
   update_product: "secondary",
   rate_limit_blocked: "destructive",
+  login_failed: "destructive",
   other: "outline",
 } as const;
 
@@ -49,10 +52,27 @@ function tryParseJson(raw: string | null | undefined): Record<string, unknown> |
   }
 }
 
-function LogEntry({ log }: { log: { id: number; actionType: string; description: string; adminName: string; adminEmail: string; targetUserName?: string | null; targetUserEmail?: string | null; metadata?: string | null; createdAt: Date } }) {
+function LogEntry({
+  log,
+}: {
+  log: {
+    id: number;
+    actionType: string;
+    description: string;
+    adminName: string;
+    adminEmail: string;
+    targetUserName?: string | null;
+    targetUserEmail?: string | null;
+    metadata?: string | null;
+    createdAt: Date;
+  };
+}) {
   const Icon = actionIcons[log.actionType as keyof typeof actionIcons] ?? AlertCircle;
   const badgeVariant = actionColors[log.actionType as keyof typeof actionColors] ?? "outline";
   const meta = tryParseJson(log.metadata);
+
+  const isSecurityEvent =
+    log.actionType === "rate_limit_blocked" || log.actionType === "login_failed";
 
   return (
     <div className="flex gap-4 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
@@ -63,7 +83,10 @@ function LogEntry({ log }: { log: { id: number; actionType: string; description:
       </div>
       <div className="flex-1 space-y-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant={badgeVariant as "destructive" | "default" | "secondary" | "outline"} className="text-xs">
+          <Badge
+            variant={badgeVariant as "destructive" | "default" | "secondary" | "outline"}
+            className="text-xs"
+          >
             {log.actionType.replace(/_/g, " ").toUpperCase()}
           </Badge>
           <span className="text-xs text-muted-foreground">
@@ -72,7 +95,7 @@ function LogEntry({ log }: { log: { id: number; actionType: string; description:
         </div>
         <p className="text-sm font-medium">{log.description}</p>
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-          {log.actionType === "rate_limit_blocked" ? (
+          {isSecurityEvent ? (
             <>
               {meta?.ip && (
                 <span className="flex items-center gap-1">
@@ -84,6 +107,18 @@ function LogEntry({ log }: { log: { id: number; actionType: string; description:
                 <span className="flex items-center gap-1">
                   <Lock className="h-3 w-3" />
                   <strong>Endpoint:</strong> {String(meta.endpoint)}
+                </span>
+              )}
+              {meta?.email && (
+                <span className="flex items-center gap-1">
+                  <KeyRound className="h-3 w-3" />
+                  <strong>Email:</strong> {String(meta.email)}
+                </span>
+              )}
+              {meta?.reason && (
+                <span className="flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  <strong>Reason:</strong> {String(meta.reason)}
                 </span>
               )}
             </>
@@ -114,34 +149,33 @@ function LogEntry({ log }: { log: { id: number; actionType: string; description:
 }
 
 function EmptyState({ message }: { message: string }) {
-  return (
-    <p className="text-sm text-muted-foreground text-center py-8">{message}</p>
-  );
+  return <p className="text-sm text-muted-foreground text-center py-8">{message}</p>;
 }
 
 export function AdminActivityLog() {
-  const [tab, setTab] = useState<"admin" | "security">("admin");
+  const [tab, setTab] = useState<"admin" | "security" | "logins">("admin");
 
   const { data: adminLogs, isLoading: adminLoading } = trpc.admin.getAdminActivityLogs.useQuery(
     { limit: 50 },
     { enabled: tab === "admin" }
   );
 
-  const { data: securityLogs, isLoading: securityLoading } = trpc.admin.getRateLimitEvents.useQuery(
-    { limit: 100 },
-    { enabled: tab === "security" }
-  );
+  const { data: rateLimitLogs, isLoading: rateLimitLoading } =
+    trpc.admin.getRateLimitEvents.useQuery({ limit: 100 }, { enabled: tab === "security" });
+
+  const { data: failedLoginLogs, isLoading: failedLoginLoading } =
+    trpc.admin.getFailedLoginEvents.useQuery({ limit: 100 }, { enabled: tab === "logins" });
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Activity &amp; Security Log</CardTitle>
         <CardDescription>
-          Audit trail of administrative actions and rate-limit security events
+          Audit trail of administrative actions, rate-limit blocks, and failed login attempts
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs value={tab} onValueChange={(v) => setTab(v as "admin" | "security")}>
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "admin" | "security" | "logins")}>
           <TabsList className="mb-4">
             <TabsTrigger value="admin" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
@@ -149,7 +183,11 @@ export function AdminActivityLog() {
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <ShieldAlert className="h-4 w-4" />
-              Security Events
+              Rate-Limit Blocks
+            </TabsTrigger>
+            <TabsTrigger value="logins" className="flex items-center gap-2">
+              <KeyRound className="h-4 w-4" />
+              Failed Logins
             </TabsTrigger>
           </TabsList>
 
@@ -163,7 +201,7 @@ export function AdminActivityLog() {
               <ScrollArea className="h-[400px] pr-4">
                 <div className="space-y-4">
                   {adminLogs
-                    .filter((l) => l.actionType !== "rate_limit_blocked")
+                    .filter((l) => l.actionType !== "rate_limit_blocked" && l.actionType !== "login_failed")
                     .map((log) => (
                       <LogEntry key={log.id} log={log} />
                     ))}
@@ -172,24 +210,50 @@ export function AdminActivityLog() {
             )}
           </TabsContent>
 
-          {/* ── Security Events tab ── */}
+          {/* ── Rate-Limit Blocks tab ── */}
           <TabsContent value="security">
-            {securityLoading ? (
-              <EmptyState message="Loading security events…" />
-            ) : !securityLogs || securityLogs.length === 0 ? (
-              <EmptyState message="No rate-limit events recorded yet" />
+            {rateLimitLoading ? (
+              <EmptyState message="Loading rate-limit events…" />
+            ) : !rateLimitLogs || rateLimitLogs.length === 0 ? (
+              <EmptyState message="No rate-limit blocks recorded yet" />
             ) : (
               <>
                 <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
                   <ShieldAlert className="h-4 w-4 text-destructive" />
                   <span>
-                    <strong>{securityLogs.length}</strong> blocked request
-                    {securityLogs.length !== 1 ? "s" : ""} recorded
+                    <strong>{rateLimitLogs.length}</strong> blocked request
+                    {rateLimitLogs.length !== 1 ? "s" : ""} recorded
                   </span>
                 </div>
                 <ScrollArea className="h-[400px] pr-4">
                   <div className="space-y-4">
-                    {securityLogs.map((log) => (
+                    {rateLimitLogs.map((log) => (
+                      <LogEntry key={log.id} log={log} />
+                    ))}
+                  </div>
+                </ScrollArea>
+              </>
+            )}
+          </TabsContent>
+
+          {/* ── Failed Logins tab ── */}
+          <TabsContent value="logins">
+            {failedLoginLoading ? (
+              <EmptyState message="Loading failed login events…" />
+            ) : !failedLoginLogs || failedLoginLogs.length === 0 ? (
+              <EmptyState message="No failed login attempts recorded yet" />
+            ) : (
+              <>
+                <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                  <KeyRound className="h-4 w-4 text-destructive" />
+                  <span>
+                    <strong>{failedLoginLogs.length}</strong> failed attempt
+                    {failedLoginLogs.length !== 1 ? "s" : ""} recorded
+                  </span>
+                </div>
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="space-y-4">
+                    {failedLoginLogs.map((log) => (
                       <LogEntry key={log.id} log={log} />
                     ))}
                   </div>

@@ -43,6 +43,9 @@ export const users = mysqlTable("users", {
   
   // Profile picture URL (stored in S3)
   profilePicture: varchar("profilePicture", { length: 512 }),
+
+  // Force password change on next login (set for auto-generated passwords, e.g. Google OAuth)
+  mustChangePassword: boolean("mustChangePassword").default(false).notNull(),
 });
 
 export type User = typeof users.$inferSelect;
@@ -361,6 +364,7 @@ export const adminActivityLogs = mysqlTable("admin_activity_logs", {
     "view_purchases",
     "update_product",
     "rate_limit_blocked",
+    "login_failed",
     "other"
   ]).notNull(),
   

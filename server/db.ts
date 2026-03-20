@@ -133,7 +133,14 @@ export async function createEmailUser(data: { email: string; passwordHash: strin
   return result[0].insertId;
 }
 
-export async function createGoogleUser(data: { email: string; name: string; googleId: string; profilePicture?: string }) {
+export async function createGoogleUser(data: {
+  email: string;
+  name: string;
+  googleId: string;
+  profilePicture?: string;
+  passwordHash?: string;
+  mustChangePassword?: boolean;
+}) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot create user: database not available");
@@ -147,9 +154,22 @@ export async function createGoogleUser(data: { email: string; name: string; goog
     loginMethod: "google",
     role: "user",
     lastSignedIn: new Date(),
+    ...(data.passwordHash ? { passwordHash: data.passwordHash } : {}),
+    ...(data.mustChangePassword !== undefined ? { mustChangePassword: data.mustChangePassword } : {}),
   });
 
   return result[0].insertId;
+}
+
+/**
+ * Clear the mustChangePassword flag after a user successfully sets a new password.
+ */
+export async function clearMustChangePassword(userId: number) {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(users)
+    .set({ mustChangePassword: false })
+    .where(eq(users.id, userId));
 }
 
 export async function updateUserLastSignIn(userId: number) {
@@ -1032,6 +1052,56 @@ export async function getRateLimitEvents(limit: number = 100) {
     .select()
     .from(adminActivityLogs)
     .where(eq(adminActivityLogs.actionType, "rate_limit_blocked"))
+    .orderBy(desc(adminActivityLogs.createdAt))
+    .limit(limit);
+}
+
+/**
+ * Log a failed login attempt (wrong password or email not found) to admin_activity_logs.
+ * Used to detect credential-stuffing attacks that stay under the rate-limit threshold.
+ */
+export async function logFailedLogin(params: {
+  ip: string;
+  email: string;
+  reason: "email_not_found" | "wrong_password" | "no_password_set";
+  userAgent?: string;
+}): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot log failed login: database not available");
+    return;
+  }
+  try {
+    await db.insert(adminActivityLogs).values({
+      adminId: 0,
+      adminName: "System",
+      adminEmail: "system@pathfinder",
+      actionType: "login_failed",
+      description: `Failed login attempt for ${params.email} from IP ${params.ip} (${params.reason})`,
+      metadata: JSON.stringify({
+        ip: params.ip,
+        email: params.email,
+        reason: params.reason,
+        userAgent: params.userAgent ?? "unknown",
+        timestamp: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    // Never let logging failures break the request
+    console.error("[Auth] Failed to log failed login:", err);
+  }
+}
+
+/**
+ * Get recent failed login events from the admin activity log.
+ */
+export async function getFailedLoginEvents(limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(adminActivityLogs)
+    .where(eq(adminActivityLogs.actionType, "login_failed"))
     .orderBy(desc(adminActivityLogs.createdAt))
     .limit(limit);
 }

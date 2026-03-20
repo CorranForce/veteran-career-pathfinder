@@ -1,8 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
-import { ENV } from "./env";
+import { ONE_YEAR_MS, ONE_DAY_MS } from "@shared/const";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default-secret-change-in-production");
-const SESSION_DURATION_MS = 365 * 24 * 60 * 60 * 1000; // 1 year
 
 export interface SessionPayload {
   userId: number;
@@ -12,13 +11,19 @@ export interface SessionPayload {
 }
 
 /**
- * Create a JWT session token
+ * Create a JWT session token.
+ * @param payload - The session data to encode.
+ * @param expiresInMs - Optional TTL in milliseconds. Defaults to ONE_YEAR_MS (1 year).
+ *                      Pass ONE_DAY_MS for short-lived "no remember me" sessions.
  */
-export async function createSessionToken(payload: SessionPayload): Promise<string> {
+export async function createSessionToken(
+  payload: SessionPayload,
+  expiresInMs: number = ONE_YEAR_MS
+): Promise<string> {
   const token = await new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(Math.floor(Date.now() / 1000) + SESSION_DURATION_MS / 1000)
+    .setExpirationTime(Math.floor(Date.now() / 1000) + Math.floor(expiresInMs / 1000))
     .sign(JWT_SECRET);
 
   return token;

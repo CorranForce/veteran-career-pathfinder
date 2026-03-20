@@ -1443,3 +1443,17 @@
 - [x] Wire owner alerts: new user signup, payment completed, rate-limit threshold
 - [x] Write vitest tests for notification system
 - [x] Fix recurring "Invalid email or password" login error - investigate root cause
+
+## Security & UX Improvements (Sprint 3)
+
+- [ ] Add mustChangePassword boolean column to users schema
+- [ ] Generate random password for Google OAuth signups and hash it
+- [ ] Include generated password in Google OAuth welcome email
+- [ ] Flag mustChangePassword=true for Google OAuth users
+- [ ] Add force-change-password page/modal that blocks navigation until changed
+- [ ] Add Remember Me toggle to login form
+- [ ] Short-lived session (24h) when Remember Me is unchecked
+- [ ] Long-lived session (1 year) when Remember Me is checked
+- [ ] Log failed login attempts (email not found) to admin_activity_logs
+- [ ] Log failed login attempts (wrong password) to admin_activity_logs
+- [ ] Surface failed login attempts in admin Security Events tab
