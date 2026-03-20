@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { constructStripeEvent, stripe } from "./stripe";
 import { createPurchase, getUserById, updatePurchaseStatus, updateUserStripeCustomerId, logActivity } from "./db";
 import { sendPurchaseConfirmationEmail } from "./services/resendEmail";
+import { notifyOwner } from "./_core/notification";
 
 export async function handleStripeWebhook(req: Request, res: Response) {
   const signature = req.headers["stripe-signature"];
@@ -117,6 +118,19 @@ export async function handleStripeWebhook(req: Request, res: Response) {
         } catch (emailError) {
           console.error("[Stripe Webhook] Failed to send purchase confirmation email:", emailError);
           // Don't fail the webhook if email fails
+        }
+
+        // Notify owner of completed payment
+        try {
+          const customerEmail = paymentIntent.receipt_email || (paymentIntent.metadata?.customer_email as string);
+          const customerName = paymentIntent.metadata?.customer_name as string || "Customer";
+          const amount = (paymentIntent.amount / 100).toFixed(2);
+          await notifyOwner({
+            title: "Payment Received",
+            content: `**${customerName}** (${customerEmail || "unknown"}) completed a payment of **$${amount} ${(paymentIntent.currency || "usd").toUpperCase()}** — Payment Intent: ${paymentIntent.id}`,
+          });
+        } catch (err) {
+          console.error("[Stripe Webhook] Failed to send owner payment notification:", err);
         }
 
         break;

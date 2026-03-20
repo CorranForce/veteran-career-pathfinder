@@ -480,3 +480,81 @@ export const blogSubscribers = mysqlTable("blog_subscribers", {
 
 export type BlogSubscriber = typeof blogSubscribers.$inferSelect;
 export type InsertBlogSubscriber = typeof blogSubscribers.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notification Preferences
+// One row per user; all channels default to false (opt-in).
+// ─────────────────────────────────────────────────────────────────────────────
+export const notificationPreferences = mysqlTable("notification_preferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+
+  // In-app inbox notifications
+  inAppEnabled: boolean("inAppEnabled").notNull().default(false),
+
+  // Email notifications
+  emailEnabled: boolean("emailEnabled").notNull().default(false),
+
+  // Browser push notifications
+  pushEnabled: boolean("pushEnabled").notNull().default(false),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type NotificationPreference = typeof notificationPreferences.$inferSelect;
+export type InsertNotificationPreference = typeof notificationPreferences.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// User Notifications (in-app inbox)
+// ─────────────────────────────────────────────────────────────────────────────
+export const userNotifications = mysqlTable("user_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+
+  title: varchar("title", { length: 255 }).notNull(),
+  body: text("body").notNull(),
+
+  // Optional deep-link within the app
+  actionUrl: varchar("actionUrl", { length: 500 }),
+
+  // Category for icon/colour differentiation
+  category: mysqlEnum("category", [
+    "general",
+    "payment",
+    "resume",
+    "security",
+    "announcement",
+    "system",
+  ]).notNull().default("general"),
+
+  isRead: boolean("isRead").notNull().default(false),
+  readAt: timestamp("readAt"),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type UserNotification = typeof userNotifications.$inferSelect;
+export type InsertUserNotification = typeof userNotifications.$inferInsert;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Push Subscriptions (Web Push / VAPID)
+// One row per browser/device per user.
+// ─────────────────────────────────────────────────────────────────────────────
+export const pushSubscriptions = mysqlTable("push_subscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+
+  // PushSubscription JSON fields
+  endpoint: text("endpoint").notNull(),
+  p256dhKey: text("p256dhKey").notNull(),
+  authKey: text("authKey").notNull(),
+
+  // User-agent hint for display in settings
+  userAgent: varchar("userAgent", { length: 500 }),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PushSubscription = typeof pushSubscriptions.$inferSelect;
+export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;

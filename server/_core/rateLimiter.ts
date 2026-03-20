@@ -53,9 +53,41 @@ function buildLimiter(options: {
 
       // Log the event asynchronously — never block the response
       import("../db")
-        .then(({ logRateLimitEvent }) =>
-          logRateLimitEvent({ ip, endpoint, userAgent })
-        )
+        .then(async ({ logRateLimitEvent, getRateLimitEvents }) => {
+          await logRateLimitEvent({ ip, endpoint, userAgent });
+
+          // Notify owner when same IP crosses the 3-block threshold in 1 hour
+          try {
+            const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+            const recentEvents = await getRateLimitEvents(200);
+            const ipEventsThisHour = recentEvents.filter((e) => {
+              // IP is stored in the metadata JSON field
+              try {
+                const meta = JSON.parse(e.metadata ?? "{}");
+                return meta.ip === ip && new Date(e.createdAt) >= oneHourAgo;
+              } catch {
+                return false;
+              }
+            });
+            if (ipEventsThisHour.length === 3) {
+              const { notifyOwner } = await import("../_core/notification");
+              const endpointSet = new Set<string>();
+              ipEventsThisHour.forEach((e) => {
+                try {
+                  const meta = JSON.parse(e.metadata ?? "{}");
+                  if (meta.endpoint) endpointSet.add(meta.endpoint);
+                } catch { /* ignore */ }
+              });
+              const endpoints = Array.from(endpointSet).join(", ");
+              await notifyOwner({
+                title: "Brute-Force Alert",
+                content: `IP **${ip}** has been rate-limited **${ipEventsThisHour.length} times** in the last hour. Targeted endpoints: ${endpoints}`,
+              });
+            }
+          } catch (thresholdErr) {
+            console.error("[RateLimit] Threshold check failed:", thresholdErr);
+          }
+        })
         .catch((err) =>
           console.error("[RateLimit] Failed to import db for logging:", err)
         );

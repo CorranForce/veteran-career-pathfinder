@@ -176,6 +176,13 @@
       "when": 1773964833113,
       "tag": "0024_yummy_mach_iv",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1773965805436,
+      "tag": "0025_nasty_zaladane",
+      "breakpoints": true
     }
   ]
 }

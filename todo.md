@@ -1430,3 +1430,15 @@
 - [x] Wire rate limiter handler to log 429 events (IP, endpoint, timestamp)
 - [x] Add admin dashboard section to display rate-limit events
 - [x] Write vitest tests for rate-limit logging
+- [x] Add notification_preferences table to schema (inApp, email, push toggles per user)
+- [x] Add user_notifications table (in-app inbox)
+- [x] Add push_subscriptions table (VAPID endpoint/keys per user)
+- [x] Install web-push package and generate VAPID keys
+- [x] Add notificationPreferences tRPC procedures (get/update)
+- [x] Add userNotifications tRPC procedures (list, markRead, markAllRead)
+- [x] Add pushSubscription tRPC procedures (subscribe/unsubscribe)
+- [x] Add notification dispatch helpers (sendInApp, sendEmail, sendPush)
+- [x] Build NotificationPreferences component with toggle switches in AccountSettings
+- [x] Build NotificationBell component with dropdown inbox in nav
+- [x] Wire owner alerts: new user signup, payment completed, rate-limit threshold
+- [x] Write vitest tests for notification system

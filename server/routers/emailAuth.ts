@@ -80,6 +80,17 @@ export const emailAuthRouter = router({
         // Don't fail signup if email fails
       }
 
+      // Notify owner of new signup
+      try {
+        const { notifyOwner } = await import("../_core/notification");
+        await notifyOwner({
+          title: "New User Signup",
+          content: `**${input.name}** (${input.email}) just created an account via email/password.`,
+        });
+      } catch (err) {
+        console.error("[EmailAuth] Failed to send owner notification:", err);
+      }
+
       return {
         success: true,
         user: {

@@ -18,6 +18,7 @@ import {
   MapPin
 } from "lucide-react";
 import MobileNav from "@/components/MobileNav";
+import { NotificationBell } from "@/components/NotificationBell";
 import { getLoginUrl, getSignupUrl } from "@/const";
 import Testimonials from "@/components/Testimonials";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
@@ -90,6 +91,7 @@ export default function Home() {
             </Button>
             {isAuthenticated ? (
               <>
+                <NotificationBell />
                 <Button variant="ghost" asChild>
                   <a href="/profile">Profile</a>
                 </Button>

@@ -104,6 +104,17 @@ export const googleAuthRouter = router({
             console.error("[GoogleAuth] Failed to send welcome email:", emailError);
           }
 
+          // Notify owner of new Google signup
+          try {
+            const { notifyOwner } = await import("../_core/notification");
+            await notifyOwner({
+              title: "New User Signup (Google)",
+              content: `**${name || email.split("@")[0]}** (${email}) just created an account via Google OAuth.`,
+            });
+          } catch (err) {
+            console.error("[GoogleAuth] Failed to send owner notification:", err);
+          }
+
           user = await db.getUserByEmail(email);
         } else {
           // Update last signed in

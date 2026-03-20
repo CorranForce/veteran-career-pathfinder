@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail } from "lucide-react";
+import { NotificationPreferences } from "@/components/NotificationPreferences";
 
 
 export default function AccountSettings() {
@@ -289,6 +290,7 @@ export default function AccountSettings() {
           )}
         </CardContent>
       </Card>
+      <NotificationPreferences />
     </div>
   );
 }

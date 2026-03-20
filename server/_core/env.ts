@@ -11,4 +11,6 @@ export const ENV = {
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
   sendgridApiKey: process.env.SENDGRID_API_KEY ?? "",
   sendgridFromEmail: process.env.SENDGRID_FROM_EMAIL ?? "",
+  vapidPublicKey: process.env.VAPID_PUBLIC_KEY ?? "",
+  vapidPrivateKey: process.env.VAPID_PRIVATE_KEY ?? "",
 };
