@@ -5,6 +5,7 @@ import * as db from "../db";
 import { OAuth2Client } from "google-auth-library";
 import { ENV } from "../_core/env";
 import { createSessionToken } from "../_core/session";
+import { getSessionCookieOptions } from "../_core/cookies";
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -148,9 +149,7 @@ export const googleAuthRouter = router({
 
         if (ctx.res) {
           ctx.res.cookie(COOKIE_NAME, sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
+            ...getSessionCookieOptions(ctx.req),
             maxAge: ONE_YEAR_MS,
           });
         }

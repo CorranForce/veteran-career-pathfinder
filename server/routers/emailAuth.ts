@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { publicProcedure, router } from "../_core/trpc";
 import * as db from "../db";
 import { createSessionToken } from "../_core/session";
+import { getSessionCookieOptions } from "../_core/cookies";
 import { COOKIE_NAME, ONE_YEAR_MS, ONE_DAY_MS } from "@shared/const";
 import crypto from "crypto";
 
@@ -59,13 +60,10 @@ export const emailAuthRouter = router({
 
       // Set cookie
       if (ctx.res) {
-        const cookieOptions = {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax" as const,
+        ctx.res.cookie(COOKIE_NAME, sessionToken, {
+          ...getSessionCookieOptions(ctx.req),
           maxAge: ONE_YEAR_MS,
-        };
-        ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
+        });
       }
 
       // Send welcome email
@@ -143,6 +141,22 @@ export const emailAuthRouter = router({
         });
       }
 
+      // Check account status before verifying password
+      if (user.status === "suspended") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Your account has been suspended. Please contact support.",
+        });
+      }
+      if (user.status === "deleted") {
+        // Treat deleted accounts the same as not found to avoid leaking info
+        db.logFailedLogin({ ip, email: input.email, reason: "email_not_found", userAgent }).catch(() => {});
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid email or password",
+        });
+      }
+
       // Verify password
       const isValidPassword = await bcrypt.compare(input.password, user.passwordHash);
 
@@ -174,13 +188,10 @@ export const emailAuthRouter = router({
 
       // Set cookie
       if (ctx.res) {
-        const cookieOptions = {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax" as const,
+        ctx.res.cookie(COOKIE_NAME, sessionToken, {
+          ...getSessionCookieOptions(ctx.req),
           maxAge: sessionDuration,
-        };
-        ctx.res.cookie(COOKIE_NAME, sessionToken, cookieOptions);
+        });
       }
 
       return {

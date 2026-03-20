@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, email, name, role, loginMethod, passwordHash IS NOT NULL as hasPassword, mustChangePassword, status FROM users WHERE email = 'corranforce@gmail.com';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, email, name, role, loginMethod, passwordHash IS NOT NULL as hasPassword, mustChangePassword, status FROM users WHERE email = 'corranforce@gmail.com';",
+  "rows": [
+    {
+      "id": "1",
+      "email": "corranforce@gmail.com",
+      "name": "  Allen Davis  ",
+      "role": "platform_owner",
+      "loginMethod": "email",
+      "hasPassword": "1",
+      "mustChangePassword": "0",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tloginMethod\thasPassword\tmustChangePassword\tstatus\n1\tcorranforce@gmail.com\t  Allen Davis  \tplatform_owner\temail\t1\t0\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 385
+}
