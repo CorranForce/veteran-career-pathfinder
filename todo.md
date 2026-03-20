@@ -1442,3 +1442,4 @@
 - [x] Build NotificationBell component with dropdown inbox in nav
 - [x] Wire owner alerts: new user signup, payment completed, rate-limit threshold
 - [x] Write vitest tests for notification system
+- [x] Fix recurring "Invalid email or password" login error - investigate root cause

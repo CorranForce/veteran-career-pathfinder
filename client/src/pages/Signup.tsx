@@ -18,7 +18,10 @@ import { Loader2, CheckCircle2, Mail } from "lucide-react";
 export default function Signup() {
   const [, setLocation] = useLocation();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  // Pre-fill email if redirected from login page with ?email= param
+  const [email, setEmail] = useState(
+    () => new URLSearchParams(window.location.search).get("email") || ""
+  );
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 

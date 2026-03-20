@@ -34,7 +34,12 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  
+
+  // Trust the first proxy hop (Manus reverse proxy / load balancer).
+  // Required for express-rate-limit to correctly read X-Forwarded-For IPs
+  // and for secure cookies to work in production behind HTTPS termination.
+  app.set("trust proxy", 1);
+
   // Stripe webhook MUST be registered BEFORE express.json() to access raw body
   app.post(
     "/api/stripe/webhook",

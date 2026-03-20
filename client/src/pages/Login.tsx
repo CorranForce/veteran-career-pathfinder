@@ -41,6 +41,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [failedEmail, setFailedEmail] = useState("");
 
   // Read ?next= param to redirect after login
   const nextPath = new URLSearchParams(window.location.search).get("next") || "/tools";
@@ -52,6 +53,8 @@ export default function Login() {
     },
     onError: (err) => {
       setError(err.message);
+      // Track the email that failed so we can pre-fill the sign-up link
+      setFailedEmail(email);
     },
   });
 
@@ -72,6 +75,9 @@ export default function Login() {
 
   // Detect if the error is a Google OAuth account mismatch
   const isGoogleAccountError = error.toLowerCase().includes("google");
+  // Detect if the error is a generic "not found" / wrong password error
+  const isInvalidCredentialsError =
+    !isGoogleAccountError && error === "Invalid email or password";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/30 to-background p-4">
@@ -99,6 +105,17 @@ export default function Login() {
                     <GoogleIcon />
                     Sign in with Google
                   </Button>
+                )}
+                {isInvalidCredentialsError && (
+                  <p className="text-xs mt-1">
+                    Don&apos;t have an account?{" "}
+                    <a
+                      href={`/signup?email=${encodeURIComponent(failedEmail)}${nextPath !== "/tools" ? `&next=${encodeURIComponent(nextPath)}` : ""}`}
+                      className="underline font-medium"
+                    >
+                      Sign up for free
+                    </a>
+                  </p>
                 )}
               </AlertDescription>
             </Alert>

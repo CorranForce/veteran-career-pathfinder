@@ -1,0 +1,170 @@
+{
+  "query": "SELECT id, email, name, loginMethod, CASE WHEN passwordHash IS NULL THEN 'NULL' ELSE 'SET' END as hashStatus, createdAt FROM users WHERE loginMethod = 'email' OR loginMethod IS NULL ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, email, name, loginMethod, CASE WHEN passwordHash IS NULL THEN 'NULL' ELSE 'SET' END as hashStatus, createdAt FROM users WHERE loginMethod = 'email' OR loginMethod IS NULL ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "1830027",
+      "email": "test-user-1773968030042@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-20 00:53:50"
+    },
+    {
+      "id": "1830012",
+      "email": "test-user-1773965079705@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-20 00:04:39"
+    },
+    {
+      "id": "1830010",
+      "email": "test-user-1773964584163@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 23:56:24"
+    },
+    {
+      "id": "1830007",
+      "email": "test-user-1773964557094@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 23:55:57"
+    },
+    {
+      "id": "1830004",
+      "email": "test-user-1773963449589@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 23:37:29"
+    },
+    {
+      "id": "1830001",
+      "email": "test-user-1773963410265@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 23:36:50"
+    },
+    {
+      "id": "1800004",
+      "email": "test-user-1773956479794@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 21:41:20"
+    },
+    {
+      "id": "1800003",
+      "email": "test-user-1773955898150@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 21:31:38"
+    },
+    {
+      "id": "1800002",
+      "email": "test-user-1773955853785@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 21:30:53"
+    },
+    {
+      "id": "1800001",
+      "email": "test-user-1773955843477@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 21:30:43"
+    },
+    {
+      "id": "1770002",
+      "email": "test-user-1773917813235@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 10:56:53"
+    },
+    {
+      "id": "1770001",
+      "email": "test-user-1773917788129@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-19 10:56:28"
+    },
+    {
+      "id": "1740001",
+      "email": "test-user-1773831337675@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-18 10:55:37"
+    },
+    {
+      "id": "1710002",
+      "email": "test-user-1773745235726@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-17 11:00:36"
+    },
+    {
+      "id": "1680004",
+      "email": "testvet_browser@mailinator.com",
+      "name": "Test Veteran",
+      "loginMethod": "email",
+      "hashStatus": "SET",
+      "createdAt": "2026-03-12 18:42:18"
+    },
+    {
+      "id": "1680003",
+      "email": "test-user-1773340760867@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-12 18:39:21"
+    },
+    {
+      "id": "1680002",
+      "email": "test-user-1773340753632@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-12 18:39:13"
+    },
+    {
+      "id": "1680001",
+      "email": "test-user-1773340744914@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-12 18:39:05"
+    },
+    {
+      "id": "1650001",
+      "email": "test-user-1773237685377@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-11 14:01:25"
+    },
+    {
+      "id": "1620007",
+      "email": "test-user-1773151540732@example.com",
+      "name": "Test User",
+      "loginMethod": "email",
+      "hashStatus": "NULL",
+      "createdAt": "2026-03-10 14:05:41"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\tloginMethod\thashStatus\tcreatedAt\n1830027\ttest-user-1773968030042@example.com\tTest User\temail\tNULL\t2026-03-20 00:53:50\n1830012\ttest-user-1773965079705@example.com\tTest User\temail\tNULL\t2026-03-20 00:04:39\n1830010\ttest-user-1773964584163@example.com\tTest User\temail\tNULL\t2026-03-19 23:56:24\n1830007\ttest-user-1773964557094@example.com\tTest User\temail\tNULL\t2026-03-19 23:55:57\n1830004\ttest-user-1773963449589@example.com\tTest User\temail\tNULL\t2026-03-19 23:37:29\n1830001\ttest-user-1773963410265@example.com\tTest User\temail\tNULL\t2026-03-19 23:36:50\n1800004\ttest-user-1773956479794@example.com\tTest User\temail\tNULL\t2026-03-19 21:41:20\n1800003\ttest-user-1773955898150@example.com\tTest User\temail\tNULL\t2026-03-19 21:31:38\n1800002\ttest-user-1773955853785@example.com\tTest User\temail\tNULL\t2026-03-19 21:30:53\n1800001\ttest-user-1773955843477@example.com\tTest User\temail\tNULL\t2026-03-19 21:30:43\n1770002\ttest-user-1773917813235@example.com\tTest User\temail\tNULL\t2026-03-19 10:56:53\n1770001\ttest-user-1773917788129@example.com\tTest User\temail\tNULL\t2026-03-19 10:56:28\n1740001\ttest-user-1773831337675@example.com\tTest User\temail\tNULL\t2026-03-18 10:55:37\n1710002\ttest-user-1773745235726@example.com\tTest User\temail\tNULL\t2026-03-17 11:00:36\n1680004\ttestvet_browser@mailinator.com\tTest Veteran\temail\tSET\t2026-03-12 18:42:18\n1680003\ttest-user-1773340760867@example.com\tTest User\temail\tNULL\t2026-03-12 18:39:21\n1680002\ttest-user-1773340753632@example.com\tTest User\temail\tNULL\t2026-03-12 18:39:13\n1680001\ttest-user-1773340744914@example.com\tTest User\temail\tNULL\t2026-03-12 18:39:05\n1650001\ttest-user-1773237685377@example.com\tTest User\temail\tNULL\t2026-03-11 14:01:25\n1620007\ttest-user-1773151540732@example.com\tTest User\temail\tNULL\t2026-03-10 14:05:41\n",
+  "stderr": "",
+  "execution_time_ms": 126
+}
