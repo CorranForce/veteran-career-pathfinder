@@ -401,6 +401,14 @@ export const profileRouter = router({
           message: "User not found",
         });
       }
+
+      // Guard: platform_owner cannot delete their own account
+      if (userData.role === "platform_owner") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "The platform owner account cannot be deleted.",
+        });
+      }
       
       // Prepare data export (remove sensitive fields)
       const dataExport = {

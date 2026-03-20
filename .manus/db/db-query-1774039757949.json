@@ -1,0 +1,388 @@
+{
+  "query": "SELECT id, email, name, role, loginMethod, passwordHash IS NOT NULL as hasPassword, status FROM users ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2Vkk6KVFrhiW4tR.46e47b5b9e7f --database TZPpwPgA6PciQ95BpgomX4 --execute SELECT id, email, name, role, loginMethod, passwordHash IS NOT NULL as hasPassword, status FROM users ORDER BY id;",
+  "rows": [
+    {
+      "id": "1",
+      "email": "deleted_1_1774015592100@deleted.local",
+      "name": "  Allen Davis  ",
+      "role": "platform_owner",
+      "loginMethod": "email",
+      "hasPassword": "1",
+      "status": "deleted"
+    },
+    {
+      "id": "870089",
+      "email": "test-user-1771258326859@example.com",
+      "name": "Test User",
+      "role": "user",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1470001",
+      "email": "test-user-1772109167383@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1500001",
+      "email": "test-user-1772550945494@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1500002",
+      "email": "test-user-1772550961961@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1530001",
+      "email": "test-user-1772811252006@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1530002",
+      "email": "test-user-1772811261350@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1560001",
+      "email": "test-user-1772815815784@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1590001",
+      "email": "testvet_e2e@example.com",
+      "name": "Test Veteran",
+      "role": "user",
+      "loginMethod": "email",
+      "hasPassword": "1",
+      "status": "active"
+    },
+    {
+      "id": "1590002",
+      "email": "test-user-1773055560128@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1590003",
+      "email": "test-user-1773055572700@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620001",
+      "email": "test-user-1773151057979@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620002",
+      "email": "test-user-1773151344327@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620003",
+      "email": "test-user-1773151391674@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620004",
+      "email": "test-user-1773151411592@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620005",
+      "email": "test-user-1773151480765@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620006",
+      "email": "test-user-1773151495632@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1620007",
+      "email": "test-user-1773151540732@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1650001",
+      "email": "test-user-1773237685377@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1680001",
+      "email": "test-user-1773340744914@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1680002",
+      "email": "test-user-1773340753632@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1680003",
+      "email": "test-user-1773340760867@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1680004",
+      "email": "testvet_browser@mailinator.com",
+      "name": "Test Veteran",
+      "role": "user",
+      "loginMethod": "email",
+      "hasPassword": "1",
+      "status": "active"
+    },
+    {
+      "id": "1710001",
+      "email": "pathfinder.casa@gmail.com",
+      "name": "Allen Davis",
+      "role": "user",
+      "loginMethod": "google",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1710002",
+      "email": "test-user-1773745235726@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1740001",
+      "email": "test-user-1773831337675@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1770001",
+      "email": "test-user-1773917788129@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1770002",
+      "email": "test-user-1773917813235@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1800001",
+      "email": "test-user-1773955843477@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1800002",
+      "email": "test-user-1773955853785@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1800003",
+      "email": "test-user-1773955898150@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1800004",
+      "email": "test-user-1773956479794@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1830001",
+      "email": "test-user-1773963410265@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1830004",
+      "email": "test-user-1773963449589@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1830007",
+      "email": "test-user-1773964557094@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1830010",
+      "email": "test-user-1773964584163@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1830012",
+      "email": "test-user-1773965079705@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1830027",
+      "email": "test-user-1773968030042@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1860015",
+      "email": "test-user-1773972002598@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1860032",
+      "email": "test-user-1773972854741@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1890015",
+      "email": "test-user-1774013096894@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    },
+    {
+      "id": "1890025",
+      "email": "test-user-1774015589458@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "loginMethod": "email",
+      "hasPassword": "0",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tloginMethod\thasPassword\tstatus\n1\tdeleted_1_1774015592100@deleted.local\t  Allen Davis  \tplatform_owner\temail\t1\tdeleted\n870089\ttest-user-1771258326859@example.com\tTest User\tuser\temail\t0\tactive\n1470001\ttest-user-1772109167383@example.com\tTest User\tadmin\temail\t0\tactive\n1500001\ttest-user-1772550945494@example.com\tTest User\tadmin\temail\t0\tactive\n1500002\ttest-user-1772550961961@example.com\tTest User\tadmin\temail\t0\tactive\n1530001\ttest-user-1772811252006@example.com\tTest User\tadmin\temail\t0\tactive\n1530002\ttest-user-1772811261350@example.com\tTest User\tadmin\temail\t0\tactive\n1560001\ttest-user-1772815815784@example.com\tTest User\tadmin\temail\t0\tactive\n1590001\ttestvet_e2e@example.com\tTest Veteran\tuser\temail\t1\tactive\n1590002\ttest-user-1773055560128@example.com\tTest User\tadmin\temail\t0\tactive\n1590003\ttest-user-1773055572700@example.com\tTest User\tadmin\temail\t0\tactive\n1620001\ttest-user-1773151057979@example.com\tTest User\tadmin\temail\t0\tactive\n1620002\ttest-user-1773151344327@example.com\tTest User\tadmin\temail\t0\tactive\n1620003\ttest-user-1773151391674@example.com\tTest User\tadmin\temail\t0\tactive\n1620004\ttest-user-1773151411592@example.com\tTest User\tadmin\temail\t0\tactive\n1620005\ttest-user-1773151480765@example.com\tTest User\tadmin\temail\t0\tactive\n1620006\ttest-user-1773151495632@example.com\tTest User\tadmin\temail\t0\tactive\n1620007\ttest-user-1773151540732@example.com\tTest User\tadmin\temail\t0\tactive\n1650001\ttest-user-1773237685377@example.com\tTest User\tadmin\temail\t0\tactive\n1680001\ttest-user-1773340744914@example.com\tTest User\tadmin\temail\t0\tactive\n1680002\ttest-user-1773340753632@example.com\tTest User\tadmin\temail\t0\tactive\n1680003\ttest-user-1773340760867@example.com\tTest User\tadmin\temail\t0\tactive\n1680004\ttestvet_browser@mailinator.com\tTest Veteran\tuser\temail\t1\tactive\n1710001\tpathfinder.casa@gmail.com\tAllen Davis\tuser\tgoogle\t0\tactive\n1710002\ttest-user-1773745235726@example.com\tTest User\tadmin\temail\t0\tactive\n1740001\ttest-user-1773831337675@example.com\tTest User\tadmin\temail\t0\tactive\n1770001\ttest-user-1773917788129@example.com\tTest User\tadmin\temail\t0\tactive\n1770002\ttest-user-1773917813235@example.com\tTest User\tadmin\temail\t0\tactive\n1800001\ttest-user-1773955843477@example.com\tTest User\tadmin\temail\t0\tactive\n1800002\ttest-user-1773955853785@example.com\tTest User\tadmin\temail\t0\tactive\n1800003\ttest-user-1773955898150@example.com\tTest User\tadmin\temail\t0\tactive\n1800004\ttest-user-1773956479794@example.com\tTest User\tadmin\temail\t0\tactive\n1830001\ttest-user-1773963410265@example.com\tTest User\tadmin\temail\t0\tactive\n1830004\ttest-user-1773963449589@example.com\tTest User\tadmin\temail\t0\tactive\n1830007\ttest-user-1773964557094@example.com\tTest User\tadmin\temail\t0\tactive\n1830010\ttest-user-1773964584163@example.com\tTest User\tadmin\temail\t0\tactive\n1830012\ttest-user-1773965079705@example.com\tTest User\tadmin\temail\t0\tactive\n1830027\ttest-user-1773968030042@example.com\tTest User\tadmin\temail\t0\tactive\n1860015\ttest-user-1773972002598@example.com\tTest User\tadmin\temail\t0\tactive\n1860032\ttest-user-1773972854741@example.com\tTest User\tadmin\temail\t0\tactive\n1890015\ttest-user-1774013096894@example.com\tTest User\tadmin\temail\t0\tactive\n1890025\ttest-user-1774015589458@example.com\tTest User\tadmin\temail\t0\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 360
+}

@@ -1462,3 +1462,5 @@
 ## Bug Fixes
 
 - [x] Suppress expected UNAUTHORIZED (401) mutation errors from global console.error logger — login page "Invalid email or password" no longer appears as a console error since the component already handles it in onError
+- [x] Add platform_owner guard to profile.deleteAccount — prevents the platform owner from deleting their own account via Account Settings (was the root cause of corranforce@gmail.com being anonymized)
+- [x] Restore corranforce@gmail.com account (was accidentally soft-deleted; email anonymized to deleted_1_...@deleted.local) — restored email, status=active, password=demo123

@@ -82,9 +82,24 @@ describe("Profile Enhancements", () => {
   });
 
   describe("Account Deletion", () => {
+    // Use a regular user context for deletion tests (platform_owner cannot be deleted)
+    const regularUserContext = {
+      user: {
+        id: 1590001, // testvet_e2e@example.com — a regular user in the DB
+        openId: "test-open-id",
+        name: "Test Veteran",
+        email: "testvet_e2e@example.com",
+        role: "user" as const,
+        loginMethod: "email" as const,
+      },
+      req: {} as any,
+      res: {} as any,
+    };
+    const deletionCaller = appRouter.createCaller(regularUserContext);
+
     it("should reject deletion without proper confirmation", async () => {
       await expect(
-        caller.profile.deleteAccount({
+        deletionCaller.profile.deleteAccount({
           confirmation: "delete",
         })
       ).rejects.toThrow();
@@ -92,27 +107,26 @@ describe("Profile Enhancements", () => {
 
     it("should reject deletion with wrong confirmation text", async () => {
       await expect(
-        caller.profile.deleteAccount({
+        deletionCaller.profile.deleteAccount({
           confirmation: "REMOVE",
         })
       ).rejects.toThrow();
     });
 
     it("should delete account with proper confirmation", async () => {
-      const result = await caller.profile.deleteAccount({
+      const result = await deletionCaller.profile.deleteAccount({
         confirmation: "DELETE",
       });
 
       expect(result.success).toBe(true);
       expect(result.message).toContain("deleted successfully");
       expect(result.dataExport).toBeDefined();
-      expect(result.dataExport.id).toBe(1);
-      // Use actual email from database
+      expect(result.dataExport.id).toBe(1590001);
       expect(result.dataExport.email).toBeDefined();
     });
 
     it("should include user data in export", async () => {
-      const result = await caller.profile.deleteAccount({
+      const result = await deletionCaller.profile.deleteAccount({
         confirmation: "DELETE",
       });
 
@@ -125,7 +139,7 @@ describe("Profile Enhancements", () => {
     });
 
     it("should not include sensitive fields in export", async () => {
-      const result = await caller.profile.deleteAccount({
+      const result = await deletionCaller.profile.deleteAccount({
         confirmation: "DELETE",
       });
 
@@ -135,13 +149,22 @@ describe("Profile Enhancements", () => {
     });
 
     it("should soft delete account (mark as deleted)", async () => {
-      const result = await caller.profile.deleteAccount({
+      const result = await deletionCaller.profile.deleteAccount({
         confirmation: "DELETE",
       });
 
       expect(result.success).toBe(true);
       // The account should be marked as deleted, not hard deleted
       // This is verified by the API returning success
+    });
+
+    it("should reject deletion for platform_owner account", async () => {
+      // The main caller uses platform_owner role — deletion must be blocked
+      await expect(
+        caller.profile.deleteAccount({
+          confirmation: "DELETE",
+        })
+      ).rejects.toThrow("The platform owner account cannot be deleted.");
     });
   });
 
