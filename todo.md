@@ -1458,3 +1458,7 @@
 - [x] Log failed login attempts (wrong password) to admin_activity_logs
 - [x] Surface failed login attempts in admin Security Events tab
 - [x] Add platform_owner guard to admin router to block delete/anonymize/suspend/changeRole on platform_owner accounts
+
+## Bug Fixes
+
+- [x] Suppress expected UNAUTHORIZED (401) mutation errors from global console.error logger — login page "Invalid email or password" no longer appears as a console error since the component already handles it in onError

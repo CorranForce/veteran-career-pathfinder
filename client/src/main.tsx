@@ -38,6 +38,9 @@ queryClient.getMutationCache().subscribe(event => {
   if (event.type === "updated" && event.action.type === "error") {
     const error = event.mutation.state.error;
     redirectToLoginIfUnauthorized(error);
+    // Only log unexpected errors — skip UNAUTHORIZED errors that are
+    // intentionally caught and displayed by individual components (e.g. Login).
+    if (error instanceof TRPCClientError && error.data?.httpStatus === 401) return;
     console.error("[API Mutation Error]", error);
   }
 });
