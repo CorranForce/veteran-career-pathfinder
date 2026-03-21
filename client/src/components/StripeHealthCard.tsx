@@ -3,7 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import {
   Activity,
   CheckCircle2,
@@ -20,6 +27,46 @@ import {
 } from "lucide-react";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
+
+/** Returns a human-readable relative time string, e.g. "3 minutes ago" */
+function relativeTime(date: Date): string {
+  const diffMs = Date.now() - date.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSec < 5) return "just now";
+  if (diffSec < 60) return `${diffSec} seconds ago`;
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? "s" : ""} ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr} hour${diffHr !== 1 ? "s" : ""} ago`;
+  const diffDay = Math.floor(diffHr / 24);
+  return `${diffDay} day${diffDay !== 1 ? "s" : ""} ago`;
+}
+
+/** A timestamp that shows relative time and reveals the exact time on hover */
+function RelativeTimestamp({ date, prefix = "" }: { date: Date; prefix?: string }) {
+  const [, tick] = useState(0);
+
+  // Re-render every 30 seconds so the relative time stays fresh
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="cursor-default underline decoration-dotted underline-offset-2">
+            {prefix}{relativeTime(date)}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="text-xs font-mono">
+          {date.toLocaleString()}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
 
 function StatusBadge({ status }: { status: "ok" | "degraded" | "error" | null }) {
   if (!status) return <Badge variant="outline">Unknown</Badge>;
@@ -125,8 +172,9 @@ export function StripeHealthCard() {
     return issues.join(" · ");
   }
 
-  const checkedAt = latestPing?.createdAt
-    ? new Date(latestPing.createdAt).toLocaleString()
+  const checkedAtDate = latestPing?.createdAt ? new Date(latestPing.createdAt) : null;
+  const webhookDeliveryDate = latestPing?.webhookLastDeliveryAt
+    ? new Date(latestPing.webhookLastDeliveryAt)
     : null;
 
   return (
@@ -184,15 +232,13 @@ export function StripeHealthCard() {
             label="Webhook configured"
             ok={latestPing ? latestPing.webhookConfigured : null}
           />
-          {latestPing?.webhookLastDeliveryAt && (
+          {webhookDeliveryDate && (
             <div className="flex items-center justify-between px-3 py-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Clock className="h-3.5 w-3.5" />
                 <span>Last webhook event received</span>
               </div>
-              <span className="font-mono">
-                {new Date(latestPing.webhookLastDeliveryAt).toLocaleString()}
-              </span>
+              <RelativeTimestamp date={webhookDeliveryDate} />
             </div>
           )}
           <CheckRow
@@ -220,8 +266,8 @@ export function StripeHealthCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
-            {checkedAt ? (
-              <span>Last checked: {checkedAt}</span>
+            {checkedAtDate ? (
+              <RelativeTimestamp date={checkedAtDate} prefix="Checked " />
             ) : (
               <span>No ping recorded yet</span>
             )}

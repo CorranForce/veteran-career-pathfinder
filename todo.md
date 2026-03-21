@@ -1478,3 +1478,5 @@
 - [x] Auto-update STRIPE_PREMIUM_PRICE_ID/STRIPE_PRO_PRICE_ID env vars after Pricing Management price update
 - [x] Add webhook last-delivery timestamp check to Stripe health check
 - [x] Add pagination (default 10) to Revenue Overview
+- [x] Update Stripe Health card footer to relative timestamp with exact-time tooltip
+- [ ] Switch Stripe to live mode (update STRIPE_SECRET_KEY and VITE_STRIPE_PUBLISHABLE_KEY to live keys)
