@@ -176,34 +176,78 @@ export const resumeRouter = router({
           }
         }
 
-        const prompt = `You are an expert ATS (Applicant Tracking System) resume reviewer specializing in helping military veterans transition to civilian careers.
+        const prompt = `You are a senior ATS (Applicant Tracking System) optimization specialist and military career transition expert. You have deep knowledge of how modern ATS platforms (Workday, Taleo, iCIMS, Greenhouse, Lever, BambooHR, SAP SuccessFactors, and SmartRecruiters) parse, rank, and filter resumes.
 
-Analyze this resume and provide detailed feedback following ATS best practices:
+## Deep ATS Best Practices Knowledge Base
+
+### ATS Parsing Rules
+- ATS systems parse resumes top-to-bottom and left-to-right; multi-column layouts, tables, text boxes, headers/footers, and graphics are frequently skipped or garbled
+- File format matters: plain .docx or single-column PDF (text-based, not scanned) parse most reliably; avoid image-based PDFs
+- Font: use standard fonts (Arial, Calibri, Times New Roman, Garamond) at 10–12pt; avoid decorative fonts
+- Avoid: tables, text boxes, columns, graphics, logos, headers/footers, fancy bullets (use plain hyphens or standard bullets)
+- Section headers must be standard labels: "Work Experience", "Education", "Skills", "Certifications" — non-standard headers like "My Journey" are often missed
+- Contact info must be in the body, not in a header/footer, and must include: name, phone, email, LinkedIn URL, city/state
+
+### Keyword Optimization (2024–2025 Best Practices)
+- ATS uses exact-match and semantic matching; include both spelled-out terms AND acronyms (e.g., "Project Management Professional (PMP)")
+- Mirror the exact language from the job description; do not paraphrase
+- Place high-priority keywords in the top third of the resume and in a dedicated Skills section
+- Use industry-standard job titles (not military equivalents) as the actual job title in each role
+- Include a "Core Competencies" or "Skills" section near the top with 12–18 keyword-rich skills
+- Avoid keyword stuffing; each keyword should appear in context 2–3 times maximum
+
+### Military-to-Civilian Translation Rules
+- Replace ALL military jargon, MOS codes, and acronyms with civilian equivalents
+- Translate rank to civilian equivalent: E-7/E-8/E-9 → Senior Manager/Director; O-3/O-4 → Manager/Senior Manager; O-5/O-6 → Director/VP
+- Reframe military duties as civilian accomplishments: "Led 12-person team" not "Commanded a squad"
+- Quantify EVERYTHING: budget managed, team size, equipment value, % improvement, number of personnel trained
+- Use civilian action verbs: Managed, Led, Developed, Implemented, Optimized, Coordinated, Delivered, Reduced, Increased
+- Remove: classified references, unit designations (e.g., "3rd Infantry Division"), deployment locations unless relevant
+
+### ATS Scoring Factors (weighted)
+1. Keyword match rate vs. job description (35%)
+2. Chronological work history completeness with dates (20%)
+3. Education and certifications match (15%)
+4. Skills section keyword density (15%)
+5. Formatting parsability (10%)
+6. Contact information completeness (5%)
+
+### Common ATS Failure Points
+- Missing or non-standard section headers
+- Dates formatted inconsistently (use MM/YYYY or Month YYYY)
+- Employment gaps not addressed
+- Objective statement instead of Professional Summary
+- Skills buried at the bottom instead of near the top
+- No LinkedIn URL or outdated LinkedIn URL
+- Resume longer than 2 pages for <10 years experience
+- Using "I", "my", or first-person language
+- Passive voice instead of active voice with strong verbs
+
+---
+
+## Resume to Analyze
 
 Resume File: ${resume.fileName}
 File Type: ${resume.mimeType}
 
-${resumeText ? `Resume Content:\n${resumeText.substring(0, 4000)}` : "Note: Text extraction not available for this file type. Analysis based on file metadata."}
+${resumeText ? `Resume Content:\n${resumeText.substring(0, 5000)}` : "Note: Text extraction not available for this file type. Provide analysis based on file metadata and general best practices, noting that a text-based PDF or .docx would enable deeper analysis."}
+
+---
+
+## Instructions
+
+Using the ATS best practices knowledge above, provide a thorough, specific analysis. For each weakness and recommendation, cite the specific ATS rule or best practice it violates or addresses. Be specific — do not give generic advice. Reference actual content from the resume where possible.
 
 Provide your analysis in the following JSON format:
 {
-  "atsScore": <number 0-100>,
-  "strengths": [<list of 3-5 strong points>],
-  "weaknesses": [<list of 3-5 areas for improvement>],
-  "recommendations": [<list of 5-7 specific actionable recommendations>],
-  "keywordSuggestions": [<list of 5-10 industry keywords to add>],
-  "formattingIssues": [<list of formatting problems if any>],
-  "summary": "<2-3 sentence overall assessment>"
-}
-
-Focus on:
-1. ATS compatibility (formatting, keywords, structure)
-2. Military-to-civilian language translation
-3. Quantifiable achievements and impact
-4. Keyword optimization for target roles
-5. Professional formatting and readability
-6. Action verbs and power words
-7. Skills section optimization`;
+  "atsScore": <integer 0-100 based on the weighted scoring factors above>,
+  "strengths": [<list of 3-5 specific strong points with evidence from the resume>],
+  "weaknesses": [<list of 3-5 specific ATS failure points found in this resume>],
+  "recommendations": [<list of 5-8 specific, actionable recommendations with the exact change to make>],
+  "keywordSuggestions": [<list of 8-12 high-value industry keywords missing from this resume>],
+  "formattingIssues": [<list of specific ATS-breaking formatting problems found>],
+  "summary": "<2-3 sentence overall assessment referencing the ATS score and top priority fix>"
+}`;
 
         const llmResponse = await invokeLLM({
           messages: [

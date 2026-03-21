@@ -11,6 +11,7 @@ import {
   Eye,
   Sparkles,
   AlertCircle,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -34,6 +35,7 @@ interface AnalysisResult {
 
 export default function ResumeList() {
   const [analyzingId, setAnalyzingId] = useState<number | null>(null);
+  const [reanalyzingId, setReanalyzingId] = useState<number | null>(null);
   const [viewingAnalysis, setViewingAnalysis] = useState<AnalysisResult | null>(null);
   const [viewingScore, setViewingScore] = useState<number | null>(null);
 
@@ -54,6 +56,20 @@ export default function ResumeList() {
     },
   });
 
+  const reanalyzeMutation = trpc.resume.analyzeResume.useMutation({
+    onSuccess: (data) => {
+      utils.resume.getMyResumes.invalidate();
+      setReanalyzingId(null);
+      setViewingAnalysis(data.analysis);
+      setViewingScore(data.analysis.atsScore);
+      toast.success("Resume re-analyzed successfully!");
+    },
+    onError: (error) => {
+      setReanalyzingId(null);
+      toast.error(error.message || "Failed to re-analyze resume");
+    },
+  });
+
   const deleteMutation = trpc.resume.deleteResume.useMutation({
     onSuccess: () => {
       utils.resume.getMyResumes.invalidate();
@@ -67,6 +83,11 @@ export default function ResumeList() {
   const handleAnalyze = (resumeId: number) => {
     setAnalyzingId(resumeId);
     analyzeMutation.mutate({ resumeId });
+  };
+
+  const handleReanalyze = (resumeId: number) => {
+    setReanalyzingId(resumeId);
+    reanalyzeMutation.mutate({ resumeId });
   };
 
   const handleDelete = (resumeId: number) => {
@@ -193,16 +214,37 @@ export default function ResumeList() {
                   )}
 
                   {resume.analysisStatus === "completed" && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        handleViewAnalysis(resume.analysisResult, resume.atsScore)
-                      }
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      View Analysis
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          handleViewAnalysis(resume.analysisResult, resume.atsScore)
+                        }
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Analysis
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleReanalyze(resume.id)}
+                        disabled={reanalyzingId === resume.id}
+                        title="Re-run AI analysis to get fresh insights"
+                      >
+                        {reanalyzingId === resume.id ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Re-analyzing...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            ReAnalyze
+                          </>
+                        )}
+                      </Button>
+                    </>
                   )}
 
                   {resume.analysisStatus === "failed" && (

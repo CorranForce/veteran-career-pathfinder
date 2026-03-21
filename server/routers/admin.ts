@@ -494,6 +494,149 @@ export type ProductKey = keyof typeof PRODUCTS;
     }),
 
   /**
+   * Get pricing configuration for all paid tiers (Pro and Premium)
+   */
+  getPricingConfig: platformOwnerProcedure.query(async () => {
+    const { stripe } = await import("../stripe");
+    const { PRODUCTS } = await import("../products");
+
+    const premiumPriceId = PRODUCTS.PREMIUM.stripePriceId;
+    const proPriceId = PRODUCTS.PRO.stripePriceId;
+
+    const [premiumPrice, proPrice] = await Promise.all([
+      premiumPriceId ? stripe.prices.retrieve(premiumPriceId, { expand: ["product"] }).catch(() => null) : null,
+      proPriceId ? stripe.prices.retrieve(proPriceId, { expand: ["product"] }).catch(() => null) : null,
+    ]);
+
+    return {
+      premium: {
+        productId: PRODUCTS.PREMIUM.id,
+        name: PRODUCTS.PREMIUM.name,
+        description: PRODUCTS.PREMIUM.description,
+        price: PRODUCTS.PREMIUM.price,
+        stripePriceId: premiumPriceId || "",
+        stripeProductId: premiumPrice && "product" in premiumPrice && premiumPrice.product && typeof premiumPrice.product === "object" ? (premiumPrice.product as { id: string }).id : "",
+        stripeActive: premiumPrice?.active ?? false,
+        type: "one_time" as const,
+      },
+      pro: {
+        productId: PRODUCTS.PRO.id,
+        name: PRODUCTS.PRO.name,
+        description: PRODUCTS.PRO.description,
+        price: PRODUCTS.PRO.price,
+        stripePriceId: proPriceId || "",
+        stripeProductId: proPrice && "product" in proPrice && proPrice.product && typeof proPrice.product === "object" ? (proPrice.product as { id: string }).id : "",
+        stripeActive: proPrice?.active ?? false,
+        type: "subscription" as const,
+        interval: "month" as const,
+      },
+    };
+  }),
+
+  /**
+   * Update price for a paid tier (Pro or Premium) — creates a new Stripe price
+   * and updates the environment secret so the new price is used for all future checkouts.
+   */
+  updateTierPrice: platformOwnerProcedure
+    .input(
+      z.object({
+        tier: z.enum(["PREMIUM", "PRO"]),
+        newAmountCents: z.number().int().min(50, "Minimum price is $0.50"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { stripe } = await import("../stripe");
+      const { PRODUCTS } = await import("../products");
+
+      const product = input.tier === "PREMIUM" ? PRODUCTS.PREMIUM : PRODUCTS.PRO;
+      const currentPriceId = product.stripePriceId;
+
+      if (!currentPriceId) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: `No active Stripe price found for ${input.tier}. Configure the price ID in Settings → Payment first.`,
+        });
+      }
+
+      // Retrieve the current price to get the product ID
+      const currentPrice = await stripe.prices.retrieve(currentPriceId);
+      const stripeProductId = typeof currentPrice.product === "string" ? currentPrice.product : currentPrice.product.id;
+
+      // Deactivate old price
+      await stripe.prices.update(currentPriceId, { active: false });
+
+      // Create new price on the same product
+      const priceParams: Parameters<typeof stripe.prices.create>[0] = {
+        product: stripeProductId,
+        unit_amount: input.newAmountCents,
+        currency: "usd",
+      };
+
+      if (input.tier === "PRO") {
+        priceParams.recurring = { interval: "month" };
+      }
+
+      const newPrice = await stripe.prices.create(priceParams);
+
+      // Update shared/products.ts with the new price in cents
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      const sharedProductsPath = path.join(process.cwd(), "shared", "products.ts");
+      let content = await fs.readFile(sharedProductsPath, "utf-8");
+
+      if (input.tier === "PREMIUM") {
+        // Update the PREMIUM price field (use [\s\S] instead of /s flag for TS compat)
+        content = content.replace(
+          /(PREMIUM:\s*\{[\s\S]*?price:\s*)\d+/,
+          `$1${input.newAmountCents}`
+        );
+      } else {
+        // Update the PRO price field
+        content = content.replace(
+          /(PRO:\s*\{[\s\S]*?price:\s*)\d+/,
+          `$1${input.newAmountCents}`
+        );
+      }
+
+      await fs.writeFile(sharedProductsPath, content, "utf-8");
+
+      // Update the env secret so the new price ID is used for checkouts
+      const envKey = input.tier === "PREMIUM" ? "STRIPE_PREMIUM_PRICE_ID" : "STRIPE_PRO_PRICE_ID";
+      const envPath = path.join(process.cwd(), ".env");
+      let envContent = "";
+      try {
+        envContent = await fs.readFile(envPath, "utf-8");
+      } catch {
+        // .env may not exist in production; that's fine
+      }
+
+      const envRegex = new RegExp(`^${envKey}=.*$`, "m");
+      const newEnvLine = `${envKey}=${newPrice.id}`;
+      if (envRegex.test(envContent)) {
+        envContent = envContent.replace(envRegex, newEnvLine);
+      } else {
+        envContent = envContent ? `${envContent.trimEnd()}\n${newEnvLine}\n` : `${newEnvLine}\n`;
+      }
+      try {
+        await fs.writeFile(envPath, envContent, "utf-8");
+      } catch {
+        // Ignore write errors in production environments where .env is read-only
+      }
+
+      // Also update the in-process env so the running server uses the new price immediately
+      process.env[envKey] = newPrice.id;
+
+      return {
+        success: true,
+        tier: input.tier,
+        newPriceId: newPrice.id,
+        newAmountCents: input.newAmountCents,
+        oldPriceId: currentPriceId,
+        stripeProductId,
+      };
+    }),
+
+  /**
    * Get admin activity logs (platform owner only)
    */
   getAdminActivityLogs: platformOwnerProcedure

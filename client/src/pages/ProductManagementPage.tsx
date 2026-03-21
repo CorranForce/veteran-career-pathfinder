@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { StripeHealthCard } from "@/components/StripeHealthCard";
+import { PricingManagement } from "@/components/PricingManagement";
 import {
   Package,
   Plus,
@@ -458,6 +459,11 @@ export default function ProductManagementPage() {
 
       {/* Stripe Health Card */}
       <StripeHealthCard />
+
+      <Separator />
+
+      {/* Tier Pricing Management */}
+      <PricingManagement />
 
       <Separator />
 

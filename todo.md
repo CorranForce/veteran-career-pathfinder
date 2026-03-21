@@ -1468,3 +1468,6 @@
 - [x] Add suspended/deleted account status check to emailAuth.login — prevents suspended users from logging in and treats deleted accounts as not found.
 - [x] Add pagination (5 per page) to Announcement Management section
 - [x] Add pagination (5 per page) to Activity & Security Log section
+- [x] Add ReAnalyze button to My Resumes section
+- [x] Enhance AI Resume Review Agent with deep ATS best practices research
+- [x] Add price update UI for Pro/Premium tiers with Stripe integration
