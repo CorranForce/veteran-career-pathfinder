@@ -121,6 +121,8 @@ export const stripeProductsRouter = router({
         description: z.string().optional(),
         features: z.array(z.string()).optional(),
         price: z.number().min(50).optional(),
+        isRecurring: z.boolean().optional(),
+        billingInterval: z.enum(["month", "year"]).optional(),
         displayOrder: z.number().optional(),
       })
     )
@@ -133,6 +135,10 @@ export const stripeProductsRouter = router({
 
       const updates: Partial<typeof products.$inferInsert> = {};
 
+      // Resolve effective billing type (use input values if provided, else keep existing)
+      const effectiveIsRecurring = input.isRecurring !== undefined ? input.isRecurring : existing.isRecurring;
+      const effectiveBillingInterval = input.billingInterval ?? (existing.billingInterval as "month" | "year" | null);
+
       // Update Stripe product metadata if name/description changed
       if ((input.name || input.description) && existing.stripeProductId) {
         await stripe.products.update(existing.stripeProductId, {
@@ -141,30 +147,43 @@ export const stripeProductsRouter = router({
         });
       }
 
-      // Price change → create new Stripe price, archive old one
-      if (input.price !== undefined && input.price !== existing.price && existing.stripeProductId) {
+      // Determine if a new Stripe price is needed:
+      // - price amount changed, OR
+      // - billing type changed (one-time ↔ recurring), OR
+      // - billing interval changed (month ↔ year)
+      const billingTypeChanged = input.isRecurring !== undefined && input.isRecurring !== existing.isRecurring;
+      const intervalChanged = input.billingInterval !== undefined && input.billingInterval !== existing.billingInterval;
+      const priceAmountChanged = input.price !== undefined && input.price !== existing.price;
+
+      if ((priceAmountChanged || billingTypeChanged || intervalChanged) && existing.stripeProductId) {
+        const newAmount = input.price !== undefined ? input.price : existing.price;
         const priceData: Parameters<typeof stripe.prices.create>[0] = {
           product: existing.stripeProductId,
-          unit_amount: input.price,
+          unit_amount: newAmount,
           currency: existing.currency,
         };
-        if (existing.isRecurring && existing.billingInterval) {
-          priceData.recurring = { interval: existing.billingInterval as "month" | "year" };
+        if (effectiveIsRecurring && effectiveBillingInterval) {
+          priceData.recurring = { interval: effectiveBillingInterval };
         }
         const newPrice = await stripe.prices.create(priceData);
 
-        // Archive old price
+        // Archive old price only after new one is confirmed
         if (existing.stripePriceId) {
           await stripe.prices.update(existing.stripePriceId, { active: false }).catch(() => {});
         }
         updates.stripePriceId = newPrice.id;
-        updates.price = input.price;
+        updates.price = newAmount;
+        updates.isRecurring = effectiveIsRecurring;
+        updates.billingInterval = effectiveIsRecurring ? effectiveBillingInterval : null;
       }
 
       if (input.name) updates.name = input.name;
       if (input.description) updates.description = input.description;
       if (input.features) updates.features = JSON.stringify(input.features);
       if (input.displayOrder !== undefined) updates.displayOrder = input.displayOrder;
+      // Persist billing type even if price didn't change (e.g., just toggling for display)
+      if (input.isRecurring !== undefined && !updates.isRecurring) updates.isRecurring = effectiveIsRecurring;
+      if (input.billingInterval !== undefined && !updates.billingInterval) updates.billingInterval = effectiveBillingInterval;
 
       await db.update(products).set(updates).where(eq(products.id, input.id));
       return { success: true };

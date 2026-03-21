@@ -216,6 +216,8 @@ function ProductFormDialog({
         description: form.description,
         features,
         price: priceCents,
+        isRecurring: form.isRecurring,
+        billingInterval: form.isRecurring ? form.billingInterval : undefined,
         displayOrder: parseInt(form.displayOrder) || 0,
       });
     } else {
@@ -329,40 +331,49 @@ function ProductFormDialog({
             </div>
           </div>
 
-          {/* Recurring (only for new products) */}
-          {!isEdit && (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>Recurring Subscription</Label>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Enable for monthly/annual billing
+          {/* Recurring / One-time toggle — shown for both create and edit */}
+          <div className="space-y-3">
+            <Separator />
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="flex items-center gap-1.5">
+                  <Repeat className="h-4 w-4" />
+                  Payment Type
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {form.isRecurring
+                    ? "Recurring subscription — billed on a set interval"
+                    : "One-time payment — charged once at checkout"}
+                </p>
+                {isEdit && (
+                  <p className="text-xs text-amber-600 mt-0.5">
+                    Changing the payment type will create a new Stripe price.
                   </p>
-                </div>
-                <Switch
-                  checked={form.isRecurring}
-                  onCheckedChange={(v) => update("isRecurring", v)}
-                />
+                )}
               </div>
-              {form.isRecurring && (
-                <div className="space-y-1.5">
-                  <Label>Billing Interval</Label>
-                  <Select
-                    value={form.billingInterval}
-                    onValueChange={(v) => update("billingInterval", v as "month" | "year")}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="month">Monthly</SelectItem>
-                      <SelectItem value="year">Yearly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              <Switch
+                checked={form.isRecurring}
+                onCheckedChange={(v) => update("isRecurring", v)}
+              />
             </div>
-          )}
+            {form.isRecurring && (
+              <div className="space-y-1.5">
+                <Label>Billing Interval</Label>
+                <Select
+                  value={form.billingInterval}
+                  onValueChange={(v) => update("billingInterval", v as "month" | "year")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="month">Monthly</SelectItem>
+                    <SelectItem value="year">Yearly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
         </div>
 
         <DialogFooter>
