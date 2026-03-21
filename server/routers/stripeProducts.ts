@@ -2,8 +2,8 @@ import { z } from "zod";
 import { platformOwnerProcedure, router } from "../_core/trpc";
 import { stripe, getStripeMode as detectStripeMode, getActivePriceId } from "../stripe";
 import { getDb } from "../db";
-import { products, stripeHealthPings } from "../../drizzle/schema";
-import { eq, desc } from "drizzle-orm";
+import { products, stripeHealthPings, purchases } from "../../drizzle/schema";
+import { eq, desc, and, count, isNotNull } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -63,6 +63,7 @@ export const stripeProductsRouter = router({
         currency: z.string().length(3).default("usd"),
         isRecurring: z.boolean().default(false),
         billingInterval: z.enum(["month", "year"]).optional(),
+        yearlyDiscountPercent: z.number().min(0).max(99).default(0),
         displayOrder: z.number().default(0),
       })
     )
@@ -101,6 +102,7 @@ export const stripeProductsRouter = router({
           stripePriceId: stripePrice.id,
           isRecurring: input.isRecurring,
           billingInterval: input.billingInterval ?? null,
+          yearlyDiscountPercent: input.yearlyDiscountPercent,
           displayOrder: input.displayOrder,
           status: "active",
         })
@@ -123,6 +125,7 @@ export const stripeProductsRouter = router({
         price: z.number().min(50).optional(),
         isRecurring: z.boolean().optional(),
         billingInterval: z.enum(["month", "year"]).optional(),
+        yearlyDiscountPercent: z.number().min(0).max(99).optional(),
         displayOrder: z.number().optional(),
       })
     )
@@ -181,6 +184,7 @@ export const stripeProductsRouter = router({
       if (input.description) updates.description = input.description;
       if (input.features) updates.features = JSON.stringify(input.features);
       if (input.displayOrder !== undefined) updates.displayOrder = input.displayOrder;
+      if (input.yearlyDiscountPercent !== undefined) updates.yearlyDiscountPercent = input.yearlyDiscountPercent;
       // Persist billing type even if price didn't change (e.g., just toggling for display)
       if (input.isRecurring !== undefined && !updates.isRecurring) updates.isRecurring = effectiveIsRecurring;
       if (input.billingInterval !== undefined && !updates.billingInterval) updates.billingInterval = effectiveBillingInterval;
@@ -430,4 +434,36 @@ export const stripeProductsRouter = router({
       .orderBy(desc(stripeHealthPings.createdAt))
       .limit(20);
   }),
+
+  /**
+   * Count active subscribers (completed purchases with a stripeSubscriptionId) for a product.
+   * Used to warn admins before switching a recurring product to one-time.
+   */
+  getActiveSubscriberCount: platformOwnerProcedure
+    .input(z.object({ productId: z.number() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { count: 0 };
+
+      // Look up the product to get its productType equivalent
+      const [product] = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, input.productId))
+        .limit(1);
+      if (!product || !product.isRecurring) return { count: 0 };
+
+      // Count completed purchases that have an active subscription ID
+      const [row] = await db
+        .select({ count: count() })
+        .from(purchases)
+        .where(
+          and(
+            eq(purchases.status, "completed"),
+            isNotNull(purchases.stripeSubscriptionId)
+          )
+        );
+
+      return { count: row?.count ?? 0 };
+    }),
 });

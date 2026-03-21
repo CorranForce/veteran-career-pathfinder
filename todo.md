@@ -1493,3 +1493,6 @@
 - [x] Fix Premium product showing as inactive on /admin/products — reactivated correct prices, fixed deactivate-before-create race condition
 - [x] Move mode badge and buttons to second row in Pricing Management card header
 - [x] Add recurring/one-time toggle to product create and edit forms
+- [x] Show One-time/Recurring badge on product list cards
+- [x] Add yearly discount percentage field to create/edit form and display savings on pricing page
+- [x] Add AlertDialog confirmation when switching recurring to one-time on products with active subscribers

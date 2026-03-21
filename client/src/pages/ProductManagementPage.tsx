@@ -58,6 +58,7 @@ type Product = {
   stripePriceId: string | null;
   isRecurring: boolean;
   billingInterval: string | null;
+  yearlyDiscountPercent: number;
   status: "active" | "disabled" | "archived";
   displayOrder: number;
   createdAt: Date;
@@ -73,6 +74,7 @@ type ProductFormData = {
   currency: string;
   isRecurring: boolean;
   billingInterval: "month" | "year";
+  yearlyDiscountPercent: string; // 0-99
   displayOrder: string;
 };
 
@@ -84,6 +86,7 @@ const DEFAULT_FORM: ProductFormData = {
   currency: "usd",
   isRecurring: false,
   billingInterval: "month",
+  yearlyDiscountPercent: "0",
   displayOrder: "0",
 };
 
@@ -139,6 +142,14 @@ function ProductFormDialog({
 }) {
   const utils = trpc.useUtils();
   const isEdit = !!editProduct;
+  const [showRecurringWarning, setShowRecurringWarning] = useState(false);
+
+  // Fetch active subscriber count only when editing a recurring product
+  const { data: subscriberData } = trpc.stripeProducts.getActiveSubscriberCount.useQuery(
+    { productId: editProduct?.id ?? 0 },
+    { enabled: isEdit && !!editProduct?.isRecurring }
+  );
+  const activeSubscriberCount = subscriberData?.count ?? 0;
 
   const [form, setForm] = useState<ProductFormData>(() =>
     editProduct
@@ -150,6 +161,7 @@ function ProductFormDialog({
           currency: editProduct.currency,
           isRecurring: editProduct.isRecurring,
           billingInterval: (editProduct.billingInterval as "month" | "year") ?? "month",
+          yearlyDiscountPercent: String(editProduct.yearlyDiscountPercent ?? 0),
           displayOrder: String(editProduct.displayOrder),
         }
       : DEFAULT_FORM
@@ -197,17 +209,10 @@ function ProductFormDialog({
     onError: (err) => toast.error(`Failed to update: ${err.message}`),
   });
 
-  function handleSubmit() {
+  function doSubmit() {
     const priceCents = Math.round(parseFloat(form.price) * 100);
-    if (isNaN(priceCents) || priceCents < 50) {
-      toast.error("Price must be at least $0.50");
-      return;
-    }
     const features = form.features.filter((f) => f.trim().length > 0);
-    if (features.length === 0) {
-      toast.error("Add at least one feature");
-      return;
-    }
+    const yearlyDiscountPercent = Math.min(99, Math.max(0, parseInt(form.yearlyDiscountPercent) || 0));
 
     if (isEdit && editProduct) {
       updateMutation.mutate({
@@ -218,6 +223,7 @@ function ProductFormDialog({
         price: priceCents,
         isRecurring: form.isRecurring,
         billingInterval: form.isRecurring ? form.billingInterval : undefined,
+        yearlyDiscountPercent: form.isRecurring && form.billingInterval === "year" ? yearlyDiscountPercent : 0,
         displayOrder: parseInt(form.displayOrder) || 0,
       });
     } else {
@@ -229,9 +235,30 @@ function ProductFormDialog({
         currency: form.currency,
         isRecurring: form.isRecurring,
         billingInterval: form.isRecurring ? form.billingInterval : undefined,
+        yearlyDiscountPercent: form.isRecurring && form.billingInterval === "year" ? yearlyDiscountPercent : 0,
         displayOrder: parseInt(form.displayOrder) || 0,
       });
     }
+  }
+
+  function handleSubmit() {
+    const priceCents = Math.round(parseFloat(form.price) * 100);
+    if (isNaN(priceCents) || priceCents < 50) {
+      toast.error("Price must be at least $0.50");
+      return;
+    }
+    const features = form.features.filter((f) => f.trim().length > 0);
+    if (features.length === 0) {
+      toast.error("Add at least one feature");
+      return;
+    }
+    // Warn if switching a recurring product to one-time and there are active subscribers
+    const switchingToOneTime = isEdit && editProduct?.isRecurring && !form.isRecurring;
+    if (switchingToOneTime && activeSubscriberCount > 0) {
+      setShowRecurringWarning(true);
+      return;
+    }
+    doSubmit();
   }
 
   const isPending = createMutation.isPending || updateMutation.isPending;
@@ -357,20 +384,49 @@ function ProductFormDialog({
               />
             </div>
             {form.isRecurring && (
-              <div className="space-y-1.5">
-                <Label>Billing Interval</Label>
-                <Select
-                  value={form.billingInterval}
-                  onValueChange={(v) => update("billingInterval", v as "month" | "year")}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="month">Monthly</SelectItem>
-                    <SelectItem value="year">Yearly</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label>Billing Interval</Label>
+                  <Select
+                    value={form.billingInterval}
+                    onValueChange={(v) => update("billingInterval", v as "month" | "year")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="month">Monthly</SelectItem>
+                      <SelectItem value="year">Yearly</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {form.billingInterval === "year" && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="p-discount" className="flex items-center gap-1.5">
+                      Yearly Discount %
+                      <span className="text-xs text-muted-foreground font-normal">(optional, shown as savings vs. monthly)</span>
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="p-discount"
+                        type="number"
+                        min="0"
+                        max="99"
+                        step="1"
+                        value={form.yearlyDiscountPercent}
+                        onChange={(e) => update("yearlyDiscountPercent", e.target.value)}
+                        placeholder="20"
+                        className="pr-8"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
+                    </div>
+                    {parseInt(form.yearlyDiscountPercent) > 0 && (
+                      <p className="text-xs text-green-600">
+                        Customers will see "Save {form.yearlyDiscountPercent}% vs. monthly" on the pricing page.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -392,6 +448,34 @@ function ProductFormDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Recurring → One-time confirmation */}
+      <AlertDialog open={showRecurringWarning} onOpenChange={setShowRecurringWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Switch to One-time Payment?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This product currently has{" "}
+              <strong>{activeSubscriberCount} active subscriber{activeSubscriberCount !== 1 ? "s" : ""}</strong>.
+              Switching to a one-time payment will create a new Stripe price, but existing subscribers will
+              continue to be billed on their current subscription until they cancel. New customers will
+              see the one-time price instead.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-amber-600 text-white hover:bg-amber-700"
+              onClick={() => {
+                setShowRecurringWarning(false);
+                doSubmit();
+              }}
+            >
+              Yes, Switch to One-time
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
@@ -608,9 +692,22 @@ function ProductCard({
           <div className="flex items-center gap-1.5 text-2xl font-bold">
             {formatPrice(product.price, product.currency)}
           </div>
-          {product.isRecurring && (
-            <Badge variant="outline" className="text-xs">
-              <Repeat className="h-3 w-3 mr-1" />/{product.billingInterval}
+          {product.isRecurring ? (
+            <>
+              <Badge variant="outline" className="text-xs text-blue-600 border-blue-400">
+                <Repeat className="h-3 w-3 mr-1" />
+                {product.billingInterval === "year" ? "Yearly" : "Monthly"}
+              </Badge>
+              {product.billingInterval === "year" && product.yearlyDiscountPercent > 0 && (
+                <Badge className="text-xs bg-green-500/15 text-green-600 border-green-500/30">
+                  Save {product.yearlyDiscountPercent}%
+                </Badge>
+              )}
+            </>
+          ) : (
+            <Badge variant="outline" className="text-xs text-green-600 border-green-400">
+              <DollarSign className="h-3 w-3 mr-1" />
+              One-time
             </Badge>
           )}
         </div>

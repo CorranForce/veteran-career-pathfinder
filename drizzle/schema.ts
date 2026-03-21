@@ -329,6 +329,7 @@ export const products = mysqlTable("products", {
   displayOrder: int("displayOrder").default(0).notNull(), // For sorting in UI
   isRecurring: boolean("isRecurring").default(false).notNull(), // One-time vs subscription
   billingInterval: varchar("billingInterval", { length: 50 }), // "month", "year", etc. for subscriptions
+  yearlyDiscountPercent: int("yearlyDiscountPercent").default(0).notNull(), // Discount % shown when billing interval is "year"
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

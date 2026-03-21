@@ -208,15 +208,26 @@ export default function PricingNew() {
               <CardHeader>
                 <CardTitle className="text-2xl">{PRODUCTS.PREMIUM.name}</CardTitle>
                 <CardDescription>{PRODUCTS.PREMIUM.description}</CardDescription>
-                <div className="mt-4 flex items-baseline gap-2">
-                  {livePrices ? (
-                    <span className="text-4xl font-bold">{fmt(premiumCents)}</span>
-                  ) : (
-                    <span className="text-4xl font-bold animate-pulse text-muted-foreground">
-                      Loading...
+                <div className="mt-4 space-y-1">
+                  <div className="flex items-baseline gap-2">
+                    {livePrices ? (
+                      <span className="text-4xl font-bold">{fmt(premiumCents)}</span>
+                    ) : (
+                      <span className="text-4xl font-bold animate-pulse text-muted-foreground">
+                        Loading...
+                      </span>
+                    )}
+                    <span className="text-muted-foreground">
+                      {livePrices?.premium.isRecurring
+                        ? `/${livePrices.premium.billingInterval ?? "month"}`
+                        : "one-time"}
                     </span>
+                  </div>
+                  {(livePrices?.premium.yearlyDiscountPercent ?? 0) > 0 && (
+                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs">
+                      Save {livePrices!.premium.yearlyDiscountPercent}% vs. monthly
+                    </Badge>
                   )}
-                  <span className="text-muted-foreground">one-time</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -252,15 +263,26 @@ export default function PricingNew() {
               <CardHeader>
                 <CardTitle className="text-2xl">{PRODUCTS.PRO.name}</CardTitle>
                 <CardDescription>{PRODUCTS.PRO.description}</CardDescription>
-                <div className="mt-4 flex items-baseline gap-2">
-                  {livePrices ? (
-                    <span className="text-4xl font-bold">{fmt(proCents)}</span>
-                  ) : (
-                    <span className="text-4xl font-bold animate-pulse text-muted-foreground">
-                      Loading...
+                <div className="mt-4 space-y-1">
+                  <div className="flex items-baseline gap-2">
+                    {livePrices ? (
+                      <span className="text-4xl font-bold">{fmt(proCents)}</span>
+                    ) : (
+                      <span className="text-4xl font-bold animate-pulse text-muted-foreground">
+                        Loading...
+                      </span>
+                    )}
+                    <span className="text-muted-foreground">
+                      {livePrices?.pro.isRecurring
+                        ? `/${livePrices.pro.billingInterval ?? "month"}`
+                        : "one-time"}
                     </span>
+                  </div>
+                  {(livePrices?.pro.yearlyDiscountPercent ?? 0) > 0 && (
+                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs">
+                      Save {livePrices!.pro.yearlyDiscountPercent}% vs. monthly
+                    </Badge>
                   )}
-                  <span className="text-muted-foreground">/month</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">

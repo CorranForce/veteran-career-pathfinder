@@ -287,25 +287,41 @@ export const paymentRouter = router({
     const premiumPriceId = PRODUCTS.PREMIUM.stripePriceId;
     const proPriceId = PRODUCTS.PRO.stripePriceId;
 
-    const [premiumPrice, proPrice] = await Promise.all([
+    // Fetch Stripe prices and local DB products in parallel
+    const db = await getDb();
+    const { products: productsTable } = await import("../../drizzle/schema");
+    const [premiumPrice, proPrice, dbProducts] = await Promise.all([
       premiumPriceId
         ? stripe.prices.retrieve(premiumPriceId).catch(() => null)
         : null,
       proPriceId
         ? stripe.prices.retrieve(proPriceId).catch(() => null)
         : null,
+      db
+        ? db.select().from(productsTable).where(eq(productsTable.status, "active")).catch(() => [])
+        : Promise.resolve([]),
     ]);
+
+    // Find DB records by matching the active Stripe price ID
+    const dbPremium = dbProducts.find((p) => p.stripePriceId === premiumPriceId);
+    const dbPro = dbProducts.find((p) => p.stripePriceId === proPriceId);
 
     return {
       premium: {
         amountCents: premiumPrice?.unit_amount ?? PRODUCTS.PREMIUM.price,
         active: premiumPrice?.active ?? false,
         currency: premiumPrice?.currency ?? PRODUCTS.PREMIUM.currency,
+        yearlyDiscountPercent: dbPremium?.yearlyDiscountPercent ?? 0,
+        billingInterval: dbPremium?.billingInterval ?? null,
+        isRecurring: dbPremium?.isRecurring ?? false,
       },
       pro: {
         amountCents: proPrice?.unit_amount ?? PRODUCTS.PRO.price,
         active: proPrice?.active ?? false,
         currency: proPrice?.currency ?? PRODUCTS.PRO.currency,
+        yearlyDiscountPercent: dbPro?.yearlyDiscountPercent ?? 0,
+        billingInterval: dbPro?.billingInterval ?? null,
+        isRecurring: dbPro?.isRecurring ?? false,
       },
     };
   }),
