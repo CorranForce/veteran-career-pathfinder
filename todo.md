@@ -1471,3 +1471,5 @@
 - [x] Add ReAnalyze button to My Resumes section
 - [x] Enhance AI Resume Review Agent with deep ATS best practices research
 - [x] Add price update UI for Pro/Premium tiers with Stripe integration
+- [x] Wire Premium price to live Stripe price (not static shared/products.ts)
+- [x] Fix 20% discount math on Pricing page

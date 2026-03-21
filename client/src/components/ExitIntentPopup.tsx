@@ -7,25 +7,41 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { X, Gift, ArrowRight } from "lucide-react";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { PRODUCTS } from "@shared/products";
+
+/** Format cents to a USD string, e.g. 2320 → "$23.20" */
+function fmt(cents: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(cents / 100);
+}
 
 export function ExitIntentPopup() {
   const [isOpen, setIsOpen] = useState(false);
-  const [email, setEmail] = useState("");
   const [hasShown, setHasShown] = useState(false);
   const [, setLocation] = useLocation();
 
+  // Fetch live Premium price from Stripe so discount math is always correct
+  const { data: livePrices } = trpc.payment.getLivePrices.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const fullPriceCents = livePrices?.premium.amountCents ?? PRODUCTS.PREMIUM.price;
+  // 20% off — round to nearest cent
+  const discountedCents = Math.round(fullPriceCents * 0.8);
+
   useEffect(() => {
-    // Check if popup has already been shown in this session
     const popupShown = sessionStorage.getItem("exitIntentShown");
     if (popupShown) {
       setHasShown(true);
       return;
     }
 
-    // Detect exit intent (mouse leaving viewport from top)
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0 && !hasShown && !isOpen) {
         setIsOpen(true);
@@ -35,14 +51,10 @@ export function ExitIntentPopup() {
     };
 
     document.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      document.removeEventListener("mouseleave", handleMouseLeave);
-    };
+    return () => document.removeEventListener("mouseleave", handleMouseLeave);
   }, [hasShown, isOpen]);
 
   const handleGetOffer = () => {
-    // Redirect to pricing page with discount parameter
     setIsOpen(false);
     setLocation("/pricing?offer=exit20");
   };
@@ -84,8 +96,17 @@ export function ExitIntentPopup() {
               Get 20% Off Your Premium Package
             </h3>
             <p className="text-muted-foreground">
-              We know transitioning to civilian life is challenging. That's why we're offering you an exclusive <strong>20% discount</strong> on our Premium Package - just <strong>$23.20</strong> instead of $29.
+              We know transitioning to civilian life is challenging. That's why we're offering you an exclusive{" "}
+              <strong>20% discount</strong> on our Premium Package — just{" "}
+              <strong>{fmt(discountedCents)}</strong> instead of{" "}
+              <span className="line-through text-muted-foreground">{fmt(fullPriceCents)}</span>.
             </p>
+          </div>
+
+          {/* Savings callout */}
+          <div className="flex items-center gap-3 rounded-md bg-green-500/10 border border-green-500/30 px-4 py-3">
+            <span className="text-green-600 font-bold text-lg">{fmt(fullPriceCents - discountedCents)}</span>
+            <span className="text-sm text-green-700">savings with your 20% veteran discount</span>
           </div>
 
           <div className="bg-accent/50 rounded-lg p-4 space-y-2">

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { stripe } from "../stripe";
 import { PRODUCTS } from "../products";
 import { createPurchase, getUserPurchases, hasUserPurchased, updateUserStripeCustomerId, getUserById } from "../db";
@@ -277,4 +277,36 @@ export const paymentRouter = router({
       }
       return await getUserDownloads(ctx.user.id);
     }),
+
+  /**
+   * Get live prices for all paid tiers directly from Stripe.
+   * This is a public procedure so the Pricing page can show up-to-date prices
+   * without requiring authentication.
+   */
+  getLivePrices: publicProcedure.query(async () => {
+    const premiumPriceId = PRODUCTS.PREMIUM.stripePriceId;
+    const proPriceId = PRODUCTS.PRO.stripePriceId;
+
+    const [premiumPrice, proPrice] = await Promise.all([
+      premiumPriceId
+        ? stripe.prices.retrieve(premiumPriceId).catch(() => null)
+        : null,
+      proPriceId
+        ? stripe.prices.retrieve(proPriceId).catch(() => null)
+        : null,
+    ]);
+
+    return {
+      premium: {
+        amountCents: premiumPrice?.unit_amount ?? PRODUCTS.PREMIUM.price,
+        active: premiumPrice?.active ?? false,
+        currency: premiumPrice?.currency ?? PRODUCTS.PREMIUM.currency,
+      },
+      pro: {
+        amountCents: proPrice?.unit_amount ?? PRODUCTS.PRO.price,
+        active: proPrice?.active ?? false,
+        currency: proPrice?.currency ?? PRODUCTS.PRO.currency,
+      },
+    };
+  }),
 });
