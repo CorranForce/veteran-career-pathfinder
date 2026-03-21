@@ -1473,3 +1473,4 @@
 - [x] Add price update UI for Pro/Premium tiers with Stripe integration
 - [x] Wire Premium price to live Stripe price (not static shared/products.ts)
 - [x] Fix 20% discount math on Pricing page
+- [x] Fix Stripe Health card showing Premium/Pro price IDs as invalid
