@@ -82,6 +82,10 @@ export default function PlatformOwnerDashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
+  // Revenue Overview pagination state
+  const [revPage, setRevPage] = useState(1);
+  const REV_PAGE_SIZE = 10;
+
   // Fetch all users with pagination
   const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(
     { page: currentPage, pageSize },
@@ -371,8 +375,17 @@ export default function PlatformOwnerDashboard() {
 
             {/* Recent Purchases Table */}
             <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-4">Recent Purchases</h3>
-              <p className="text-sm text-muted-foreground mb-4">Latest completed transactions</p>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold">Recent Purchases</h3>
+                  <p className="text-sm text-muted-foreground">Latest completed transactions</p>
+                </div>
+                {revenueAnalytics?.recentPurchases && revenueAnalytics.recentPurchases.length > REV_PAGE_SIZE && (
+                  <span className="text-xs text-muted-foreground">
+                    Showing {Math.min((revPage - 1) * REV_PAGE_SIZE + 1, revenueAnalytics.recentPurchases.length)}–{Math.min(revPage * REV_PAGE_SIZE, revenueAnalytics.recentPurchases.length)} of {revenueAnalytics.recentPurchases.length}
+                  </span>
+                )}
+              </div>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -385,22 +398,24 @@ export default function PlatformOwnerDashboard() {
                   </TableHeader>
                   <TableBody>
                     {revenueAnalytics?.recentPurchases && revenueAnalytics.recentPurchases.length > 0 ? (
-                      revenueAnalytics.recentPurchases.map((purchase: any) => (
-                        <TableRow key={purchase.id}>
-                          <TableCell className="font-medium">
-                            {purchase.productType === "premium_prompt" ? "Premium Package" : "Pro Subscription"}
-                          </TableCell>
-                          <TableCell>
-                            {format(new Date(purchase.createdAt), "MMM d, yyyy 'at' h:mm a")}
-                          </TableCell>
-                          <TableCell>${(purchase.amount / 100).toFixed(2)}</TableCell>
-                          <TableCell>
-                            <Badge variant={purchase.status === "completed" ? "default" : "secondary"}>
-                              {purchase.status}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))
+                      revenueAnalytics.recentPurchases
+                        .slice((revPage - 1) * REV_PAGE_SIZE, revPage * REV_PAGE_SIZE)
+                        .map((purchase: any) => (
+                          <TableRow key={purchase.id}>
+                            <TableCell className="font-medium">
+                              {purchase.productType === "premium_prompt" ? "Premium Package" : "Pro Subscription"}
+                            </TableCell>
+                            <TableCell>
+                              {format(new Date(purchase.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                            </TableCell>
+                            <TableCell>${(purchase.amount / 100).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Badge variant={purchase.status === "completed" ? "default" : "secondary"}>
+                                {purchase.status}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))
                     ) : (
                       <TableRow>
                         <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
@@ -411,6 +426,30 @@ export default function PlatformOwnerDashboard() {
                   </TableBody>
                 </Table>
               </div>
+              {/* Pagination controls */}
+              {revenueAnalytics?.recentPurchases && revenueAnalytics.recentPurchases.length > REV_PAGE_SIZE && (
+                <div className="flex items-center justify-between mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setRevPage((p) => Math.max(1, p - 1))}
+                    disabled={revPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {revPage} of {Math.ceil(revenueAnalytics.recentPurchases.length / REV_PAGE_SIZE)}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setRevPage((p) => Math.min(Math.ceil(revenueAnalytics.recentPurchases.length / REV_PAGE_SIZE), p + 1))}
+                    disabled={revPage >= Math.ceil(revenueAnalytics.recentPurchases.length / REV_PAGE_SIZE)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

@@ -36,6 +36,7 @@ export async function runStripeHealthCheck(
   latencyMs: number;
   accountId: string | null;
   webhookConfigured: boolean;
+  webhookLastDeliveryAt: Date | null;
   premiumPriceValid: boolean;
   proPriceValid: boolean;
   errorMessage: string | null;
@@ -45,6 +46,7 @@ export async function runStripeHealthCheck(
   let status: "ok" | "degraded" | "error" = "ok";
   let accountId: string | null = null;
   let webhookConfigured = false;
+  let webhookLastDeliveryAt: Date | null = null;
   let premiumPriceValid = false;
   let proPriceValid = false;
   let errorMessage: string | null = null;
@@ -56,11 +58,24 @@ export async function runStripeHealthCheck(
 
     // 2. Verify webhook endpoint is registered (inbound ← Stripe)
     const webhooks = await stripe.webhookEndpoints.list({ limit: 10 });
-    webhookConfigured = webhooks.data.some(
+    const appWebhook = webhooks.data.find(
       (wh) => wh.status === "enabled" && wh.url.includes("/api/stripe/webhook")
     );
+    webhookConfigured = !!appWebhook;
 
-    // 3. Verify price IDs are valid and active
+    // 3. Fetch the last successful webhook event delivery timestamp
+    if (appWebhook) {
+      try {
+        const events = await stripe.events.list({ limit: 1 });
+        if (events.data.length > 0) {
+          webhookLastDeliveryAt = new Date(events.data[0].created * 1000);
+        }
+      } catch {
+        // Non-fatal: last delivery timestamp is best-effort
+      }
+    }
+
+    // 4. Verify price IDs are valid and active
     premiumPriceValid = await verifyStripePrice(process.env.STRIPE_PREMIUM_PRICE_ID ?? "");
     proPriceValid = await verifyStripePrice(process.env.STRIPE_PRO_PRICE_ID ?? "");
 
@@ -84,6 +99,7 @@ export async function runStripeHealthCheck(
         latencyMs,
         accountId,
         webhookConfigured,
+        webhookLastDeliveryAt,
         premiumPriceValid,
         proPriceValid,
         errorMessage,
@@ -95,10 +111,10 @@ export async function runStripeHealthCheck(
   }
 
   console.log(
-    `[StripeHeartbeat] ${triggeredBy} ping — status: ${status}, latency: ${latencyMs}ms, account: ${accountId ?? "N/A"}`
+    `[StripeHeartbeat] ${triggeredBy} ping — status: ${status}, latency: ${latencyMs}ms, account: ${accountId ?? "N/A"}, lastDelivery: ${webhookLastDeliveryAt?.toISOString() ?? "N/A"}`
   );
 
-  return { status, latencyMs, accountId, webhookConfigured, premiumPriceValid, proPriceValid, errorMessage, checkedAt };
+  return { status, latencyMs, accountId, webhookConfigured, webhookLastDeliveryAt, premiumPriceValid, proPriceValid, errorMessage, checkedAt };
 }
 
 /**

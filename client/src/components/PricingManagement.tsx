@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -51,6 +52,7 @@ function TierPriceEditor({
   interval,
   onSaved,
 }: TierPriceEditorProps) {
+  const utils = trpc.useUtils();
   const [priceInput, setPriceInput] = useState(
     (currentPriceCents / 100).toFixed(2)
   );
@@ -66,6 +68,14 @@ function TierPriceEditor({
       toast.success(
         `${label} price updated to $${(data.newAmountCents / 100).toFixed(2)}. New Stripe price ID: ${data.newPriceId}`
       );
+      // Invalidate health ping cache so the Stripe Health card reflects the new price ID.
+      // The server triggers a background health ping on price update, so this will
+      // pick up the fresh result once it arrives.
+      setTimeout(() => {
+        utils.stripeProducts.getLatestPing.invalidate();
+        utils.stripeProducts.getPingHistory.invalidate();
+        utils.payment.getLivePrices.invalidate();
+      }, 3000);
       onSaved();
     },
     onError: (error) => {

@@ -1,0 +1,1 @@
+ALTER TABLE `stripe_health_pings` ADD `webhookLastDeliveryAt` timestamp;

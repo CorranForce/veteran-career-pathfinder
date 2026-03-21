@@ -295,6 +295,7 @@ export const stripeProductsRouter = router({
       let status: "ok" | "degraded" | "error" = "ok";
       let accountId: string | null = null;
       let webhookConfigured = false;
+      let webhookLastDeliveryAt: Date | null = null;
       let premiumPriceValid = false;
       let proPriceValid = false;
       let errorMessage: string | null = null;
@@ -306,11 +307,24 @@ export const stripeProductsRouter = router({
 
         // 2. Verify webhook endpoint is configured
         const webhooks = await stripe.webhookEndpoints.list({ limit: 10 });
-        webhookConfigured = webhooks.data.some(
+        const appWebhook = webhooks.data.find(
           (wh) => wh.status === "enabled" && wh.url.includes("/api/stripe/webhook")
         );
+        webhookConfigured = !!appWebhook;
 
-        // 3. Verify price IDs
+        // 3. Fetch the last successful webhook event delivery timestamp
+        if (appWebhook) {
+          try {
+            const events = await stripe.events.list({ limit: 1 });
+            if (events.data.length > 0) {
+              webhookLastDeliveryAt = new Date(events.data[0].created * 1000);
+            }
+          } catch {
+            // Non-fatal: last delivery timestamp is best-effort
+          }
+        }
+
+        // 4. Verify price IDs
         premiumPriceValid = await verifyStripePrice(process.env.STRIPE_PREMIUM_PRICE_ID ?? "");
         proPriceValid = await verifyStripePrice(process.env.STRIPE_PRO_PRICE_ID ?? "");
 
@@ -331,6 +345,7 @@ export const stripeProductsRouter = router({
           latencyMs,
           accountId,
           webhookConfigured,
+          webhookLastDeliveryAt,
           premiumPriceValid,
           proPriceValid,
           errorMessage,
@@ -343,6 +358,7 @@ export const stripeProductsRouter = router({
         latencyMs,
         accountId,
         webhookConfigured,
+        webhookLastDeliveryAt,
         premiumPriceValid,
         proPriceValid,
         errorMessage,
@@ -362,6 +378,15 @@ export const stripeProductsRouter = router({
       .orderBy(desc(stripeHealthPings.createdAt))
       .limit(1);
     return latest ?? null;
+  }),
+
+  /**
+   * Return the current Stripe key mode (test or live) so the UI can display a badge.
+   */
+  getStripeMode: platformOwnerProcedure.query(() => {
+    const key = process.env.STRIPE_SECRET_KEY ?? "";
+    const isLive = key.startsWith("sk_live_") || key.startsWith("rk_live_");
+    return { mode: isLive ? ("live" as const) : ("test" as const) };
   }),
 
   /**

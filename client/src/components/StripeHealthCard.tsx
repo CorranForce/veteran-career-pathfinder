@@ -15,6 +15,8 @@ import {
   DollarSign,
   Clock,
   Zap,
+  FlaskConical,
+  Rocket,
 } from "lucide-react";
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -76,6 +78,8 @@ function CheckRow({
 export function StripeHealthCard() {
   const utils = trpc.useUtils();
 
+  const { data: stripeMode } = trpc.stripeProducts.getStripeMode.useQuery();
+
   const { data: latestPing, isLoading } = trpc.stripeProducts.getLatestPing.useQuery(undefined, {
     refetchInterval: 60_000, // refresh every minute in background
   });
@@ -133,7 +137,20 @@ export function StripeHealthCard() {
             <Activity className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg">Stripe Health</CardTitle>
           </div>
-          <StatusBadge status={latestPing?.status ?? null} />
+          <div className="flex items-center gap-2">
+            {stripeMode && (
+              stripeMode.mode === "live" ? (
+                <Badge className="bg-green-600/15 text-green-700 border-green-600/30 hover:bg-green-600/20 gap-1">
+                  <Rocket className="h-3 w-3" /> Live Mode
+                </Badge>
+              ) : (
+                <Badge className="bg-orange-500/15 text-orange-600 border-orange-500/30 hover:bg-orange-500/20 gap-1">
+                  <FlaskConical className="h-3 w-3" /> Test Mode
+                </Badge>
+              )
+            )}
+            <StatusBadge status={latestPing?.status ?? null} />
+          </div>
         </div>
         <CardDescription>
           Bi-directional connectivity check · heartbeat every 15 minutes
@@ -167,6 +184,17 @@ export function StripeHealthCard() {
             label="Webhook configured"
             ok={latestPing ? latestPing.webhookConfigured : null}
           />
+          {latestPing?.webhookLastDeliveryAt && (
+            <div className="flex items-center justify-between px-3 py-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <Clock className="h-3.5 w-3.5" />
+                <span>Last webhook event received</span>
+              </div>
+              <span className="font-mono">
+                {new Date(latestPing.webhookLastDeliveryAt).toLocaleString()}
+              </span>
+            </div>
+          )}
           <CheckRow
             icon={DollarSign}
             label="Premium price ID valid"

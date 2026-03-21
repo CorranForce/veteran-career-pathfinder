@@ -1474,3 +1474,7 @@
 - [x] Wire Premium price to live Stripe price (not static shared/products.ts)
 - [x] Fix 20% discount math on Pricing page
 - [x] Fix Stripe Health card showing Premium/Pro price IDs as invalid
+- [x] Add Price ID Mode badge (Test/Live) to Stripe Health card
+- [x] Auto-update STRIPE_PREMIUM_PRICE_ID/STRIPE_PRO_PRICE_ID env vars after Pricing Management price update
+- [x] Add webhook last-delivery timestamp check to Stripe health check
+- [x] Add pagination (default 10) to Revenue Overview

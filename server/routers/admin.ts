@@ -626,6 +626,12 @@ export type ProductKey = keyof typeof PRODUCTS;
       // Also update the in-process env so the running server uses the new price immediately
       process.env[envKey] = newPrice.id;
 
+      // Trigger an async health ping so the Stripe Health card reflects the new price ID immediately.
+      // We intentionally don't await this — it runs in the background.
+      import("../stripeHeartbeat")
+        .then(({ runStripeHealthCheck }) => runStripeHealthCheck("manual"))
+        .catch((err) => console.error("[updateTierPrice] Background health ping failed:", err));
+
       return {
         success: true,
         tier: input.tier,

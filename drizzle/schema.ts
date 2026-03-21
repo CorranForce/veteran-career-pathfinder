@@ -433,6 +433,7 @@ export const stripeHealthPings = mysqlTable("stripe_health_pings", {
   latencyMs: int("latencyMs").notNull(),
   accountId: varchar("accountId", { length: 255 }),
   webhookConfigured: boolean("webhookConfigured").default(false).notNull(),
+  webhookLastDeliveryAt: timestamp("webhookLastDeliveryAt"),
   premiumPriceValid: boolean("premiumPriceValid").default(false).notNull(),
   proPriceValid: boolean("proPriceValid").default(false).notNull(),
   errorMessage: text("errorMessage"),
