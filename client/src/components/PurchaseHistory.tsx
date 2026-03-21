@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, ExternalLink, Loader2, ShoppingBag } from "lucide-react";
 import { format } from "date-fns";
 
+const PAGE_SIZE = 5;
+
 export default function PurchaseHistory() {
   const { data: purchases, isLoading } = trpc.payment.getPurchases.useQuery();
+  const [currentPage, setCurrentPage] = useState(1);
 
   if (isLoading) {
     return (
@@ -30,9 +34,12 @@ export default function PurchaseHistory() {
     );
   }
 
+  const totalPages = Math.ceil(purchases.length / PAGE_SIZE);
+  const paginated = purchases.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
   return (
     <div className="space-y-4">
-      {purchases.map((purchase) => (
+      {paginated.map((purchase) => (
         <div
           key={purchase.id}
           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -80,6 +87,52 @@ export default function PurchaseHistory() {
           </div>
         </div>
       ))}
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-4 border-t">
+          <span className="text-sm text-muted-foreground">
+            Showing {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, purchases.length)} of {purchases.length}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
+              First
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <span className="px-3 text-sm">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              Last
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

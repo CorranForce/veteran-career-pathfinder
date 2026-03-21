@@ -1488,3 +1488,4 @@
 - [x] Add dismissible test-mode banner on Pricing page
 - [x] Change User Management default page size to 5 and add 5 as a page size option
 - [x] Change Recent Purchases default page size to 5 (Revenue Overview section)
+- [x] Add 5-per-page pagination to Purchase History component (user dashboard)
