@@ -6,7 +6,7 @@
  * dashboard can display the latest status without triggering a live ping.
  */
 
-import { stripe } from "./stripe";
+import { stripe, getStripeMode, getActivePriceId } from "./stripe";
 import { getDb } from "./db";
 import { stripeHealthPings } from "../drizzle/schema";
 
@@ -17,9 +17,7 @@ async function verifyStripePrice(priceId: string): Promise<boolean> {
 
   // In test mode the Stripe client cannot resolve live-mode price IDs.
   // A well-formed price ID is sufficient validation when running with a test key.
-  const stripeKey = process.env.STRIPE_SECRET_KEY ?? "";
-  const isTestKey = stripeKey.startsWith("sk_test_") || stripeKey.startsWith("rk_test_");
-  if (isTestKey) return true;
+  if (getStripeMode() === "test") return true;
 
   try {
     const price = await stripe.prices.retrieve(priceId);
@@ -75,9 +73,9 @@ export async function runStripeHealthCheck(
       }
     }
 
-    // 4. Verify price IDs are valid and active
-    premiumPriceValid = await verifyStripePrice(process.env.STRIPE_PREMIUM_PRICE_ID ?? "");
-    proPriceValid = await verifyStripePrice(process.env.STRIPE_PRO_PRICE_ID ?? "");
+    // 4. Verify price IDs are valid and active (mode-aware)
+    premiumPriceValid = await verifyStripePrice(getActivePriceId("PREMIUM"));
+    proPriceValid = await verifyStripePrice(getActivePriceId("PRO"));
 
     if (!webhookConfigured || !premiumPriceValid || !proPriceValid) {
       status = "degraded";

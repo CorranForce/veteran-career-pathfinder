@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { platformOwnerProcedure, router } from "../_core/trpc";
-import { stripe } from "../stripe";
+import { stripe, getStripeMode as detectStripeMode, getActivePriceId } from "../stripe";
 import { getDb } from "../db";
 import { products, stripeHealthPings } from "../../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
@@ -384,9 +384,19 @@ export const stripeProductsRouter = router({
    * Return the current Stripe key mode (test or live) so the UI can display a badge.
    */
   getStripeMode: platformOwnerProcedure.query(() => {
-    const key = process.env.STRIPE_SECRET_KEY ?? "";
-    const isLive = key.startsWith("sk_live_") || key.startsWith("rk_live_");
-    return { mode: isLive ? ("live" as const) : ("test" as const) };
+    const mode = detectStripeMode();
+    return {
+      mode,
+      activePriceIds: {
+        PREMIUM: getActivePriceId("PREMIUM"),
+        PRO: getActivePriceId("PRO"),
+      },
+      // Also expose the mode-specific env var names so the UI can show which vars are in use
+      envVarNames: {
+        PREMIUM: mode === "test" ? "STRIPE_TEST_PREMIUM_PRICE_ID" : "STRIPE_LIVE_PREMIUM_PRICE_ID",
+        PRO: mode === "test" ? "STRIPE_TEST_PRO_PRICE_ID" : "STRIPE_LIVE_PRO_PRICE_ID",
+      },
+    };
   }),
 
   /**

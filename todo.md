@@ -1481,3 +1481,4 @@
 - [x] Update Stripe Health card footer to relative timestamp with exact-time tooltip
 - [ ] Switch Stripe to live mode (update STRIPE_SECRET_KEY and VITE_STRIPE_PUBLISHABLE_KEY to live keys)
 - [x] Add 'Sync to Env' button in Pricing Management to auto-update STRIPE_PREMIUM_PRICE_ID and STRIPE_PRO_PRICE_ID
+- [x] Implement automatic Stripe test/live mode switching based on environment

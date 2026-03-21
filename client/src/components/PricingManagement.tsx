@@ -225,6 +225,7 @@ function TierPriceEditor({
 export function PricingManagement() {
   const utils = trpc.useUtils();
   const { data, isLoading, refetch } = trpc.admin.getPricingConfig.useQuery();
+  const { data: modeData } = trpc.stripeProducts.getStripeMode.useQuery();
 
   const syncMutation = trpc.admin.syncPriceIdsToEnv.useMutation({
     onSuccess: (result) => {
@@ -294,12 +295,21 @@ export function PricingManagement() {
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
+            {modeData && (
+              <Badge
+                className={modeData.mode === "live"
+                  ? "bg-green-500 text-white"
+                  : "bg-yellow-500 text-white"}
+              >
+                {modeData.mode === "live" ? "Live Mode" : "Test Mode"}
+              </Badge>
+            )}
             <Button
               variant="outline"
               size="sm"
               onClick={() => syncMutation.mutate()}
               disabled={syncMutation.isPending}
-              title="Fetch the current active price IDs from Stripe and write them to STRIPE_PREMIUM_PRICE_ID / STRIPE_PRO_PRICE_ID env vars"
+              title={`Fetch the current active price IDs from Stripe and write them to ${modeData?.envVarNames?.PREMIUM ?? "STRIPE_PREMIUM_PRICE_ID"} / ${modeData?.envVarNames?.PRO ?? "STRIPE_PRO_PRICE_ID"} env vars`}
             >
               {syncMutation.isPending ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

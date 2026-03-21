@@ -600,8 +600,15 @@ export type ProductKey = keyof typeof PRODUCTS;
 
       await fs.writeFile(sharedProductsPath, content, "utf-8");
 
-      // Update the env secret so the new price ID is used for checkouts
-      const envKey = input.tier === "PREMIUM" ? "STRIPE_PREMIUM_PRICE_ID" : "STRIPE_PRO_PRICE_ID";
+      // Update the env secret so the new price ID is used for checkouts.
+      // Write both the mode-specific key and the generic key for backward compatibility.
+      const { getStripeMode } = await import("../stripe");
+      const mode = getStripeMode();
+      const modePrefix = mode === "test" ? "STRIPE_TEST_" : "STRIPE_LIVE_";
+      const suffix = input.tier === "PREMIUM" ? "PREMIUM_PRICE_ID" : "PRO_PRICE_ID";
+      const modeEnvKey = `${modePrefix}${suffix}`;
+      const genericEnvKey = `STRIPE_${suffix}`;
+
       const envPath = path.join(process.cwd(), ".env");
       let envContent = "";
       try {
@@ -610,12 +617,14 @@ export type ProductKey = keyof typeof PRODUCTS;
         // .env may not exist in production; that's fine
       }
 
-      const envRegex = new RegExp(`^${envKey}=.*$`, "m");
-      const newEnvLine = `${envKey}=${newPrice.id}`;
-      if (envRegex.test(envContent)) {
-        envContent = envContent.replace(envRegex, newEnvLine);
-      } else {
-        envContent = envContent ? `${envContent.trimEnd()}\n${newEnvLine}\n` : `${newEnvLine}\n`;
+      for (const envKey of [modeEnvKey, genericEnvKey]) {
+        const envRegex = new RegExp(`^${envKey}=.*$`, "m");
+        const newEnvLine = `${envKey}=${newPrice.id}`;
+        if (envRegex.test(envContent)) {
+          envContent = envContent.replace(envRegex, newEnvLine);
+        } else {
+          envContent = envContent ? `${envContent.trimEnd()}\n${newEnvLine}\n` : `${newEnvLine}\n`;
+        }
       }
       try {
         await fs.writeFile(envPath, envContent, "utf-8");
@@ -624,7 +633,8 @@ export type ProductKey = keyof typeof PRODUCTS;
       }
 
       // Also update the in-process env so the running server uses the new price immediately
-      process.env[envKey] = newPrice.id;
+      process.env[modeEnvKey] = newPrice.id;
+      process.env[genericEnvKey] = newPrice.id;
 
       // Trigger an async health ping so the Stripe Health card reflects the new price ID immediately.
       // We intentionally don't await this — it runs in the background.
@@ -649,16 +659,18 @@ export type ProductKey = keyof typeof PRODUCTS;
    */
   syncPriceIdsToEnv: platformOwnerProcedure
     .mutation(async () => {
-      const { stripe } = await import("../stripe");
-      const { PRODUCTS } = await import("../products");
+      const { stripe, getStripeMode, getActivePriceId } = await import("../stripe");
       const fs = await import("fs/promises");
       const path = await import("path");
+
+      const mode = getStripeMode();
+      const modePrefix = mode === "test" ? "STRIPE_TEST_" : "STRIPE_LIVE_";
 
       const results: Record<string, { priceId: string; synced: boolean; error?: string }> = {};
 
       const tiers = [
-        { key: "PREMIUM" as const, envKey: "STRIPE_PREMIUM_PRICE_ID", currentPriceId: PRODUCTS.PREMIUM.stripePriceId },
-        { key: "PRO" as const, envKey: "STRIPE_PRO_PRICE_ID", currentPriceId: PRODUCTS.PRO.stripePriceId },
+        { key: "PREMIUM" as const, modeEnvKey: `${modePrefix}PREMIUM_PRICE_ID`, genericEnvKey: "STRIPE_PREMIUM_PRICE_ID", currentPriceId: getActivePriceId("PREMIUM") },
+        { key: "PRO" as const, modeEnvKey: `${modePrefix}PRO_PRICE_ID`, genericEnvKey: "STRIPE_PRO_PRICE_ID", currentPriceId: getActivePriceId("PRO") },
       ];
 
       for (const tier of tiers) {
@@ -685,18 +697,23 @@ export type ProductKey = keyof typeof PRODUCTS;
 
           const activePriceId = prices.data[0].id;
 
-          // Update process.env immediately
-          process.env[tier.envKey] = activePriceId;
+          // Update process.env immediately for both mode-specific and generic keys
+          process.env[tier.modeEnvKey] = activePriceId;
+          process.env[tier.genericEnvKey] = activePriceId;
 
           // Persist to .env file
           const envPath = path.join(process.cwd(), ".env");
           let envContent = "";
           try { envContent = await fs.readFile(envPath, "utf-8"); } catch { /* no .env */ }
-          const envRegex = new RegExp(`^${tier.envKey}=.*$`, "m");
-          const newLine = `${tier.envKey}=${activePriceId}`;
-          envContent = envRegex.test(envContent)
-            ? envContent.replace(envRegex, newLine)
-            : (envContent ? `${envContent.trimEnd()}\n${newLine}\n` : `${newLine}\n`);
+
+          // Write both mode-specific and generic env vars
+          for (const envKey of [tier.modeEnvKey, tier.genericEnvKey]) {
+            const envRegex = new RegExp(`^${envKey}=.*$`, "m");
+            const newLine = `${envKey}=${activePriceId}`;
+            envContent = envRegex.test(envContent)
+              ? envContent.replace(envRegex, newLine)
+              : (envContent ? `${envContent.trimEnd()}\n${newLine}\n` : `${newLine}\n`);
+          }
           try { await fs.writeFile(envPath, envContent, "utf-8"); } catch { /* read-only in prod */ }
 
           results[tier.key] = { priceId: activePriceId, synced: true };
