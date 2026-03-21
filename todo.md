@@ -1489,3 +1489,4 @@
 - [x] Change User Management default page size to 5 and add 5 as a page size option
 - [x] Change Recent Purchases default page size to 5 (Revenue Overview section)
 - [x] Add 5-per-page pagination to Purchase History component (user dashboard)
+- [x] Fix "No such price" Stripe error on /admin/products — created fresh test-mode prices and updated all 4 price ID secrets

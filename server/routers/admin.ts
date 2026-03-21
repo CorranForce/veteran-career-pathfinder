@@ -559,7 +559,15 @@ export type ProductKey = keyof typeof PRODUCTS;
       }
 
       // Retrieve the current price to get the product ID
-      const currentPrice = await stripe.prices.retrieve(currentPriceId);
+      let currentPrice: Awaited<ReturnType<typeof stripe.prices.retrieve>>;
+      try {
+        currentPrice = await stripe.prices.retrieve(currentPriceId);
+      } catch (err: any) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: `Price ID "${currentPriceId}" not found in Stripe. This usually means the price belongs to a different Stripe account or mode. Use "Sync to Env" to refresh the price IDs, or set the correct IDs in Settings → Payment.`,
+        });
+      }
       const stripeProductId = typeof currentPrice.product === "string" ? currentPrice.product : currentPrice.product.id;
 
       // Deactivate old price
