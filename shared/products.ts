@@ -21,7 +21,7 @@ export const PRODUCTS = {
     id: "premium",
     name: "Premium Prompt Access",
     description: "One-time payment for full prompt and bonus resources",
-    price: 2900, // $29.00 in cents
+    price: 19700, // $29.00 in cents
     currency: "usd",
     type: "one_time" as const,
     features: [
@@ -40,7 +40,7 @@ export const PRODUCTS = {
     id: "pro",
     name: "Pro Membership",
     description: "Monthly subscription with ongoing support and community",
-    price: 999, // $9.99 in cents
+    price: 2999, // $9.99 in cents
     currency: "usd",
     type: "subscription" as const,
     interval: "month" as const,

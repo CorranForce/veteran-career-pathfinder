@@ -570,10 +570,8 @@ export type ProductKey = keyof typeof PRODUCTS;
       }
       const stripeProductId = typeof currentPrice.product === "string" ? currentPrice.product : currentPrice.product.id;
 
-      // Deactivate old price
-      await stripe.prices.update(currentPriceId, { active: false });
-
-      // Create new price on the same product
+      // Create new price FIRST — only deactivate old price after new one is confirmed created.
+      // This prevents leaving the product with no active price if the create call fails.
       const priceParams: Parameters<typeof stripe.prices.create>[0] = {
         product: stripeProductId,
         unit_amount: input.newAmountCents,
@@ -585,6 +583,9 @@ export type ProductKey = keyof typeof PRODUCTS;
       }
 
       const newPrice = await stripe.prices.create(priceParams);
+
+      // Deactivate old price only after new one is successfully created
+      await stripe.prices.update(currentPriceId, { active: false });
 
       // Update shared/products.ts with the new price in cents
       const fs = await import("fs/promises");
