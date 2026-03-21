@@ -84,7 +84,7 @@ export default function PlatformOwnerDashboard() {
 
   // Revenue Overview pagination state
   const [revPage, setRevPage] = useState(1);
-  const REV_PAGE_SIZE = 10;
+  const REV_PAGE_SIZE = 5;
 
   // Fetch all users with pagination
   const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(

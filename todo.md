@@ -1487,3 +1487,4 @@
 - [x] Set STRIPE_TEST_PREMIUM_PRICE_ID and STRIPE_TEST_PRO_PRICE_ID as explicit secrets
 - [x] Add dismissible test-mode banner on Pricing page
 - [x] Change User Management default page size to 5 and add 5 as a page size option
+- [x] Change Recent Purchases default page size to 5 (Revenue Overview section)
