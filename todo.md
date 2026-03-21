@@ -1496,3 +1496,4 @@
 - [x] Show One-time/Recurring badge on product list cards
 - [x] Add yearly discount percentage field to create/edit form and display savings on pricing page
 - [x] Add AlertDialog confirmation when switching recurring to one-time on products with active subscribers
+- [x] Fix Vite HMR WebSocket connection error behind proxy

@@ -36,6 +36,12 @@ export default defineConfig({
       "localhost",
       "127.0.0.1",
     ],
+    hmr: {
+      // When running behind a reverse proxy the WebSocket must use the same
+      // host/port as the HTTP connection so the browser can reach it.
+      clientPort: 443,
+      protocol: "wss",
+    },
     fs: {
       strict: true,
       deny: ["**/.*"],
