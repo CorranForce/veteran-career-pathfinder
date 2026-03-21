@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Loader2, Shield, Menu, Star } from "lucide-react";
+import { CheckCircle2, Loader2, Shield, Menu, Star, X, AlertTriangle } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { getSignupUrl } from "@/const";
@@ -20,6 +21,13 @@ function fmt(cents: number): string {
 
 export default function PricingNew() {
   const { user, isAuthenticated } = useAuth();
+  const [testBannerDismissed, setTestBannerDismissed] = useState(false);
+
+  // Detect Stripe mode to show test-mode warning banner
+  const { data: stripeMode } = trpc.stripeProducts.getStripeMode.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000,
+  });
+  const isTestMode = stripeMode?.mode === "test";
 
   // Live prices from Stripe — falls back to shared/products.ts values while loading
   const { data: livePrices } = trpc.payment.getLivePrices.useQuery(undefined, {
@@ -52,6 +60,28 @@ export default function PricingNew() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Test-mode banner */}
+      {isTestMode && !testBannerDismissed && (
+        <div className="bg-yellow-500/15 border-b border-yellow-500/30 px-4 py-2.5">
+          <div className="container mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+              <p className="text-sm font-medium">
+                <strong>Test Mode Active</strong> — Payments are in Stripe test mode. No real charges will occur.
+                Use card <code className="font-mono bg-yellow-500/20 px-1 rounded">4242 4242 4242 4242</code> with any future date and CVC to test.
+              </p>
+            </div>
+            <button
+              onClick={() => setTestBannerDismissed(true)}
+              className="text-yellow-700 dark:text-yellow-400 hover:opacity-70 flex-shrink-0"
+              aria-label="Dismiss test mode banner"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">

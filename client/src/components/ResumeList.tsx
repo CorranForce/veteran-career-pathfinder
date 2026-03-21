@@ -172,27 +172,48 @@ export default function ResumeList() {
             {resumes.map((resume) => (
               <div
                 key={resume.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex flex-col p-4 border rounded-lg hover:bg-muted/50 transition-colors gap-3"
               >
-                <div className="flex items-center gap-4 flex-1">
-                  <FileText className="h-8 w-8 text-primary flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{resume.fileName}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {getStatusBadge(resume.analysisStatus)}
-                      {resume.atsScore !== null && (
-                        <Badge className={getScoreColor(resume.atsScore)}>
-                          ATS Score: {resume.atsScore}/100
-                        </Badge>
-                      )}
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(resume.createdAt).toLocaleDateString()}
-                      </span>
+                {/* Top row: file info + download/delete actions */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{resume.fileName}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {getStatusBadge(resume.analysisStatus)}
+                        {resume.atsScore !== null && (
+                          <Badge className={getScoreColor(resume.atsScore)}>
+                            ATS Score: {resume.atsScore}/100
+                          </Badge>
+                        )}
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(resume.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Download + Delete always on the right */}
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <Button size="sm" variant="ghost" asChild>
+                      <a href={resume.fileUrl} target="_blank" rel="noopener noreferrer">
+                        <Download className="h-4 w-4" />
+                      </a>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(resume.id)}
+                      disabled={deleteMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Second row: analysis action buttons */}
+                <div className="flex items-center gap-2 pl-12">
                   {resume.analysisStatus === "pending" && (
                     <Button
                       size="sm"
@@ -267,25 +288,6 @@ export default function ResumeList() {
                       )}
                     </Button>
                   )}
-
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    asChild
-                  >
-                    <a href={resume.fileUrl} target="_blank" rel="noopener noreferrer">
-                      <Download className="h-4 w-4" />
-                    </a>
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(resume.id)}
-                    disabled={deleteMutation.isPending}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
                 </div>
               </div>
             ))}

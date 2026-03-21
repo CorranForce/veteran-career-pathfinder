@@ -1482,3 +1482,7 @@
 - [ ] Switch Stripe to live mode (update STRIPE_SECRET_KEY and VITE_STRIPE_PUBLISHABLE_KEY to live keys)
 - [x] Add 'Sync to Env' button in Pricing Management to auto-update STRIPE_PREMIUM_PRICE_ID and STRIPE_PRO_PRICE_ID
 - [x] Implement automatic Stripe test/live mode switching based on environment
+- [x] Move View Analysis and ReAnalyze buttons to new row in My Resumes card
+- [x] Add test transaction notice on checkout success page
+- [x] Set STRIPE_TEST_PREMIUM_PRICE_ID and STRIPE_TEST_PRO_PRICE_ID as explicit secrets
+- [x] Add dismissible test-mode banner on Pricing page

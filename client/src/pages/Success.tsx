@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Download, ArrowRight, Shield } from "lucide-react";
+import { CheckCircle2, Download, ArrowRight, Shield, FlaskConical } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 export default function Success() {
+  // Detect Stripe mode to show test transaction notice
+  const { data: stripeMode } = trpc.stripeProducts.getStripeMode.useQuery(undefined, {
+    staleTime: 5 * 60 * 1000,
+  });
+  const isTestMode = stripeMode?.mode === "test";
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -17,13 +24,30 @@ export default function Success() {
 
       {/* Success Message */}
       <section className="flex-1 flex items-center justify-center py-20 bg-gradient-to-br from-background via-secondary/30 to-background">
-        <div className="container mx-auto max-w-2xl">
+        <div className="container mx-auto max-w-2xl space-y-4">
+
+          {/* Test transaction notice */}
+          {isTestMode && (
+            <div className="flex items-start gap-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-4 py-3">
+              <FlaskConical className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-yellow-700 dark:text-yellow-300">
+                <p className="font-semibold mb-0.5">This was a test transaction</p>
+                <p className="text-yellow-600 dark:text-yellow-400">
+                  Stripe is currently in <strong>test mode</strong>. No real charge was made to any payment method.
+                  This confirmation is for testing purposes only.
+                </p>
+              </div>
+            </div>
+          )}
+
           <Card className="border-2 border-primary shadow-2xl">
             <CardHeader className="text-center space-y-4 pb-8">
               <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="h-10 w-10 text-primary" />
               </div>
-              <CardTitle className="text-3xl">Payment Successful!</CardTitle>
+              <CardTitle className="text-3xl">
+                {isTestMode ? "Test Payment Successful!" : "Payment Successful!"}
+              </CardTitle>
               <CardDescription className="text-lg">
                 Welcome to Pathfinder. Your career transition journey starts now.
               </CardDescription>
@@ -76,7 +100,7 @@ export default function Success() {
                   </a>
                 </Button>
                 <Button variant="outline" className="flex-1" asChild>
-                  <a href="/">
+                  <a href="/tools">
                     <ArrowRight className="mr-2 h-4 w-4" />
                     Go to Dashboard
                   </a>
@@ -94,7 +118,7 @@ export default function Success() {
             </CardContent>
           </Card>
 
-          <div className="mt-8 text-center">
+          <div className="text-center">
             <p className="text-sm text-muted-foreground">
               Thank you for trusting Pathfinder with your career transition. We're honored to serve those who served.
             </p>
