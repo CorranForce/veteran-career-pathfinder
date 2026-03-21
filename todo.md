@@ -1491,3 +1491,4 @@
 - [x] Add 5-per-page pagination to Purchase History component (user dashboard)
 - [x] Fix "No such price" Stripe error on /admin/products — created fresh test-mode prices and updated all 4 price ID secrets
 - [x] Fix Premium product showing as inactive on /admin/products — reactivated correct prices, fixed deactivate-before-create race condition
+- [x] Move mode badge and buttons to second row in Pricing Management card header

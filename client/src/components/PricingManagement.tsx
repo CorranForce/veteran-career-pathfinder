@@ -283,51 +283,51 @@ export function PricingManagement() {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
-              Pricing Management
-            </CardTitle>
-            <CardDescription>
-              Update prices for paid tiers. The Free tier cannot be modified. Changes are applied immediately to new checkouts.
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            {modeData && (
-              <Badge
-                className={modeData.mode === "live"
-                  ? "bg-green-500 text-white"
-                  : "bg-yellow-500 text-white"}
-              >
-                {modeData.mode === "live" ? "Live Mode" : "Test Mode"}
-              </Badge>
+      <CardHeader className="space-y-3">
+        {/* Row 1: title + description */}
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5" />
+            Pricing Management
+          </CardTitle>
+          <CardDescription>
+            Update prices for paid tiers. The Free tier cannot be modified. Changes are applied immediately to new checkouts.
+          </CardDescription>
+        </div>
+        {/* Row 2: mode badge + action buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {modeData && (
+            <Badge
+              className={modeData.mode === "live"
+                ? "bg-green-500 text-white"
+                : "bg-yellow-500 text-white"}
+            >
+              {modeData.mode === "live" ? "Live Mode" : "Test Mode"}
+            </Badge>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+            title={`Fetch the current active price IDs from Stripe and write them to ${modeData?.envVarNames?.PREMIUM ?? "STRIPE_PREMIUM_PRICE_ID"} / ${modeData?.envVarNames?.PRO ?? "STRIPE_PRO_PRICE_ID"} env vars`}
+          >
+            {syncMutation.isPending ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <CloudUpload className="h-4 w-4 mr-2" />
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => syncMutation.mutate()}
-              disabled={syncMutation.isPending}
-              title={`Fetch the current active price IDs from Stripe and write them to ${modeData?.envVarNames?.PREMIUM ?? "STRIPE_PREMIUM_PRICE_ID"} / ${modeData?.envVarNames?.PRO ?? "STRIPE_PRO_PRICE_ID"} env vars`}
-            >
-              {syncMutation.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <CloudUpload className="h-4 w-4 mr-2" />
-              )}
-              Sync to Env
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              disabled={isLoading}
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-          </div>
+            Sync to Env
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            disabled={isLoading}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
