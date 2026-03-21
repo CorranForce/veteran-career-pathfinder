@@ -643,6 +643,81 @@ export type ProductKey = keyof typeof PRODUCTS;
     }),
 
   /**
+   * Sync the current active Stripe price IDs for PREMIUM and PRO into env
+   * without changing the price amount. Useful after manually updating prices
+   * in the Stripe dashboard or after switching from test to live keys.
+   */
+  syncPriceIdsToEnv: platformOwnerProcedure
+    .mutation(async () => {
+      const { stripe } = await import("../stripe");
+      const { PRODUCTS } = await import("../products");
+      const fs = await import("fs/promises");
+      const path = await import("path");
+
+      const results: Record<string, { priceId: string; synced: boolean; error?: string }> = {};
+
+      const tiers = [
+        { key: "PREMIUM" as const, envKey: "STRIPE_PREMIUM_PRICE_ID", currentPriceId: PRODUCTS.PREMIUM.stripePriceId },
+        { key: "PRO" as const, envKey: "STRIPE_PRO_PRICE_ID", currentPriceId: PRODUCTS.PRO.stripePriceId },
+      ];
+
+      for (const tier of tiers) {
+        try {
+          if (!tier.currentPriceId) {
+            results[tier.key] = { priceId: "", synced: false, error: "No price ID configured in products.ts" };
+            continue;
+          }
+
+          // Retrieve the current price to get the product ID, then list active prices for that product
+          const currentPrice = await stripe.prices.retrieve(tier.currentPriceId);
+          const productId = typeof currentPrice.product === "string" ? currentPrice.product : currentPrice.product.id;
+
+          const prices = await stripe.prices.list({
+            product: productId,
+            active: true,
+            limit: 1,
+          });
+
+          if (!prices.data.length) {
+            results[tier.key] = { priceId: "", synced: false, error: "No active price found in Stripe" };
+            continue;
+          }
+
+          const activePriceId = prices.data[0].id;
+
+          // Update process.env immediately
+          process.env[tier.envKey] = activePriceId;
+
+          // Persist to .env file
+          const envPath = path.join(process.cwd(), ".env");
+          let envContent = "";
+          try { envContent = await fs.readFile(envPath, "utf-8"); } catch { /* no .env */ }
+          const envRegex = new RegExp(`^${tier.envKey}=.*$`, "m");
+          const newLine = `${tier.envKey}=${activePriceId}`;
+          envContent = envRegex.test(envContent)
+            ? envContent.replace(envRegex, newLine)
+            : (envContent ? `${envContent.trimEnd()}\n${newLine}\n` : `${newLine}\n`);
+          try { await fs.writeFile(envPath, envContent, "utf-8"); } catch { /* read-only in prod */ }
+
+          results[tier.key] = { priceId: activePriceId, synced: true };
+        } catch (err: unknown) {
+          results[tier.key] = {
+            priceId: "",
+            synced: false,
+            error: err instanceof Error ? err.message : "Unknown error",
+          };
+        }
+      }
+
+      // Trigger a background health ping so the Stripe Health card reflects the updated IDs
+      import("../stripeHeartbeat")
+        .then(({ runStripeHealthCheck }) => runStripeHealthCheck("manual"))
+        .catch((err) => console.error("[syncPriceIdsToEnv] Background health ping failed:", err));
+
+      return { results };
+    }),
+
+  /**
    * Get admin activity logs (platform owner only)
    */
   getAdminActivityLogs: platformOwnerProcedure

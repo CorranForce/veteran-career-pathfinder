@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Tag,
+  CloudUpload,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -222,7 +223,45 @@ function TierPriceEditor({
 }
 
 export function PricingManagement() {
+  const utils = trpc.useUtils();
   const { data, isLoading, refetch } = trpc.admin.getPricingConfig.useQuery();
+
+  const syncMutation = trpc.admin.syncPriceIdsToEnv.useMutation({
+    onSuccess: (result) => {
+      const synced = Object.entries(result.results)
+        .filter(([, v]) => v.synced)
+        .map(([k, v]) => `${k}: ${v.priceId}`);
+      const failed = Object.entries(result.results)
+        .filter(([, v]) => !v.synced)
+        .map(([k, v]) => `${k}: ${v.error}`);
+
+      if (failed.length === 0) {
+        toast.success("Price IDs synced to env", {
+          description: synced.join(" · "),
+        });
+      } else if (synced.length > 0) {
+        toast.warning("Partial sync", {
+          description: [
+            synced.length ? `Synced: ${synced.join(", ")}` : "",
+            failed.length ? `Failed: ${failed.join(", ")}` : "",
+          ]
+            .filter(Boolean)
+            .join(" | "),
+        });
+      } else {
+        toast.error("Sync failed", {
+          description: failed.join(" · "),
+        });
+      }
+      // Refresh health card after sync
+      setTimeout(() => {
+        utils.stripeProducts.getLatestPing.invalidate();
+      }, 3000);
+    },
+    onError: (err) => {
+      toast.error(`Sync failed: ${err.message}`);
+    },
+  });
 
   if (isLoading) {
     return (
@@ -254,15 +293,31 @@ export function PricingManagement() {
               Update prices for paid tiers. The Free tier cannot be modified. Changes are applied immediately to new checkouts.
             </CardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => syncMutation.mutate()}
+              disabled={syncMutation.isPending}
+              title="Fetch the current active price IDs from Stripe and write them to STRIPE_PREMIUM_PRICE_ID / STRIPE_PRO_PRICE_ID env vars"
+            >
+              {syncMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <CloudUpload className="h-4 w-4 mr-2" />
+              )}
+              Sync to Env
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
