@@ -1466,3 +1466,5 @@
 - [x] Restore corranforce@gmail.com account (was accidentally soft-deleted; email anonymized to deleted_1_...@deleted.local) — restored email, status=active, password=demo123
 - [x] Fix session cookie sameSite/secure mismatch — emailAuth.login, emailAuth.signup, and googleAuth.verifyToken were setting cookies with hardcoded sameSite:"lax" and secure:NODE_ENV==="production" instead of using the shared getSessionCookieOptions helper (sameSite:"none", dynamic secure). This caused the cookie to not be sent back on subsequent API requests behind the reverse proxy, breaking the login-to-dashboard flow.
 - [x] Add suspended/deleted account status check to emailAuth.login — prevents suspended users from logging in and treats deleted accounts as not found.
+- [x] Add pagination (5 per page) to Announcement Management section
+- [x] Add pagination (5 per page) to Activity & Security Log section

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Shield,
@@ -17,6 +17,8 @@ import {
   Lock,
   KeyRound,
 } from "lucide-react";
+
+const PAGE_SIZE = 5;
 
 const actionIcons = {
   suspend_user: UserX,
@@ -152,6 +154,93 @@ function EmptyState({ message }: { message: string }) {
   return <p className="text-sm text-muted-foreground text-center py-8">{message}</p>;
 }
 
+/** Reusable pagination bar for a flat log array. */
+function PaginatedLogs({
+  logs,
+  loading,
+  loadingMessage,
+  emptyMessage,
+  headerSlot,
+}: {
+  logs: Parameters<typeof LogEntry>[0]["log"][] | undefined;
+  loading: boolean;
+  loadingMessage: string;
+  emptyMessage: string;
+  headerSlot?: React.ReactNode;
+}) {
+  const [page, setPage] = useState(1);
+
+  const total = logs?.length ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+
+  const paginated = useMemo(() => {
+    if (!logs) return [];
+    const start = (safePage - 1) * PAGE_SIZE;
+    return logs.slice(start, start + PAGE_SIZE);
+  }, [logs, safePage]);
+
+  if (loading) return <EmptyState message={loadingMessage} />;
+  if (!logs || logs.length === 0) return <EmptyState message={emptyMessage} />;
+
+  return (
+    <>
+      {headerSlot}
+      <div className="space-y-4">
+        {paginated.map((log) => (
+          <LogEntry key={log.id} log={log} />
+        ))}
+      </div>
+
+      {/* Pagination Controls */}
+      {total > PAGE_SIZE && (
+        <div className="flex items-center justify-between mt-6 pt-4 border-t">
+          <span className="text-sm text-muted-foreground">
+            Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, total)} of {total}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(1)}
+              disabled={safePage === 1}
+            >
+              First
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(safePage - 1)}
+              disabled={safePage === 1}
+            >
+              Previous
+            </Button>
+            <span className="px-3 text-sm">
+              Page {safePage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(safePage + 1)}
+              disabled={safePage === totalPages}
+            >
+              Next
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(totalPages)}
+              disabled={safePage === totalPages}
+            >
+              Last
+            </Button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 export function AdminActivityLog() {
   const [tab, setTab] = useState<"admin" | "security" | "logins">("admin");
 
@@ -165,6 +254,15 @@ export function AdminActivityLog() {
 
   const { data: failedLoginLogs, isLoading: failedLoginLoading } =
     trpc.admin.getFailedLoginEvents.useQuery({ limit: 100 }, { enabled: tab === "logins" });
+
+  // Filter admin-only logs (exclude security events that live in their own tabs)
+  const filteredAdminLogs = useMemo(
+    () =>
+      adminLogs?.filter(
+        (l) => l.actionType !== "rate_limit_blocked" && l.actionType !== "login_failed"
+      ) ?? [],
+    [adminLogs]
+  );
 
   return (
     <Card>
@@ -193,73 +291,54 @@ export function AdminActivityLog() {
 
           {/* ── Admin Actions tab ── */}
           <TabsContent value="admin">
-            {adminLoading ? (
-              <EmptyState message="Loading activity history…" />
-            ) : !adminLogs || adminLogs.length === 0 ? (
-              <EmptyState message="No admin activity recorded yet" />
-            ) : (
-              <ScrollArea className="h-[400px] pr-4">
-                <div className="space-y-4">
-                  {adminLogs
-                    .filter((l) => l.actionType !== "rate_limit_blocked" && l.actionType !== "login_failed")
-                    .map((log) => (
-                      <LogEntry key={log.id} log={log} />
-                    ))}
-                </div>
-              </ScrollArea>
-            )}
+            <PaginatedLogs
+              logs={filteredAdminLogs}
+              loading={adminLoading}
+              loadingMessage="Loading activity history…"
+              emptyMessage="No admin activity recorded yet"
+            />
           </TabsContent>
 
           {/* ── Rate-Limit Blocks tab ── */}
           <TabsContent value="security">
-            {rateLimitLoading ? (
-              <EmptyState message="Loading rate-limit events…" />
-            ) : !rateLimitLogs || rateLimitLogs.length === 0 ? (
-              <EmptyState message="No rate-limit blocks recorded yet" />
-            ) : (
-              <>
-                <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                  <ShieldAlert className="h-4 w-4 text-destructive" />
-                  <span>
-                    <strong>{rateLimitLogs.length}</strong> blocked request
-                    {rateLimitLogs.length !== 1 ? "s" : ""} recorded
-                  </span>
-                </div>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {rateLimitLogs.map((log) => (
-                      <LogEntry key={log.id} log={log} />
-                    ))}
+            <PaginatedLogs
+              logs={rateLimitLogs}
+              loading={rateLimitLoading}
+              loadingMessage="Loading rate-limit events…"
+              emptyMessage="No rate-limit blocks recorded yet"
+              headerSlot={
+                rateLimitLogs && rateLimitLogs.length > 0 ? (
+                  <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                    <ShieldAlert className="h-4 w-4 text-destructive" />
+                    <span>
+                      <strong>{rateLimitLogs.length}</strong> blocked request
+                      {rateLimitLogs.length !== 1 ? "s" : ""} recorded
+                    </span>
                   </div>
-                </ScrollArea>
-              </>
-            )}
+                ) : undefined
+              }
+            />
           </TabsContent>
 
           {/* ── Failed Logins tab ── */}
           <TabsContent value="logins">
-            {failedLoginLoading ? (
-              <EmptyState message="Loading failed login events…" />
-            ) : !failedLoginLogs || failedLoginLogs.length === 0 ? (
-              <EmptyState message="No failed login attempts recorded yet" />
-            ) : (
-              <>
-                <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                  <KeyRound className="h-4 w-4 text-destructive" />
-                  <span>
-                    <strong>{failedLoginLogs.length}</strong> failed attempt
-                    {failedLoginLogs.length !== 1 ? "s" : ""} recorded
-                  </span>
-                </div>
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="space-y-4">
-                    {failedLoginLogs.map((log) => (
-                      <LogEntry key={log.id} log={log} />
-                    ))}
+            <PaginatedLogs
+              logs={failedLoginLogs}
+              loading={failedLoginLoading}
+              loadingMessage="Loading failed login events…"
+              emptyMessage="No failed login attempts recorded yet"
+              headerSlot={
+                failedLoginLogs && failedLoginLogs.length > 0 ? (
+                  <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                    <KeyRound className="h-4 w-4 text-destructive" />
+                    <span>
+                      <strong>{failedLoginLogs.length}</strong> failed attempt
+                      {failedLoginLogs.length !== 1 ? "s" : ""} recorded
+                    </span>
                   </div>
-                </ScrollArea>
-              </>
-            )}
+                ) : undefined
+              }
+            />
           </TabsContent>
         </Tabs>
       </CardContent>

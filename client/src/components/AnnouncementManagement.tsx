@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,10 +42,13 @@ interface Announcement {
   createdByName: string;
 }
 
+const PAGE_SIZE = 5;
+
 export function AnnouncementManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   
   // Form state
   const [title, setTitle] = useState("");
@@ -57,11 +60,24 @@ export function AnnouncementManagement() {
   // Fetch announcements
   const { data: announcements, isLoading, refetch } = trpc.announcements.getAll.useQuery();
 
+  // Pagination derived state
+  const totalItems = announcements?.length ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedAnnouncements = useMemo(() => {
+    if (!announcements) return [];
+    const start = (safePage - 1) * PAGE_SIZE;
+    return announcements.slice(start, start + PAGE_SIZE);
+  }, [announcements, safePage]);
+
+  // Reset to page 1 after mutations that may change total count
+  const refetchAndReset = () => { refetch(); setCurrentPage(1); };
+
   // Mutations
   const createMutation = trpc.announcements.create.useMutation({
     onSuccess: () => {
       toast.success("Announcement created successfully");
-      refetch();
+      refetchAndReset();
       resetForm();
       setIsCreateDialogOpen(false);
     },
@@ -85,7 +101,7 @@ export function AnnouncementManagement() {
   const deleteMutation = trpc.announcements.delete.useMutation({
     onSuccess: () => {
       toast.success("Announcement deleted successfully");
-      refetch();
+      refetchAndReset();
     },
     onError: (error) => {
       toast.error(`Failed to delete announcement: ${error.message}`);
@@ -226,7 +242,7 @@ export function AnnouncementManagement() {
           </div>
         ) : (
           <div className="space-y-4">
-            {announcements.map((announcement) => (
+            {paginatedAnnouncements.map((announcement) => (
               <div
                 key={announcement.id}
                 className="border rounded-lg p-4 space-y-2"
@@ -298,6 +314,52 @@ export function AnnouncementManagement() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!isLoading && totalItems > PAGE_SIZE && (
+          <div className="flex items-center justify-between mt-6 pt-4 border-t">
+            <span className="text-sm text-muted-foreground">
+              Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, totalItems)} of {totalItems}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(1)}
+                disabled={safePage === 1}
+              >
+                First
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(safePage - 1)}
+                disabled={safePage === 1}
+              >
+                Previous
+              </Button>
+              <span className="px-3 text-sm">
+                Page {safePage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(safePage + 1)}
+                disabled={safePage === totalPages}
+              >
+                Next
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={safePage === totalPages}
+              >
+                Last
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
