@@ -14,7 +14,7 @@ export const adminRouter = router({
     .input(
       z.object({
         page: z.number().min(1).default(1),
-        pageSize: z.number().min(10).max(100).default(25),
+        pageSize: z.number().min(5).max(100).default(5),
       }).optional()
     )
     .query(async ({ ctx, input }) => {
@@ -22,7 +22,7 @@ export const adminRouter = router({
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
       
       const page = input?.page || 1;
-      const pageSize = input?.pageSize || 25;
+      const pageSize = input?.pageSize || 5;
       const offset = (page - 1) * pageSize;
       
       // Get total count

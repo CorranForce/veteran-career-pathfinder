@@ -80,7 +80,7 @@ export default function PlatformOwnerDashboard() {
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [pageSize, setPageSize] = useState(5);
 
   // Revenue Overview pagination state
   const [revPage, setRevPage] = useState(1);
@@ -745,6 +745,7 @@ export default function PlatformOwnerDashboard() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="5">5 / page</SelectItem>
                       <SelectItem value="10">10 / page</SelectItem>
                       <SelectItem value="25">25 / page</SelectItem>
                       <SelectItem value="50">50 / page</SelectItem>
