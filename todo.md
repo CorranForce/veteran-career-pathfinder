@@ -1497,3 +1497,4 @@
 - [x] Add yearly discount percentage field to create/edit form and display savings on pricing page
 - [x] Add AlertDialog confirmation when switching recurring to one-time on products with active subscribers
 - [x] Fix Vite HMR WebSocket connection error behind proxy
+- [x] Fix tRPC returning HTML instead of JSON on /admin/products — switched to mysql2 connection pool to survive ECONNRESET, fixed Vite HMR config inheritance in middleware mode

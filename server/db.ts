@@ -1,19 +1,39 @@
 import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import { createPool, type Pool } from "mysql2";
 import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog, adminActivityLogs, InsertAdminActivityLog, announcements, InsertAnnouncement, Announcement } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { desc } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _pool: Pool | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
+// Lazily create a mysql2 connection pool and drizzle instance.
+// Using a pool (instead of a single connection) ensures that ECONNRESET errors
+// are automatically recovered by acquiring a fresh connection from the pool.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _pool = createPool({
+        uri: process.env.DATABASE_URL,
+        // Keep a small pool — enough for concurrent requests without exhausting
+        // the TiDB serverless connection limit.
+        connectionLimit: 5,
+        // Automatically re-establish stale connections.
+        enableKeepAlive: true,
+        keepAliveInitialDelay: 10000,
+        // Discard connections that have been idle for 5 minutes.
+        idleTimeout: 300000,
+        // Wait up to 10 s for a free connection before throwing.
+        waitForConnections: true,
+        queueLimit: 0,
+      });
+      _db = drizzle(_pool);
+      console.log("[Database] Connection pool created");
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
+      console.warn("[Database] Failed to create pool:", error);
       _db = null;
+      _pool = null;
     }
   }
   return _db;
