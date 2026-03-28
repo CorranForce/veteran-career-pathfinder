@@ -9,6 +9,8 @@ import {
   getAnnouncementsByType,
   publishAnnouncement,
   archiveAnnouncement,
+  restoreAnnouncement,
+  getArchivedAnnouncements,
 } from "../db";
 
 export const announcementsRouter = router({
@@ -119,4 +121,21 @@ export const announcementsRouter = router({
       await archiveAnnouncement(input.id);
       return { success: true };
     }),
+
+  /**
+   * Restore an archived announcement back to draft (admin only)
+   */
+  restore: adminProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await restoreAnnouncement(input.id);
+      return { success: true };
+    }),
+
+  /**
+   * Get archived announcements (admin only)
+   */
+  getArchived: adminProcedure.query(async () => {
+    return await getArchivedAnnouncements();
+  }),
 });

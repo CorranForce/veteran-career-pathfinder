@@ -1498,3 +1498,7 @@
 - [x] Add AlertDialog confirmation when switching recurring to one-time on products with active subscribers
 - [x] Fix Vite HMR WebSocket connection error behind proxy
 - [x] Fix tRPC returning HTML instead of JSON on /admin/products — switched to mysql2 connection pool to survive ECONNRESET, fixed Vite HMR config inheritance in middleware mode
+- [x] Clear test announcements from the database
+- [x] Add isArchived field to announcements schema and migrate (existing status field used)
+- [x] Add Active and Archive tabs to Announcement Management
+- [x] Ensure landing page only shows active (non-archived) announcements

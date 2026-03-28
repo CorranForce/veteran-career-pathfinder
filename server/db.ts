@@ -988,6 +988,42 @@ export async function archiveAnnouncement(id: number): Promise<void> {
     .where(eq(announcements.id, id));
 }
 
+/**
+ * Restore an archived announcement back to draft
+ */
+export async function restoreAnnouncement(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot restore announcement: database not available");
+    return;
+  }
+
+  await db
+    .update(announcements)
+    .set({ 
+      status: "draft",
+      archivedAt: null
+    })
+    .where(eq(announcements.id, id));
+}
+
+/**
+ * Get archived announcements (admin only)
+ */
+export async function getArchivedAnnouncements(): Promise<Announcement[]> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get archived announcements: database not available");
+    return [];
+  }
+
+  return await db
+    .select()
+    .from(announcements)
+    .where(eq(announcements.status, "archived"))
+    .orderBy(desc(announcements.archivedAt), desc(announcements.createdAt));
+}
+
 
 export async function updateUserEmailVerificationToken(userId: number, emailVerificationToken: string, emailVerificationTokenExpiry: Date) {
   const db = await getDb();
