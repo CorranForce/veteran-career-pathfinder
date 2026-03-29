@@ -876,10 +876,12 @@ export default function PlatformOwnerDashboard() {
       </Dialog>
 
       {/* Admin Activity Log */}
-      <AdminActivityLog />
-
-      {/* Announcement Management */}
-      <AnnouncementManagement />
+      <div className="container mx-auto pb-8">
+        <div className="space-y-6">
+          <AdminActivityLog />
+          <AnnouncementManagement />
+        </div>
+      </div>
     </div>
   );
 }

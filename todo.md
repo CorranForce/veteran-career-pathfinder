@@ -1502,3 +1502,4 @@
 - [x] Add isArchived field to announcements schema and migrate (existing status field used)
 - [x] Add Active and Archive tabs to Announcement Management
 - [x] Ensure landing page only shows active (non-archived) announcements
+- [x] Fix Activity & Security Log and Announcement Management section width/spacing to match other dashboard sections
