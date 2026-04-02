@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `tier` enum('premium','pro');

@@ -1503,3 +1503,4 @@
 - [x] Add Active and Archive tabs to Announcement Management
 - [x] Ensure landing page only shows active (non-archived) announcements
 - [x] Fix Activity & Security Log and Announcement Management section width/spacing to match other dashboard sections
+- [x] Rewire /pricing page to dynamically pull prices from active DB products (no hardcoded values)

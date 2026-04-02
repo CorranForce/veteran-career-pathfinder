@@ -206,8 +206,8 @@ export default function PricingNew() {
                 </Badge>
               </div>
               <CardHeader>
-                <CardTitle className="text-2xl">{PRODUCTS.PREMIUM.name}</CardTitle>
-                <CardDescription>{PRODUCTS.PREMIUM.description}</CardDescription>
+                <CardTitle className="text-2xl">{livePrices?.premium.name ?? PRODUCTS.PREMIUM.name}</CardTitle>
+                <CardDescription>{livePrices?.premium.description ?? PRODUCTS.PREMIUM.description}</CardDescription>
                 <div className="mt-4 space-y-1">
                   <div className="flex items-baseline gap-2">
                     {livePrices ? (
@@ -261,8 +261,8 @@ export default function PricingNew() {
             {/* Pro Tier */}
             <Card className="border-2 border-accent">
               <CardHeader>
-                <CardTitle className="text-2xl">{PRODUCTS.PRO.name}</CardTitle>
-                <CardDescription>{PRODUCTS.PRO.description}</CardDescription>
+                <CardTitle className="text-2xl">{livePrices?.pro.name ?? PRODUCTS.PRO.name}</CardTitle>
+                <CardDescription>{livePrices?.pro.description ?? PRODUCTS.PRO.description}</CardDescription>
                 <div className="mt-4 space-y-1">
                   <div className="flex items-baseline gap-2">
                     {livePrices ? (

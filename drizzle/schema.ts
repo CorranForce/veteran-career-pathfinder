@@ -318,6 +318,9 @@ export const products = mysqlTable("products", {
   price: int("price").notNull(), // Price in cents
   currency: varchar("currency", { length: 10 }).default("usd").notNull(),
   
+  // Tier identifier — links this DB product to the PREMIUM or PRO slot on the pricing page
+  tier: mysqlEnum("tier", ["premium", "pro"]),
+
   // Stripe integration
   stripeProductId: varchar("stripeProductId", { length: 255 }),
   stripePriceId: varchar("stripePriceId", { length: 255 }),

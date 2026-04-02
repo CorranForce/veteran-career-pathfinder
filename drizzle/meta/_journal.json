@@ -204,6 +204,13 @@
       "when": 1774134507863,
       "tag": "0028_furry_black_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "5",
+      "when": 1774981707750,
+      "tag": "0029_premium_mattie_franklin",
+      "breakpoints": true
     }
   ]
 }

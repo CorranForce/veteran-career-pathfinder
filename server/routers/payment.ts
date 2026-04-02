@@ -20,8 +20,24 @@ export const paymentRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const product = PRODUCTS[input.productId];
       const origin = ctx.req.headers.origin || `${ctx.req.protocol}://${ctx.req.get("host")}`;
+
+      // Look up the product from the DB by tier so price changes in /admin/products
+      // are immediately reflected in checkout without needing to update env vars.
+      const db = await getDb();
+      const { products: productsTable } = await import("../../drizzle/schema");
+      const tier = input.productId === "PREMIUM" ? "premium" : "pro";
+      const dbProduct = db
+        ? await db
+            .select()
+            .from(productsTable)
+            .where(eq(productsTable.tier, tier))
+            .then((rows) => rows[0] ?? null)
+            .catch(() => null)
+        : null;
+
+      // Fall back to shared/products.ts constants if DB lookup fails
+      const fallbackProduct = PRODUCTS[input.productId];
 
       // Create or retrieve Stripe customer
       let customerId = ctx.user.stripeCustomerId;
@@ -41,6 +57,11 @@ export const paymentRouter = router({
       // Determine product type for metadata
       const productType = input.productId.toLowerCase();
 
+      // Resolve the price ID: prefer DB record's stripePriceId, fall back to env-var
+      const activePriceId = dbProduct?.stripePriceId || fallbackProduct.stripePriceId;
+      const isRecurring = dbProduct ? dbProduct.isRecurring : ("type" in fallbackProduct && fallbackProduct.type === "subscription");
+      const billingInterval = dbProduct?.billingInterval ?? ("interval" in fallbackProduct ? fallbackProduct.interval : undefined);
+
       // Create checkout session with optional coupon
       const sessionConfig: any = {
         customer: customerId,
@@ -52,28 +73,27 @@ export const paymentRouter = router({
           product_type: productType,
         },
         line_items: [
-          // Use Stripe Price ID if available, otherwise use price_data
-          "stripePriceId" in product && product.stripePriceId
+          activePriceId
             ? {
-                price: product.stripePriceId,
+                price: activePriceId,
                 quantity: 1,
               }
             : {
                 price_data: {
-                  currency: product.currency,
+                  currency: dbProduct?.currency ?? fallbackProduct.currency,
                   product_data: {
-                    name: product.name,
-                    description: product.description,
+                    name: dbProduct?.name ?? fallbackProduct.name,
+                    description: dbProduct?.description ?? fallbackProduct.description ?? undefined,
                   },
-                  unit_amount: product.price,
-                  ...("type" in product && product.type === "subscription"
-                    ? { recurring: { interval: product.interval } }
+                  unit_amount: dbProduct?.price ?? fallbackProduct.price,
+                  ...(isRecurring && billingInterval
+                    ? { recurring: { interval: billingInterval } }
                     : {}),
                 },
                 quantity: 1,
               },
         ],
-        mode: "type" in product && product.type === "subscription" ? "subscription" : "payment",
+        mode: isRecurring ? "subscription" : "payment",
         success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/pricing`,
         allow_promotion_codes: true,
@@ -284,44 +304,53 @@ export const paymentRouter = router({
    * without requiring authentication.
    */
   getLivePrices: publicProcedure.query(async () => {
-    const premiumPriceId = PRODUCTS.PREMIUM.stripePriceId;
-    const proPriceId = PRODUCTS.PRO.stripePriceId;
-
-    // Fetch Stripe prices and local DB products in parallel
+    // Source of truth: active products in the DB, identified by tier.
+    // This means any price change made in /admin/products is immediately
+    // reflected on /pricing without needing to update env vars.
     const db = await getDb();
     const { products: productsTable } = await import("../../drizzle/schema");
-    const [premiumPrice, proPrice, dbProducts] = await Promise.all([
-      premiumPriceId
-        ? stripe.prices.retrieve(premiumPriceId).catch(() => null)
-        : null,
-      proPriceId
-        ? stripe.prices.retrieve(proPriceId).catch(() => null)
-        : null,
-      db
-        ? db.select().from(productsTable).where(eq(productsTable.status, "active")).catch(() => [])
-        : Promise.resolve([]),
-    ]);
 
-    // Find DB records by matching the active Stripe price ID
-    const dbPremium = dbProducts.find((p) => p.stripePriceId === premiumPriceId);
-    const dbPro = dbProducts.find((p) => p.stripePriceId === proPriceId);
+    const dbProducts = db
+      ? await db
+          .select()
+          .from(productsTable)
+          .where(eq(productsTable.status, "active"))
+          .catch(() => [])
+      : [];
+
+    const dbPremium = dbProducts.find((p) => p.tier === "premium") ?? null;
+    const dbPro = dbProducts.find((p) => p.tier === "pro") ?? null;
+
+    // Fetch live Stripe prices using the price IDs stored in the DB records
+    const [premiumStripePrice, proStripePrice] = await Promise.all([
+      dbPremium?.stripePriceId
+        ? stripe.prices.retrieve(dbPremium.stripePriceId).catch(() => null)
+        : null,
+      dbPro?.stripePriceId
+        ? stripe.prices.retrieve(dbPro.stripePriceId).catch(() => null)
+        : null,
+    ]);
 
     return {
       premium: {
-        amountCents: premiumPrice?.unit_amount ?? PRODUCTS.PREMIUM.price,
-        active: premiumPrice?.active ?? false,
-        currency: premiumPrice?.currency ?? PRODUCTS.PREMIUM.currency,
+        amountCents: premiumStripePrice?.unit_amount ?? dbPremium?.price ?? PRODUCTS.PREMIUM.price,
+        active: premiumStripePrice?.active ?? (dbPremium !== null),
+        currency: premiumStripePrice?.currency ?? dbPremium?.currency ?? PRODUCTS.PREMIUM.currency,
         yearlyDiscountPercent: dbPremium?.yearlyDiscountPercent ?? 0,
         billingInterval: dbPremium?.billingInterval ?? null,
         isRecurring: dbPremium?.isRecurring ?? false,
+        name: dbPremium?.name ?? PRODUCTS.PREMIUM.name,
+        description: dbPremium?.description ?? PRODUCTS.PREMIUM.description,
       },
       pro: {
-        amountCents: proPrice?.unit_amount ?? PRODUCTS.PRO.price,
-        active: proPrice?.active ?? false,
-        currency: proPrice?.currency ?? PRODUCTS.PRO.currency,
+        amountCents: proStripePrice?.unit_amount ?? dbPro?.price ?? PRODUCTS.PRO.price,
+        active: proStripePrice?.active ?? (dbPro !== null),
+        currency: proStripePrice?.currency ?? dbPro?.currency ?? PRODUCTS.PRO.currency,
         yearlyDiscountPercent: dbPro?.yearlyDiscountPercent ?? 0,
         billingInterval: dbPro?.billingInterval ?? null,
         isRecurring: dbPro?.isRecurring ?? false,
+        name: dbPro?.name ?? PRODUCTS.PRO.name,
+        description: dbPro?.description ?? PRODUCTS.PRO.description,
       },
     };
   }),
