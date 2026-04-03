@@ -59,6 +59,7 @@ type Product = {
   isRecurring: boolean;
   billingInterval: string | null;
   yearlyDiscountPercent: number;
+  tier: "premium" | "pro" | null;
   status: "active" | "disabled" | "archived";
   displayOrder: number;
   createdAt: Date;
@@ -76,6 +77,7 @@ type ProductFormData = {
   billingInterval: "month" | "year";
   yearlyDiscountPercent: string; // 0-99
   displayOrder: string;
+  tier: "premium" | "pro" | "none";
 };
 
 const DEFAULT_FORM: ProductFormData = {
@@ -88,6 +90,7 @@ const DEFAULT_FORM: ProductFormData = {
   billingInterval: "month",
   yearlyDiscountPercent: "0",
   displayOrder: "0",
+  tier: "none",
 };
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
@@ -163,6 +166,7 @@ function ProductFormDialog({
           billingInterval: (editProduct.billingInterval as "month" | "year") ?? "month",
           yearlyDiscountPercent: String(editProduct.yearlyDiscountPercent ?? 0),
           displayOrder: String(editProduct.displayOrder),
+          tier: (editProduct.tier as "premium" | "pro") ?? "none",
         }
       : DEFAULT_FORM
   );
@@ -214,6 +218,7 @@ function ProductFormDialog({
     const features = form.features.filter((f) => f.trim().length > 0);
     const yearlyDiscountPercent = Math.min(99, Math.max(0, parseInt(form.yearlyDiscountPercent) || 0));
 
+    const tier = form.tier === "none" ? null : form.tier;
     if (isEdit && editProduct) {
       updateMutation.mutate({
         id: editProduct.id,
@@ -225,6 +230,7 @@ function ProductFormDialog({
         billingInterval: form.isRecurring ? form.billingInterval : undefined,
         yearlyDiscountPercent: form.isRecurring && form.billingInterval === "year" ? yearlyDiscountPercent : 0,
         displayOrder: parseInt(form.displayOrder) || 0,
+        tier: tier ?? undefined,
       });
     } else {
       createMutation.mutate({
@@ -237,6 +243,7 @@ function ProductFormDialog({
         billingInterval: form.isRecurring ? form.billingInterval : undefined,
         yearlyDiscountPercent: form.isRecurring && form.billingInterval === "year" ? yearlyDiscountPercent : 0,
         displayOrder: parseInt(form.displayOrder) || 0,
+        tier: tier ?? undefined,
       });
     }
   }
@@ -356,6 +363,27 @@ function ProductFormDialog({
                 min="0"
               />
             </div>
+          </div>
+
+          {/* Tier Assignment */}
+          <div className="space-y-1.5">
+            <Label htmlFor="p-tier">Pricing Tier</Label>
+            <Select
+              value={form.tier}
+              onValueChange={(v) => update("tier", v as "premium" | "pro" | "none")}
+            >
+              <SelectTrigger id="p-tier">
+                <SelectValue placeholder="Select tier…" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None (standalone product)</SelectItem>
+                <SelectItem value="premium">Premium — maps to the Premium pricing card</SelectItem>
+                <SelectItem value="pro">Pro — maps to the Pro pricing card</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Tier controls which card on the /pricing page this product populates.
+            </p>
           </div>
 
           {/* Recurring / One-time toggle — shown for both create and edit */}
@@ -736,6 +764,30 @@ function ProductCard({
         )}
 
         <Separator />
+
+        {/* Tier badge */}
+        {product.tier && (
+          <div className="flex items-center gap-1.5">
+            <Badge
+              variant="outline"
+              className={product.tier === "premium"
+                ? "text-xs text-purple-600 border-purple-400 bg-purple-500/10"
+                : "text-xs text-blue-600 border-blue-400 bg-blue-500/10"}
+            >
+              {product.tier === "premium" ? "Premium Tier" : "Pro Tier"}
+            </Badge>
+            {!isArchived && (
+              <a
+                href="/pricing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary underline underline-offset-2 transition-colors"
+              >
+                View on /pricing ↗
+              </a>
+            )}
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex gap-2">

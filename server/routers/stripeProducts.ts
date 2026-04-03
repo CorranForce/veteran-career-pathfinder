@@ -65,6 +65,7 @@ export const stripeProductsRouter = router({
         billingInterval: z.enum(["month", "year"]).optional(),
         yearlyDiscountPercent: z.number().min(0).max(99).default(0),
         displayOrder: z.number().default(0),
+        tier: z.enum(["premium", "pro"]).optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -104,6 +105,7 @@ export const stripeProductsRouter = router({
           billingInterval: input.billingInterval ?? null,
           yearlyDiscountPercent: input.yearlyDiscountPercent,
           displayOrder: input.displayOrder,
+          tier: input.tier ?? null,
           status: "active",
         })
         .$returningId();
@@ -127,6 +129,7 @@ export const stripeProductsRouter = router({
         billingInterval: z.enum(["month", "year"]).optional(),
         yearlyDiscountPercent: z.number().min(0).max(99).optional(),
         displayOrder: z.number().optional(),
+        tier: z.enum(["premium", "pro"]).optional().nullable(),
       })
     )
     .mutation(async ({ input }) => {
@@ -185,6 +188,7 @@ export const stripeProductsRouter = router({
       if (input.features) updates.features = JSON.stringify(input.features);
       if (input.displayOrder !== undefined) updates.displayOrder = input.displayOrder;
       if (input.yearlyDiscountPercent !== undefined) updates.yearlyDiscountPercent = input.yearlyDiscountPercent;
+      if (input.tier !== undefined) updates.tier = input.tier ?? null;
       // Persist billing type even if price didn't change (e.g., just toggling for display)
       if (input.isRecurring !== undefined && !updates.isRecurring) updates.isRecurring = effectiveIsRecurring;
       if (input.billingInterval !== undefined && !updates.billingInterval) updates.billingInterval = effectiveBillingInterval;
@@ -347,9 +351,26 @@ export const stripeProductsRouter = router({
           }
         }
 
-        // 4. Verify price IDs
-        premiumPriceValid = await verifyStripePrice(process.env.STRIPE_PREMIUM_PRICE_ID ?? "");
-        proPriceValid = await verifyStripePrice(process.env.STRIPE_PRO_PRICE_ID ?? "");
+        // 4. Verify tier-assigned DB products have valid active Stripe price IDs
+        if (db) {
+          const [premiumProduct] = await db
+            .select({ stripePriceId: products.stripePriceId })
+            .from(products)
+            .where(and(eq(products.tier, "premium"), eq(products.status, "active")))
+            .limit(1);
+          const [proProduct] = await db
+            .select({ stripePriceId: products.stripePriceId })
+            .from(products)
+            .where(and(eq(products.tier, "pro"), eq(products.status, "active")))
+            .limit(1);
+
+          premiumPriceValid = premiumProduct?.stripePriceId
+            ? await verifyStripePrice(premiumProduct.stripePriceId)
+            : false;
+          proPriceValid = proProduct?.stripePriceId
+            ? await verifyStripePrice(proProduct.stripePriceId)
+            : false;
+        }
 
         if (!webhookConfigured || !premiumPriceValid || !proPriceValid) {
           status = "degraded";

@@ -1504,3 +1504,6 @@
 - [x] Ensure landing page only shows active (non-archived) announcements
 - [x] Fix Activity & Security Log and Announcement Management section width/spacing to match other dashboard sections
 - [x] Rewire /pricing page to dynamically pull prices from active DB products (no hardcoded values)
+- [x] Add Tier dropdown (None/Premium/Pro) to Create/Edit Product form
+- [x] Add "View on /pricing" link to active product cards in admin
+- [x] Add tier assignment validation to Stripe Health card check
