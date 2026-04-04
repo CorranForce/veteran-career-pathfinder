@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,7 @@ import {
   XCircle,
   Tag,
   X,
+  TriangleAlert,
 } from "lucide-react";
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -548,6 +550,14 @@ export default function ProductManagementPage() {
   const active = productList.filter((p) => p.status !== "archived");
   const archived = productList.filter((p) => p.status === "archived");
 
+  // Determine if any active products are assigned to each tier
+  const hasPremiumTier = active.some((p) => p.tier === "premium");
+  const hasProTier = active.some((p) => p.tier === "pro");
+  const missingTiers: string[] = [];
+  if (!hasPremiumTier) missingTiers.push("Premium");
+  if (!hasProTier) missingTiers.push("Pro");
+  const showTierWarning = !isLoading && missingTiers.length > 0;
+
   return (
     <div className="container max-w-5xl py-8 space-y-8">
       {/* Header */}
@@ -579,6 +589,24 @@ export default function ProductManagementPage() {
           </Button>
         </div>
       </div>
+
+      {/* Tier Assignment Warning */}
+      {showTierWarning && (
+        <Alert className="border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400">
+          <TriangleAlert className="h-4 w-4 !text-amber-600 dark:!text-amber-400" />
+          <AlertTitle>Pricing page will not display correctly</AlertTitle>
+          <AlertDescription>
+            No active product is assigned to the{" "}
+            <strong>{missingTiers.join(" or ")}</strong>{" "}
+            {missingTiers.length === 1 ? "tier" : "tiers"}. The{" "}
+            <a href="/pricing" target="_blank" className="underline font-medium">
+              /pricing
+            </a>{" "}
+            page requires at least one active product per tier. Edit a product and set its Tier
+            field to fix this.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Stripe Health Card */}
       <StripeHealthCard />

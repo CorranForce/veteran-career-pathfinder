@@ -1507,3 +1507,4 @@
 - [x] Add Tier dropdown (None/Premium/Pro) to Create/Edit Product form
 - [x] Add "View on /pricing" link to active product cards in admin
 - [x] Add tier assignment validation to Stripe Health card check
+- [x] Show warning banner on /admin/products when no active Premium or Pro tier product is assigned
