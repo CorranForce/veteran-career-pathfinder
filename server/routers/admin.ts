@@ -782,4 +782,27 @@ export type ProductKey = keyof typeof PRODUCTS;
       const { getFailedLoginEvents } = await import("../db");
       return getFailedLoginEvents(input.limit);
     }),
+
+  /**
+   * Get recent Platform Agent run logs (platform owner only)
+   */
+  getAgentLogs: platformOwnerProcedure
+    .input(z.object({ limit: z.number().optional().default(10) }))
+    .query(async ({ input }) => {
+      const { getRecentAgentLogs } = await import("../db");
+      return getRecentAgentLogs(input.limit);
+    }),
+
+  /**
+   * Manually trigger a Platform Agent run (platform owner only)
+   */
+  runPlatformAgent: platformOwnerProcedure
+    .mutation(async () => {
+      const { runPlatformAgent } = await import("../platformAgent");
+      // Run in background — don't await so the response returns immediately
+      runPlatformAgent("manual").catch((err) =>
+        console.error("[Admin] Manual agent run failed:", err)
+      );
+      return { triggered: true };
+    }),
 });

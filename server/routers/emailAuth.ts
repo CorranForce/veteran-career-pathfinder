@@ -89,6 +89,19 @@ export const emailAuthRouter = router({
         console.error("[EmailAuth] Failed to send owner notification:", err);
       }
 
+      // Platform Agent: email owner about new free signup
+      try {
+        const { notifyOwnerNewSignup } = await import("../platformAgent");
+        await notifyOwnerNewSignup({
+          name: input.name,
+          email: input.email,
+          loginMethod: "email",
+          signedUpAt: new Date(),
+        });
+      } catch (err) {
+        console.error("[EmailAuth] Failed to send platform agent signup email:", err);
+      }
+
       return {
         success: true,
         user: {

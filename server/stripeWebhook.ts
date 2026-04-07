@@ -3,6 +3,7 @@ import { constructStripeEvent, stripe } from "./stripe";
 import { createPurchase, getUserById, updatePurchaseStatus, updateUserStripeCustomerId, logActivity } from "./db";
 import { sendPurchaseConfirmationEmail } from "./services/resendEmail";
 import { notifyOwner } from "./_core/notification";
+import { notifyOwnerUpgrade } from "./platformAgent";
 
 export async function handleStripeWebhook(req: Request, res: Response) {
   const signature = req.headers["stripe-signature"];
@@ -131,6 +132,26 @@ export async function handleStripeWebhook(req: Request, res: Response) {
           });
         } catch (err) {
           console.error("[Stripe Webhook] Failed to send owner payment notification:", err);
+        }
+
+        // Platform Agent: email owner about upgrade
+        try {
+          const customerEmail = paymentIntent.receipt_email || (paymentIntent.metadata?.customer_email as string);
+          const customerName = paymentIntent.metadata?.customer_name as string || "Customer";
+          const productType = paymentIntent.metadata?.product_type as string | undefined;
+          const tier = productType === "pro_subscription" ? "pro" : "premium";
+          if (customerEmail) {
+            await notifyOwnerUpgrade({
+              name: customerName,
+              email: customerEmail,
+              tier,
+              amount: paymentIntent.amount,
+              currency: paymentIntent.currency || "usd",
+              purchasedAt: new Date(),
+            });
+          }
+        } catch (err) {
+          console.error("[Stripe Webhook] Failed to send upgrade owner email:", err);
         }
 
         break;

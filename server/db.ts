@@ -1,9 +1,8 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, lt, lte, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { createPool, type Pool } from "mysql2";
-import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog, adminActivityLogs, InsertAdminActivityLog, announcements, InsertAnnouncement, Announcement } from "../drizzle/schema";
+import { InsertPurchase, InsertSubscriber, InsertUser, purchases, subscribers, users, userProfiles, careerHighlights, InsertUserProfile, InsertCareerHighlight, resumes, InsertResume, resumeTemplates, activityLogs, InsertActivityLog, adminActivityLogs, InsertAdminActivityLog, announcements, InsertAnnouncement, Announcement, blogPosts, InsertBlogPost, BlogPost, platformAgentLogs, InsertPlatformAgentLog } from "../drizzle/schema";
 import { ENV } from './_core/env';
-import { desc } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 let _pool: Pool | null = null;
@@ -960,11 +959,22 @@ export async function publishAnnouncement(id: number): Promise<void> {
     return;
   }
 
+  // Fetch the current announcement to check visibleOnLandingPage
+  const rows = await db.select().from(announcements).where(eq(announcements.id, id)).limit(1);
+  const existing = rows[0];
+  const now = new Date();
+  // If visible on landing page, set a 14-day expiry from publish time
+  const landingPageExpiresAt =
+    existing?.visibleOnLandingPage
+      ? new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000)
+      : existing?.landingPageExpiresAt ?? null;
+
   await db
     .update(announcements)
     .set({ 
       status: "published",
-      publishedAt: new Date()
+      publishedAt: now,
+      landingPageExpiresAt,
     })
     .where(eq(announcements.id, id));
 }
@@ -1160,4 +1170,225 @@ export async function getFailedLoginEvents(limit: number = 100) {
     .where(eq(adminActivityLogs.actionType, "login_failed"))
     .orderBy(desc(adminActivityLogs.createdAt))
     .limit(limit);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Blog Post Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Generate a URL-safe slug from a title */
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .substring(0, 280);
+}
+
+/** Ensure slug is unique by appending a numeric suffix if needed */
+async function uniqueSlug(db: ReturnType<typeof drizzle>, base: string, excludeId?: number): Promise<string> {
+  let candidate = base;
+  let attempt = 0;
+  while (true) {
+    const rows = await db
+      .select({ id: blogPosts.id })
+      .from(blogPosts)
+      .where(eq(blogPosts.slug, candidate))
+      .limit(1);
+    const conflict = rows[0];
+    if (!conflict || conflict.id === excludeId) return candidate;
+    attempt++;
+    candidate = `${base}-${attempt}`;
+  }
+}
+
+export async function getAllBlogPosts(): Promise<BlogPost[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt));
+}
+
+export async function getPublishedBlogPosts(limit = 20): Promise<BlogPost[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(blogPosts)
+    .where(eq(blogPosts.status, "published"))
+    .orderBy(desc(blogPosts.publishedAt))
+    .limit(limit);
+}
+
+export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getBlogPostById(id: number): Promise<BlogPost | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db.select().from(blogPosts).where(eq(blogPosts.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function createBlogPost(data: {
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImageUrl?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  authorId: number;
+  authorName: string;
+}): Promise<BlogPost> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const base = slugify(data.title);
+  const slug = await uniqueSlug(db, base);
+  await db.insert(blogPosts).values({
+    title: data.title,
+    slug,
+    excerpt: data.excerpt,
+    content: data.content,
+    coverImageUrl: data.coverImageUrl ?? null,
+    metaTitle: data.metaTitle ?? null,
+    metaDescription: data.metaDescription ?? null,
+    authorId: data.authorId,
+    authorName: data.authorName,
+    status: "draft",
+  });
+  const created = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug)).limit(1);
+  return created[0];
+}
+
+export async function updateBlogPost(id: number, data: Partial<{
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImageUrl: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+}>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  // If title changed, regenerate slug
+  const updates: Record<string, unknown> = { ...data };
+  if (data.title) {
+    const base = slugify(data.title);
+    updates.slug = await uniqueSlug(db, base, id);
+  }
+  await db.update(blogPosts).set(updates).where(eq(blogPosts.id, id));
+}
+
+export async function publishBlogPost(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(blogPosts).set({ status: "published", publishedAt: new Date() }).where(eq(blogPosts.id, id));
+}
+
+export async function unpublishBlogPost(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(blogPosts).set({ status: "draft", publishedAt: null }).where(eq(blogPosts.id, id));
+}
+
+export async function archiveBlogPost(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(blogPosts).set({ status: "archived" }).where(eq(blogPosts.id, id));
+}
+
+export async function deleteBlogPost(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(blogPosts).where(eq(blogPosts.id, id));
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Announcement Landing Page Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Get published announcements visible on landing page where expiry is in the future (or null).
+ */
+export async function getActiveLandingAnnouncements() {
+  const db = await getDb();
+  if (!db) return [];
+  const now = new Date();
+  return db
+    .select()
+    .from(announcements)
+    .where(
+      and(
+        eq(announcements.status, "published"),
+        eq(announcements.visibleOnLandingPage, true),
+        or(
+          isNotNull(announcements.landingPageExpiresAt),
+          sql`${announcements.landingPageExpiresAt} IS NULL`
+        ),
+        // landingPageExpiresAt IS NULL OR landingPageExpiresAt > now
+        sql`(${announcements.landingPageExpiresAt} IS NULL OR ${announcements.landingPageExpiresAt} > ${now})`
+      )
+    )
+    .orderBy(desc(announcements.priority), desc(announcements.publishedAt))
+    .limit(5);
+}
+
+/**
+ * Auto-archive announcements whose landingPageExpiresAt has passed.
+ * Returns the number of announcements archived.
+ */
+export async function autoArchiveExpiredAnnouncements(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const now = new Date();
+  const expired = await db
+    .select({ id: announcements.id })
+    .from(announcements)
+    .where(
+      and(
+        eq(announcements.status, "published"),
+        eq(announcements.visibleOnLandingPage, true),
+        isNotNull(announcements.landingPageExpiresAt),
+        lt(announcements.landingPageExpiresAt, now)
+      )
+    );
+  if (expired.length === 0) return 0;
+  for (const row of expired) {
+    await db
+      .update(announcements)
+      .set({ status: "archived", archivedAt: now })
+      .where(eq(announcements.id, row.id));
+  }
+  return expired.length;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Platform Agent Log Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function createAgentLog(data: Omit<InsertPlatformAgentLog, "id" | "startedAt">): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.insert(platformAgentLogs).values({
+    ...data,
+    startedAt: new Date(),
+  });
+  return (result as any)[0]?.insertId ?? 0;
+}
+
+export async function completeAgentLog(id: number, updates: Partial<InsertPlatformAgentLog>): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.update(platformAgentLogs).set({ ...updates, completedAt: new Date() }).where(eq(platformAgentLogs.id, id));
+}
+
+export async function getRecentAgentLogs(limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(platformAgentLogs).orderBy(desc(platformAgentLogs.startedAt)).limit(limit);
 }

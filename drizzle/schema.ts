@@ -415,6 +415,11 @@ export const announcements = mysqlTable("announcements", {
   // Optional link for "Learn More"
   link: varchar("link", { length: 500 }),
   
+  // Landing page visibility — when true, announcement banner appears on the public home page
+  visibleOnLandingPage: boolean("visibleOnLandingPage").default(false).notNull(),
+  // Auto-archive date: set to publishedAt + 14 days when published with visibleOnLandingPage=true
+  landingPageExpiresAt: timestamp("landingPageExpiresAt"),
+  
   // Timestamps
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
@@ -567,3 +572,64 @@ export const pushSubscriptions = mysqlTable("push_subscriptions", {
 
 export type PushSubscription = typeof pushSubscriptions.$inferSelect;
 export type InsertPushSubscription = typeof pushSubscriptions.$inferInsert;
+
+/**
+ * Blog Posts - admin-managed blog content for the /blog page
+ */
+export const blogPosts = mysqlTable("blog_posts", {
+  id: int("id").autoincrement().primaryKey(),
+
+  title: varchar("title", { length: 255 }).notNull(),
+  slug: varchar("slug", { length: 300 }).notNull().unique(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(), // Markdown / rich text
+  coverImageUrl: text("coverImageUrl"),
+
+  // Status
+  status: mysqlEnum("status", ["draft", "published", "archived"]).default("draft").notNull(),
+
+  // Author info (platform owner)
+  authorId: int("authorId").notNull(),
+  authorName: varchar("authorName", { length: 255 }).notNull(),
+
+  // SEO
+  metaTitle: varchar("metaTitle", { length: 255 }),
+  metaDescription: text("metaDescription"),
+
+  // Timestamps
+  publishedAt: timestamp("publishedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = typeof blogPosts.$inferInsert;
+
+/**
+ * Platform Agent Log — records each daily agent run and actions taken
+ */
+export const platformAgentLogs = mysqlTable("platform_agent_logs", {
+  id: int("id").autoincrement().primaryKey(),
+
+  // What triggered this run
+  trigger: mysqlEnum("trigger", ["scheduled", "manual"]).default("scheduled").notNull(),
+
+  // Summary of actions taken (JSON array of strings)
+  actions: text("actions").notNull(), // e.g. [{type, description, metadata}]
+
+  // Stripe latency observed during this run
+  stripeLatencyMs: int("stripeLatencyMs"),
+  stripeStatus: mysqlEnum("stripeStatus", ["ok", "degraded", "error", "skipped"]).default("skipped").notNull(),
+
+  // Counts
+  announcementsArchived: int("announcementsArchived").default(0).notNull(),
+
+  // Errors encountered (JSON array)
+  errors: text("errors"),
+
+  startedAt: timestamp("startedAt").defaultNow().notNull(),
+  completedAt: timestamp("completedAt"),
+});
+
+export type PlatformAgentLog = typeof platformAgentLogs.$inferSelect;
+export type InsertPlatformAgentLog = typeof platformAgentLogs.$inferInsert;

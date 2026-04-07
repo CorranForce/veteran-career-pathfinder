@@ -1508,3 +1508,31 @@
 - [x] Add "View on /pricing" link to active product cards in admin
 - [x] Add tier assignment validation to Stripe Health card check
 - [x] Show warning banner on /admin/products when no active Premium or Pro tier product is assigned
+
+## Sprint: Blog Management, Announcement Enhancements & Platform AI Agent
+
+### Blog Management (Admin Dashboard)
+- [x] Add `blogPosts` table to DB schema (id, title, slug, excerpt, content, coverImageUrl, status, publishedAt, createdAt, updatedAt)
+- [x] Create blog DB helper functions (getAll, getById, create, update, delete, publish/unpublish)
+- [x] Create blog tRPC router with CRUD procedures (admin-protected)
+- [x] Register blog router in main app router
+- [x] Build BlogManagement card component in PlatformOwnerDashboard (list, create, edit, delete, publish/unpublish)
+- [x] Add pagination (5 per page) to blog post list in admin
+- [ ] Wire existing /blog page to pull posts from DB instead of static data
+
+### Announcement Enhancements
+- [x] Add `visibleOnLandingPage` boolean column to announcements table
+- [x] Add `landingPageExpiresAt` timestamp column (set to publishedAt + 14 days on publish)
+- [x] Add "Visible on Landing Page" toggle to announcement create/edit form in admin
+- [x] Display landing page announcements on Home.tsx (published + visibleOnLandingPage + not expired)
+- [x] Update getPublicAnnouncements procedure to filter by visibleOnLandingPage flag
+
+### Platform AI Agent (Daily Scheduler)
+- [x] Create platform agent scheduler (runs daily via setInterval or node-cron)
+- [x] Agent task 1: Auto-archive announcements where landingPageExpiresAt < now and status != archived
+- [x] Agent task 2: Ping Stripe health check; if latency > 1000ms, trigger a second ping and email owner with before/after latency
+- [x] Agent task 3: Email owner when a new user signs up for a free account
+- [x] Agent task 4: Email owner when a user upgrades to Premium or Pro tier
+- [x] Create email templates for agent notifications (latency alert, new signup, upgrade)
+- [x] Add agent activity log entries for each action taken
+- [x] Add Platform Agent status card to PlatformOwnerDashboard (last run time, actions taken)

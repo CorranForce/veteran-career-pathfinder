@@ -25,6 +25,7 @@ import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { SimpleContactButton } from "@/components/LiveChatWidget";
 import { StructuredData } from "@/components/StructuredData";
 import { AnnouncementsCard } from "@/components/AnnouncementsCard";
+import { LandingAnnouncementBanner } from "@/components/LandingAnnouncementBanner";
 import { ContentGate } from "@/components/ContentGate";
 
 export default function Home() {
@@ -119,6 +120,9 @@ export default function Home() {
           <MobileNav onScrollToPrompt={scrollToPrompt} />
         </div>
       </nav>
+
+      {/* Landing Page Announcement Banners */}
+      <LandingAnnouncementBanner />
 
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background">

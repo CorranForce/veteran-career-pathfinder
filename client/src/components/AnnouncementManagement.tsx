@@ -22,7 +22,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Archive, CheckCircle, RotateCcw, Megaphone } from "lucide-react";
+import { Plus, Edit, Trash2, Archive, CheckCircle, RotateCcw, Megaphone, Globe, Clock } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 type AnnouncementType = "feature" | "bugfix" | "news" | "maintenance";
@@ -36,6 +37,8 @@ interface Announcement {
   status: AnnouncementStatus;
   priority: number;
   link: string | null;
+  visibleOnLandingPage: boolean;
+  landingPageExpiresAt: Date | null;
   createdAt: Date;
   publishedAt: Date | null;
   archivedAt: Date | null;
@@ -125,6 +128,11 @@ function AnnouncementList({
                 {announcement.priority > 0 && (
                   <Badge variant="outline">Priority: {announcement.priority}</Badge>
                 )}
+                {announcement.visibleOnLandingPage && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Globe className="h-3 w-3" /> Landing Page
+                  </Badge>
+                )}
               </div>
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
                 {announcement.content}
@@ -147,6 +155,11 @@ function AnnouncementList({
                 )}
                 {announcement.archivedAt && (
                   <> · Archived {new Date(announcement.archivedAt).toLocaleDateString()}</>
+                )}
+                {announcement.visibleOnLandingPage && announcement.landingPageExpiresAt && announcement.status === "published" && (
+                  <span className="ml-1 inline-flex items-center gap-1">
+                    · <Clock className="h-3 w-3" /> Landing page expires {new Date(announcement.landingPageExpiresAt).toLocaleDateString()}
+                  </span>
                 )}
               </div>
             </div>
@@ -216,6 +229,7 @@ export function AnnouncementManagement() {
   const [type, setType] = useState<AnnouncementType>("feature");
   const [priority, setPriority] = useState(0);
   const [link, setLink] = useState("");
+  const [visibleOnLandingPage, setVisibleOnLandingPage] = useState(false);
 
   // Fetch active (draft + published) and archived separately
   const { data: activeAnnouncements, isLoading: isLoadingActive, refetch: refetchActive } =
@@ -262,11 +276,11 @@ export function AnnouncementManagement() {
     onError: (e) => toast.error(`Failed to restore: ${e.message}`),
   });
 
-  const resetForm = () => { setTitle(""); setContent(""); setType("feature"); setPriority(0); setLink(""); };
+  const resetForm = () => { setTitle(""); setContent(""); setType("feature"); setPriority(0); setLink(""); setVisibleOnLandingPage(false); };
 
   const handleCreate = () => {
     if (!title.trim() || !content.trim()) { toast.error("Title and content are required"); return; }
-    createMutation.mutate({ title: title.trim(), content: content.trim(), type, priority, link: link.trim() || undefined });
+    createMutation.mutate({ title: title.trim(), content: content.trim(), type, priority, link: link.trim() || undefined, visibleOnLandingPage });
   };
 
   const handleEdit = (announcement: Announcement) => {
@@ -276,13 +290,14 @@ export function AnnouncementManagement() {
     setType(announcement.type);
     setPriority(announcement.priority);
     setLink(announcement.link || "");
+    setVisibleOnLandingPage(announcement.visibleOnLandingPage ?? false);
     setIsEditDialogOpen(true);
   };
 
   const handleUpdate = () => {
     if (!editingAnnouncement) return;
     if (!title.trim() || !content.trim()) { toast.error("Title and content are required"); return; }
-    updateMutation.mutate({ id: editingAnnouncement.id, title: title.trim(), content: content.trim(), type, priority, link: link.trim() || "" });
+    updateMutation.mutate({ id: editingAnnouncement.id, title: title.trim(), content: content.trim(), type, priority, link: link.trim() || "", visibleOnLandingPage });
   };
 
   const handleDelete = (id: number) => {
@@ -322,6 +337,18 @@ export function AnnouncementManagement() {
       <div>
         <Label htmlFor="ann-link">Link (optional)</Label>
         <Input id="ann-link" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://..." />
+      </div>
+      <div className="flex items-center gap-3 rounded-lg border p-3 bg-muted/30">
+        <Globe className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <div className="flex-1">
+          <p className="text-sm font-medium">Visible on Landing Page</p>
+          <p className="text-xs text-muted-foreground">When published, this announcement will appear on the public landing page for 14 days, then auto-archive.</p>
+        </div>
+        <Switch
+          id="ann-landing"
+          checked={visibleOnLandingPage}
+          onCheckedChange={setVisibleOnLandingPage}
+        />
       </div>
     </div>
   );

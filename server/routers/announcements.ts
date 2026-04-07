@@ -11,6 +11,7 @@ import {
   archiveAnnouncement,
   restoreAnnouncement,
   getArchivedAnnouncements,
+  getActiveLandingAnnouncements,
 } from "../db";
 
 export const announcementsRouter = router({
@@ -42,6 +43,13 @@ export const announcementsRouter = router({
     }),
 
   /**
+   * Get landing page announcements (public) — published, visibleOnLandingPage=true, not expired
+   */
+  getLandingAnnouncements: publicProcedure.query(async () => {
+    return await getActiveLandingAnnouncements();
+  }),
+
+  /**
    * Create announcement (admin only)
    */
   create: adminProcedure
@@ -51,6 +59,7 @@ export const announcementsRouter = router({
       type: z.enum(["feature", "bugfix", "news", "maintenance"]),
       priority: z.number().optional().default(0),
       link: z.string().url().optional().or(z.literal("")),
+      visibleOnLandingPage: z.boolean().optional().default(false),
     }))
     .mutation(async ({ input, ctx }) => {
       const announcement = await createAnnouncement({
@@ -60,6 +69,7 @@ export const announcementsRouter = router({
         status: "draft",
         priority: input.priority,
         link: input.link || null,
+        visibleOnLandingPage: input.visibleOnLandingPage,
         createdBy: ctx.user.id,
         createdByName: ctx.user.name || "Unknown",
       });
@@ -78,6 +88,7 @@ export const announcementsRouter = router({
       type: z.enum(["feature", "bugfix", "news", "maintenance"]).optional(),
       priority: z.number().optional(),
       link: z.string().url().optional().or(z.literal("")),
+      visibleOnLandingPage: z.boolean().optional(),
     }))
     .mutation(async ({ input }) => {
       const { id, ...updates } = input;

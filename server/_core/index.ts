@@ -100,6 +100,10 @@ async function startServer() {
     import("../stripeHeartbeat").then(({ startStripeHeartbeat }) => {
       startStripeHeartbeat();
     }).catch((err) => console.error("[Server] Failed to start Stripe heartbeat:", err));
+    // Start Platform AI Agent (daily checks)
+    import("../platformAgent").then(({ startPlatformAgent }) => {
+      startPlatformAgent();
+    }).catch((err) => console.error("[Server] Failed to start Platform Agent:", err));
   });
 }
 

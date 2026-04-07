@@ -126,6 +126,19 @@ export const googleAuthRouter = router({
             console.error("[GoogleAuth] Failed to send owner notification:", err);
           }
 
+          // Platform Agent: email owner about new free signup
+          try {
+            const { notifyOwnerNewSignup } = await import("../platformAgent");
+            await notifyOwnerNewSignup({
+              name: name || email.split("@")[0],
+              email,
+              loginMethod: "google",
+              signedUpAt: new Date(),
+            });
+          } catch (err) {
+            console.error("[GoogleAuth] Failed to send platform agent signup email:", err);
+          }
+
           user = await db.getUserByEmail(email);
         } else {
           // Update last signed in

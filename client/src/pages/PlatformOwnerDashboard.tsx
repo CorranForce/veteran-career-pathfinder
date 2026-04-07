@@ -64,6 +64,8 @@ import { useLocation } from "wouter";
 import ActivityFeed from "@/components/ActivityFeed";
 import { ProductManagement } from "@/components/ProductManagement";
 import { StripeHealthCard } from "@/components/StripeHealthCard";
+import { BlogManagement } from "@/components/BlogManagement";
+import { PlatformAgentCard } from "@/components/PlatformAgentCard";
 
 export default function PlatformOwnerDashboard() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -880,6 +882,8 @@ export default function PlatformOwnerDashboard() {
         <div className="space-y-6">
           <AdminActivityLog />
           <AnnouncementManagement />
+          <BlogManagement />
+          <PlatformAgentCard />
         </div>
       </div>
     </div>
