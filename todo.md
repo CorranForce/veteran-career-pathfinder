@@ -1536,3 +1536,13 @@
 - [x] Create email templates for agent notifications (latency alert, new signup, upgrade)
 - [x] Add agent activity log entries for each action taken
 - [x] Add Platform Agent status card to PlatformOwnerDashboard (last run time, actions taken)
+
+## Sprint: Stripe Mode Drift Detector
+
+- [x] Diagnose "No such product" error — confirmed test-mode/live-mode key mismatch
+- [x] Fix DB: update Pathfinder Pro (id=1) and Pathfinder Premium (id=2) to correct live-mode Stripe IDs (prod_U83GFJ7Nhc54vX / prod_U83FNQ7yZAA4t3)
+- [x] Archive duplicate synced rows (id=30002, 30003) that had no tier assignment
+- [x] Add checkStripeDrift() to Platform AI Agent — validates all active DB product IDs against current Stripe mode
+- [x] Auto-archive stale products and email owner with summary when drift is detected
+- [x] Guard drift check to only run in live mode (skip in test/dev to avoid false positives)
+- [x] Fix stripe.prices.test.ts to skip live-mode price retrieval when running with a test key

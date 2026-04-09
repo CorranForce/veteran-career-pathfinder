@@ -21,8 +21,9 @@ import {
   getDb,
 } from "./db";
 import { runStripeHealthCheck } from "./stripeHeartbeat";
-import { users } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { users, products } from "../drizzle/schema";
+import { eq, and } from "drizzle-orm";
+import { stripe, getStripeMode } from "./stripe";
 
 // ── SendGrid init ─────────────────────────────────────────────────────────────
 if (ENV.sendgridApiKey) {
@@ -67,6 +68,113 @@ async function sendOwnerEmail(subject: string, html: string): Promise<void> {
   } catch (err: any) {
     console.error("[PlatformAgent] Failed to send owner email:", err?.response?.body ?? err?.message);
   }
+}
+
+// ── Stripe Mode Drift Detector ───────────────────────────────────────────────
+
+/**
+ * Validates that every active DB product's stripeProductId exists in the
+ * currently active Stripe mode (test vs. live). If any are stale (wrong mode),
+ * emails the owner with a summary and marks those products as archived locally
+ * so the tier-warning banner fires in the admin dashboard.
+ */
+async function checkStripeDrift(): Promise<{
+  staleCount: number;
+  mode: string;
+  staleProducts: Array<{ id: number; name: string; stripeProductId: string }>;
+}> {
+  const db = await getDb();
+  if (!db) return { staleCount: 0, mode: "unknown", staleProducts: [] };
+
+  const mode = getStripeMode();
+
+  // Only run the drift check in live mode.
+  // In test/dev mode the DB may intentionally hold live-mode product IDs
+  // (the production site uses sk_live_, the sandbox uses sk_test_).
+  // Flagging those as "stale" would incorrectly archive valid production products.
+  if (mode !== "live") {
+    console.log("[PlatformAgent] Stripe drift check skipped — running in test mode");
+    return { staleCount: 0, mode, staleProducts: [] };
+  }
+  const activeProducts = await db
+    .select({
+      id: products.id,
+      name: products.name,
+      stripeProductId: products.stripeProductId,
+      stripePriceId: products.stripePriceId,
+    })
+    .from(products)
+    .where(and(eq(products.status, "active")));
+
+  const staleProducts: Array<{ id: number; name: string; stripeProductId: string }> = [];
+
+  for (const product of activeProducts) {
+    if (!product.stripeProductId) continue;
+    try {
+      await stripe.products.retrieve(product.stripeProductId);
+      // Product exists in current mode — valid
+    } catch (err: any) {
+      if (err?.code === "resource_missing" || err?.statusCode === 404) {
+        staleProducts.push({
+          id: product.id,
+          name: product.name,
+          stripeProductId: product.stripeProductId,
+        });
+      }
+    }
+  }
+
+  if (staleProducts.length > 0) {
+    // Auto-archive stale products so the tier-warning banner fires
+    for (const sp of staleProducts) {
+      await db
+        .update(products)
+        .set({ status: "archived", archivedAt: new Date() })
+        .where(eq(products.id, sp.id));
+    }
+
+    // Email owner
+    const rows = staleProducts
+      .map(
+        (sp) =>
+          `<tr>
+            <td style="padding:8px;border:1px solid #ddd">${sp.name}</td>
+            <td style="padding:8px;border:1px solid #ddd;font-family:monospace">${sp.stripeProductId}</td>
+            <td style="padding:8px;border:1px solid #ddd;color:#c0392b">Not found in ${mode} mode</td>
+          </tr>`
+      )
+      .join("");
+
+    const subject = `🚨 Stripe Mode Drift Detected — ${staleProducts.length} product(s) invalid in ${mode} mode`;
+    const html = `
+      <h2>Stripe Mode Drift Alert</h2>
+      <p>The Platform AI Agent detected that <strong>${staleProducts.length}</strong> active product(s) in your database
+      have Stripe product IDs that do not exist in the current <strong>${mode}</strong> mode.
+      This typically happens when the Stripe key is switched between test and live mode.</p>
+      <p>The affected products have been <strong>auto-archived</strong> in your database.
+      Please recreate them in the correct Stripe mode from the
+      <a href="${process.env.FRONTEND_URL ?? ""}/admin/products">Product Management page</a>.</p>
+      <table style="border-collapse:collapse;width:100%;margin-top:12px">
+        <tr style="background:#f5f5f5">
+          <th style="text-align:left;padding:8px;border:1px solid #ddd">Product Name</th>
+          <th style="text-align:left;padding:8px;border:1px solid #ddd">Stale Stripe ID</th>
+          <th style="text-align:left;padding:8px;border:1px solid #ddd">Issue</th>
+        </tr>
+        ${rows}
+      </table>
+      <p style="margin-top:16px;color:#666;font-size:12px">
+        Detected at ${new Date().toUTCString()} · Active Stripe mode: ${mode}
+      </p>
+    `;
+    await sendOwnerEmail(subject, html);
+    console.warn(
+      `[PlatformAgent] Stripe mode drift: ${staleProducts.length} stale product(s) auto-archived and owner notified`
+    );
+  } else {
+    console.log(`[PlatformAgent] Stripe mode drift check: all products valid in ${mode} mode`);
+  }
+
+  return { staleCount: staleProducts.length, mode, staleProducts };
 }
 
 // ── Stripe latency check ──────────────────────────────────────────────────────
@@ -158,7 +266,29 @@ export async function runPlatformAgent(trigger: "scheduled" | "manual" = "schedu
     console.error(`[PlatformAgent] ${msg}`);
   }
 
-  // ── Task 2: Stripe latency check ─────────────────────────────────────────
+  // ── Task 2: Stripe Mode Drift Detector ────────────────────────────────────
+  let driftCount = 0;
+  try {
+    const drift = await checkStripeDrift();
+    driftCount = drift.staleCount;
+    if (driftCount > 0) {
+      actions.push({
+        type: "stripe_drift",
+        description: `Stripe mode drift: ${driftCount} stale product(s) auto-archived (mode: ${drift.mode})`,
+      });
+    } else {
+      actions.push({
+        type: "stripe_drift",
+        description: `Stripe mode drift check: all products valid in ${drift.mode} mode`,
+      });
+    }
+  } catch (err: any) {
+    const msg = `Stripe drift check failed: ${err?.message}`;
+    errors.push(msg);
+    console.error(`[PlatformAgent] ${msg}`);
+  }
+
+  // ── Task 3 (continued): Stripe latency check ────────────────────────────
   let stripeStatus: "ok" | "degraded" | "error" | "skipped" = "skipped";
   let stripeLatencyMs = 0;
   try {
