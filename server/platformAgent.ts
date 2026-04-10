@@ -268,9 +268,13 @@ export async function runPlatformAgent(trigger: "scheduled" | "manual" = "schedu
 
   // ── Task 2: Stripe Mode Drift Detector ────────────────────────────────────
   let driftCount = 0;
+  let driftMode: string | null = null;
+  let driftCheckedAt: Date | null = null;
   try {
     const drift = await checkStripeDrift();
     driftCount = drift.staleCount;
+    driftMode = drift.mode;
+    driftCheckedAt = new Date();
     if (driftCount > 0) {
       actions.push({
         type: "stripe_drift",
@@ -312,6 +316,9 @@ export async function runPlatformAgent(trigger: "scheduled" | "manual" = "schedu
     stripeStatus,
     stripeLatencyMs,
     announcementsArchived,
+    driftCount,
+    driftMode: driftMode ?? undefined,
+    driftCheckedAt: driftCheckedAt ?? undefined,
     errors: errors.length > 0 ? JSON.stringify(errors) : null,
   });
 

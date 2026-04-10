@@ -1546,3 +1546,9 @@
 - [x] Auto-archive stale products and email owner with summary when drift is detected
 - [x] Guard drift check to only run in live mode (skip in test/dev to avoid false positives)
 - [x] Fix stripe.prices.test.ts to skip live-mode price retrieval when running with a test key
+
+## Sprint: Legacy Row Cleanup & Agent UX
+
+- [x] Rename DB rows id=30002 and id=30003 to "Legacy – Do Not Restore (Pro)" and "Legacy – Do Not Restore (Premium)"
+- [x] Add "Last Drift Check" status row to PlatformAgentCard (timestamp + result of most recent drift scan)
+- [x] Verify Stripe Health Ping returns all green after product ID fix

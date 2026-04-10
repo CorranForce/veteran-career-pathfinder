@@ -624,6 +624,11 @@ export const platformAgentLogs = mysqlTable("platform_agent_logs", {
   // Counts
   announcementsArchived: int("announcementsArchived").default(0).notNull(),
 
+  // Stripe Mode Drift check results
+  driftCount: int("driftCount").default(0).notNull(),   // number of stale product IDs found
+  driftMode: varchar("driftMode", { length: 10 }),       // "live" | "test" | null (skipped)
+  driftCheckedAt: timestamp("driftCheckedAt"),           // when the drift check ran
+
   // Errors encountered (JSON array)
   errors: text("errors"),
 

@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bot, CheckCircle2, AlertTriangle, XCircle, Clock, RefreshCw } from "lucide-react";
+import { Bot, CheckCircle2, AlertTriangle, XCircle, Clock, RefreshCw, ShieldCheck, ShieldAlert, ShieldOff } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -13,6 +13,9 @@ interface AgentLog {
   stripeStatus: string | null;
   stripeLatencyMs: number | null;
   announcementsArchived: number | null;
+  driftCount: number | null;
+  driftMode: string | null;
+  driftCheckedAt: Date | null;
   errors: string | null;
   startedAt: Date;
   completedAt: Date | null;
@@ -30,6 +33,75 @@ function StatusIcon({ status }: { status: string | null }) {
   if (status === "ok") return <CheckCircle2 className="h-4 w-4 text-green-600" />;
   if (status === "degraded") return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
   return <XCircle className="h-4 w-4 text-red-600" />;
+}
+
+/** Renders the Last Drift Check status row */
+function DriftCheckRow({ log }: { log: AgentLog }) {
+  const { driftCount, driftMode, driftCheckedAt } = log;
+
+  // If no drift check was recorded (e.g. very old log before the feature)
+  if (driftCheckedAt === null && driftCount === 0 && driftMode === null) {
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground mb-1">Last Drift Check</p>
+        <div className="flex items-center gap-1.5">
+          <ShieldOff className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">Not yet run</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Skipped (test mode)
+  if (driftMode && driftMode !== "live") {
+    return (
+      <div>
+        <p className="text-xs text-muted-foreground mb-1">Last Drift Check</p>
+        <div className="flex items-center gap-1.5">
+          <ShieldOff className="h-4 w-4 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">Skipped (test mode)</span>
+        </div>
+        {driftCheckedAt && (
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {format(new Date(driftCheckedAt), "MMM d 'at' h:mm a")}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  // Ran in live mode — show result
+  const hasStale = (driftCount ?? 0) > 0;
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-1">Last Drift Check</p>
+      <div className="flex items-center gap-1.5">
+        {hasStale ? (
+          <>
+            <ShieldAlert className="h-4 w-4 text-red-600" />
+            <Badge className="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 text-xs">
+              {driftCount} stale
+            </Badge>
+          </>
+        ) : (
+          <>
+            <ShieldCheck className="h-4 w-4 text-green-600" />
+            <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 text-xs">
+              All valid
+            </Badge>
+          </>
+        )}
+        {driftMode && (
+          <span className="text-xs text-muted-foreground capitalize">({driftMode})</span>
+        )}
+      </div>
+      {driftCheckedAt && (
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {format(new Date(driftCheckedAt), "MMM d 'at' h:mm a")}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function PlatformAgentCard() {
@@ -53,7 +125,7 @@ export function PlatformAgentCard() {
             <div>
               <CardTitle>Platform AI Agent</CardTitle>
               <CardDescription>
-                Daily checks: announcement auto-archive, Stripe latency monitoring, and owner email alerts.
+                Daily checks: announcement auto-archive, Stripe latency, mode drift detection, and owner email alerts.
               </CardDescription>
             </div>
           </div>
@@ -91,7 +163,9 @@ export function PlatformAgentCard() {
                     {format(new Date(latestLog.startedAt), "MMM d, yyyy 'at' h:mm a")}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+
+                {/* 4-column status grid: Stripe, Drift Check, Archived, Duration */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Stripe Status</p>
                     <StripeStatusBadge status={latestLog.stripeStatus} />
@@ -99,6 +173,10 @@ export function PlatformAgentCard() {
                       <p className="text-xs text-muted-foreground mt-1">{latestLog.stripeLatencyMs}ms</p>
                     )}
                   </div>
+
+                  {/* ── Last Drift Check ─────────────────────────────────── */}
+                  <DriftCheckRow log={latestLog} />
+
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Announcements Archived</p>
                     <p className="font-semibold">{latestLog.announcementsArchived ?? 0}</p>
@@ -112,6 +190,7 @@ export function PlatformAgentCard() {
                     </p>
                   </div>
                 </div>
+
                 {latestLog.errors && (
                   <div className="rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-2">
                     <p className="text-xs text-red-700 dark:text-red-400 font-medium mb-1">Errors</p>
@@ -142,6 +221,12 @@ export function PlatformAgentCard() {
                       </div>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
                         <StripeStatusBadge status={log.stripeStatus} />
+                        {/* Drift indicator in history row */}
+                        {log.driftMode === "live" && (
+                          (log.driftCount ?? 0) > 0
+                            ? <span className="flex items-center gap-0.5 text-red-500"><ShieldAlert className="h-3 w-3" />{log.driftCount} stale</span>
+                            : <span className="flex items-center gap-0.5 text-green-600"><ShieldCheck className="h-3 w-3" />drift OK</span>
+                        )}
                         {(log.announcementsArchived ?? 0) > 0 && (
                           <span>{log.announcementsArchived} archived</span>
                         )}

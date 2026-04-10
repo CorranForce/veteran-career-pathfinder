@@ -218,6 +218,13 @@
       "when": 1775414549494,
       "tag": "0030_many_silhouette",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "5",
+      "when": 1775838184611,
+      "tag": "0031_quick_enchantress",
+      "breakpoints": true
     }
   ]
 }
