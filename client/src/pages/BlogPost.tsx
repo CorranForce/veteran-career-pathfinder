@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Streamdown } from "streamdown";
 import { StructuredData } from "@/components/StructuredData";
+import { PostSEO } from "@/components/PostSEO";
 
 /** Estimate read time from content length (~200 wpm) */
 function estimateReadTime(content: string): string {
@@ -57,19 +58,32 @@ export default function BlogPost() {
   }
 
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://pathfinder.casa";
+  const postUrl = `${siteUrl}/blog/${post.slug}`;
+  const seoTitle = post.metaTitle ?? `${post.title} | Pathfinder`;
+  const seoDescription = post.metaDescription ?? post.excerpt;
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* SEO: BlogPosting structured data */}
+      {/* Per-post HTML meta tags: title, description, canonical, OG, Twitter Card */}
+      <PostSEO
+        title={seoTitle}
+        description={seoDescription}
+        url={postUrl}
+        image={post.coverImageUrl}
+        publishedAt={post.publishedAt}
+        authorName={post.authorName}
+      />
+
+      {/* SEO: BlogPosting structured data (JSON-LD) */}
       <StructuredData
         type="BlogPosting"
-        headline={post.metaTitle ?? post.title}
-        description={post.metaDescription ?? post.excerpt}
+        headline={seoTitle}
+        description={seoDescription}
         author={post.authorName}
         datePublished={post.publishedAt ? post.publishedAt.toISOString() : post.createdAt.toISOString()}
         dateModified={post.updatedAt.toISOString()}
         image={post.coverImageUrl ?? undefined}
-        url={`${siteUrl}/blog/${post.slug}`}
+        url={postUrl}
       />
 
       {/* Navigation */}

@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Calendar, Clock, ArrowRight, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,35 @@ function estimateReadTime(content: string): string {
 
 export default function Blog() {
   const { data: posts, isLoading, error } = trpc.blog.getPublished.useQuery({ limit: 50 });
+
+  // Set page-level SEO meta tags
+  useEffect(() => {
+    const prevTitle = document.title;
+    document.title = "Career Resources & Guides | Pathfinder";
+
+    const setMeta = (name: string, content: string) => {
+      let el = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute("name", name); document.head.appendChild(el); }
+      el.setAttribute("content", content);
+      return el;
+    };
+    const setOg = (property: string, content: string) => {
+      let el = document.querySelector<HTMLMetaElement>(`meta[property="${property}"]`);
+      if (!el) { el = document.createElement("meta"); el.setAttribute("property", property); document.head.appendChild(el); }
+      el.setAttribute("content", content);
+      return el;
+    };
+
+    const desc = setMeta("description", "Career guides, MOS translation tips, certification roadmaps, and transition strategies written specifically for military veterans entering the civilian workforce.");
+    const ogTitle = setOg("og:title", "Career Resources & Guides | Pathfinder");
+    const ogDesc = setOg("og:description", "Career guides, MOS translation tips, certification roadmaps, and transition strategies written specifically for military veterans.");
+    const ogType = setOg("og:type", "website");
+
+    return () => {
+      document.title = prevTitle;
+      [desc, ogTitle, ogDesc, ogType].forEach((el) => { if (el?.parentNode === document.head) document.head.removeChild(el); });
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">

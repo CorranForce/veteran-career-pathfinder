@@ -1558,3 +1558,12 @@
 - [x] Wire /blog public page to DB via trpc.blog.getPublished (replace static data)
 - [x] Add blog post detail page /blog/:slug pulling from DB
 - [x] Add inline feature chip editor to ProductManagementPage (click chip to edit in place, no modal)
+
+## Sprint: First Blog Post & SEO Meta Tags
+
+- [x] Write "Army 25U to IT Career: Complete Guide" blog post content
+- [x] Insert blog post into DB and publish it (slug: army-25u-to-it-career)
+- [x] Create PostSEO component (title, description, canonical, og:*, twitter:card, cleanup on unmount)
+- [x] Add per-post SEO meta tags to BlogPost page (title, meta description, og:title, og:description, og:image, og:url, twitter:card)
+- [x] Add canonical URL tag to BlogPost page
+- [x] Add SEO meta tags to Blog listing page
