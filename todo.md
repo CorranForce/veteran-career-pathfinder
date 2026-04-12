@@ -1552,3 +1552,9 @@
 - [x] Rename DB rows id=30002 and id=30003 to "Legacy – Do Not Restore (Pro)" and "Legacy – Do Not Restore (Premium)"
 - [x] Add "Last Drift Check" status row to PlatformAgentCard (timestamp + result of most recent drift scan)
 - [x] Verify Stripe Health Ping returns all green after product ID fix
+
+## Sprint: Blog DB Wiring & Inline Feature Editor
+
+- [x] Wire /blog public page to DB via trpc.blog.getPublished (replace static data)
+- [x] Add blog post detail page /blog/:slug pulling from DB
+- [x] Add inline feature chip editor to ProductManagementPage (click chip to edit in place, no modal)

@@ -1,11 +1,20 @@
 import { Link } from "wouter";
-import { blogPosts } from "@/data/blogPosts";
-import { Calendar, Clock, ArrowRight } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import { Calendar, Clock, ArrowRight, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+/** Estimate read time from content length (~200 wpm) */
+function estimateReadTime(content: string): string {
+  const words = content.trim().split(/\s+/).length;
+  const minutes = Math.max(1, Math.round(words / 200));
+  return `${minutes} min read`;
+}
+
 export default function Blog() {
+  const { data: posts, isLoading, error } = trpc.blog.getPublished.useQuery({ limit: 50 });
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navigation */}
@@ -39,39 +48,70 @@ export default function Blog() {
       </section>
 
       {/* Blog Posts Grid */}
-      <section className="py-20">
+      <section className="py-20 flex-1">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.map((post) => (
-              <Card key={post.slug} className="flex flex-col hover:shadow-lg transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 rounded-t-lg" />
-                <CardHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="secondary">{post.category}</Badge>
-                  </div>
-                  <CardTitle className="text-2xl">{post.title}</CardTitle>
-                  <CardDescription className="text-base">{post.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col justify-between">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>{new Date(post.publishDate).toLocaleDateString()}</span>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-24 text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin mr-3" />
+              <span>Loading articles…</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-24 text-muted-foreground">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-30" />
+              <p className="text-lg font-medium">Unable to load articles right now.</p>
+              <p className="text-sm mt-1">Please try again later.</p>
+            </div>
+          ) : !posts || posts.length === 0 ? (
+            <div className="text-center py-24 text-muted-foreground">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-30" />
+              <p className="text-lg font-medium">No articles published yet.</p>
+              <p className="text-sm mt-1">Check back soon — new career resources are on the way.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.map((post) => (
+                <Card key={post.slug} className="flex flex-col hover:shadow-lg transition-shadow">
+                  {/* Cover image or gradient placeholder */}
+                  {post.coverImageUrl ? (
+                    <div className="h-48 overflow-hidden rounded-t-lg">
+                      <img
+                        src={post.coverImageUrl}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{post.readTime}</span>
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 rounded-t-lg flex items-center justify-center">
+                      <BookOpen className="h-12 w-12 text-primary/40" />
                     </div>
-                  </div>
-                  <Link href={`/blog/${post.slug}`}>
-                    <Button className="w-full">
-                      Read Article <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="text-xl leading-snug">{post.title}</CardTitle>
+                    <CardDescription className="text-base line-clamp-3">{post.excerpt}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1 flex flex-col justify-between">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                      {post.publishedAt && (
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        <span>{estimateReadTime(post.content)}</span>
+                      </div>
+                    </div>
+                    <Link href={`/blog/${post.slug}`}>
+                      <Button className="w-full">
+                        Read Article <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -93,7 +133,7 @@ export default function Blog() {
       {/* Footer */}
       <footer className="py-12 border-t bg-muted/30">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2026 Pathfinder. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Pathfinder. All rights reserved.</p>
         </div>
       </footer>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +45,8 @@ import {
   Tag,
   X,
   TriangleAlert,
+  Save,
+  Loader2,
 } from "lucide-react";
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -730,6 +732,85 @@ function ProductCard({
   const features = parseFeatures(product.features);
   const isArchived = product.status === "archived";
 
+  // ── Inline feature editor state ──────────────────────────────────────────
+  const [editingFeatures, setEditingFeatures] = useState(false);
+  const [draftFeatures, setDraftFeatures] = useState<string[]>(features);
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const utils = trpc.useUtils();
+  const featurePatchMutation = trpc.stripeProducts.updateProduct.useMutation({
+    onSuccess: () => {
+      toast.success("Features saved");
+      utils.stripeProducts.listProducts.invalidate();
+      setEditingFeatures(false);
+      setEditingIdx(null);
+    },
+    onError: (err) => toast.error(`Failed to save features: ${err.message}`),
+  });
+
+  // Focus the input when editing starts
+  useEffect(() => {
+    if (editingIdx !== null) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [editingIdx]);
+
+  function startEditFeatures() {
+    setDraftFeatures(parseFeatures(product.features));
+    setEditingFeatures(true);
+    setEditingIdx(null);
+  }
+
+  function cancelEditFeatures() {
+    setEditingFeatures(false);
+    setEditingIdx(null);
+    setEditingText("");
+  }
+
+  function commitInlineEdit() {
+    if (editingIdx === null) return;
+    const trimmed = editingText.trim();
+    if (trimmed) {
+      const next = [...draftFeatures];
+      next[editingIdx] = trimmed;
+      setDraftFeatures(next);
+    }
+    setEditingIdx(null);
+    setEditingText("");
+  }
+
+  function startEditChip(idx: number) {
+    commitInlineEdit(); // commit any open edit first
+    setEditingIdx(idx);
+    setEditingText(draftFeatures[idx]);
+  }
+
+  function removeFeatureChip(idx: number) {
+    setDraftFeatures(draftFeatures.filter((_, i) => i !== idx));
+    if (editingIdx === idx) { setEditingIdx(null); setEditingText(""); }
+  }
+
+  function addFeatureChip() {
+    commitInlineEdit();
+    const newIdx = draftFeatures.length;
+    setDraftFeatures([...draftFeatures, ""]);
+    setEditingIdx(newIdx);
+    setEditingText("");
+  }
+
+  function saveFeatures() {
+    commitInlineEdit();
+    const cleaned = draftFeatures.filter((f) => f.trim().length > 0);
+    if (cleaned.length === 0) {
+      toast.error("Add at least one feature before saving");
+      return;
+    }
+    featurePatchMutation.mutate({ id: product.id, features: cleaned });
+  }
+
   return (
     <Card className={`border-2 ${isArchived ? "opacity-60" : ""}`}>
       <CardHeader className="pb-3">
@@ -776,20 +857,108 @@ function ProductCard({
           </div>
         )}
 
-        {/* Features */}
-        {features.length > 0 && (
-          <ul className="space-y-1">
-            {features.slice(0, 4).map((f, i) => (
-              <li key={i} className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
-                {f}
-              </li>
-            ))}
-            {features.length > 4 && (
-              <li className="text-xs text-muted-foreground pl-5">+{features.length - 4} more</li>
-            )}
-          </ul>
-        )}
+        {/* ── Features section ─────────────────────────────────────────────── */}
+        <div>
+          {!editingFeatures ? (
+            // ── Read-only view with "Edit Features" button ──────────────────
+            <div className="group">
+              {features.length > 0 ? (
+                <ul className="space-y-1 mb-2">
+                  {features.map((f, i) => (
+                    <li key={i} className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
+                      <span className="truncate">{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-muted-foreground italic mb-2">No features listed.</p>
+              )}
+              {!isArchived && (
+                <button
+                  onClick={startEditFeatures}
+                  className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                  title="Edit features inline"
+                >
+                  <Pencil className="h-3 w-3" /> Edit features
+                </button>
+              )}
+            </div>
+          ) : (
+            // ── Inline chip editor ──────────────────────────────────────────
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Features</p>
+              <div className="flex flex-wrap gap-1.5">
+                {draftFeatures.map((f, idx) =>
+                  editingIdx === idx ? (
+                    // Active edit input
+                    <div key={idx} className="flex items-center gap-1">
+                      <Input
+                        ref={inputRef}
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onBlur={commitInlineEdit}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") { e.preventDefault(); commitInlineEdit(); }
+                          if (e.key === "Escape") { setEditingIdx(null); setEditingText(""); }
+                        }}
+                        className="h-7 text-xs px-2 w-36"
+                        placeholder="Feature text…"
+                      />
+                    </div>
+                  ) : (
+                    // Chip — click to edit, × to remove
+                    <div
+                      key={idx}
+                      className="group/chip flex items-center gap-1 bg-muted rounded-full px-2.5 py-1 text-xs cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors"
+                      onClick={() => startEditChip(idx)}
+                      title="Click to edit"
+                    >
+                      <CheckCircle2 className="h-3 w-3 text-green-500 flex-shrink-0" />
+                      <span className="max-w-[120px] truncate">{f || <em className="opacity-50">empty</em>}</span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeFeatureChip(idx); }}
+                        className="ml-0.5 opacity-0 group-hover/chip:opacity-100 hover:text-destructive transition-opacity"
+                        title="Remove"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  )
+                )}
+                {/* Add chip button */}
+                <button
+                  onClick={addFeatureChip}
+                  className="flex items-center gap-1 border border-dashed border-muted-foreground/40 rounded-full px-2.5 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  <Plus className="h-3 w-3" /> Add
+                </button>
+              </div>
+              {/* Save / Cancel */}
+              <div className="flex gap-2 pt-1">
+                <Button
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={saveFeatures}
+                  disabled={featurePatchMutation.isPending}
+                >
+                  {featurePatchMutation.isPending
+                    ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Saving…</>
+                    : <><Save className="h-3 w-3 mr-1" /> Save features</>}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 text-xs"
+                  onClick={cancelEditFeatures}
+                  disabled={featurePatchMutation.isPending}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <Separator />
 
