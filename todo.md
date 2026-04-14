@@ -1576,3 +1576,7 @@
 - [ ] Add social sharing buttons to BlogPost page (LinkedIn, X/Twitter, copy link)
 - [ ] Add sitemap.xml generator endpoint (home, blog listing, all published posts)
 - [ ] Mark first blog post item in Phase 2 as complete
+
+## Sprint: robots.txt
+
+- [x] Add robots.txt to public directory with sitemap pointer and crawl rules
