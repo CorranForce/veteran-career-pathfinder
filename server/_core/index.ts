@@ -72,6 +72,12 @@ async function startServer() {
   app.use("/api/trpc/emailAuth.requestPasswordReset", passwordResetRateLimiter);
   app.use("/api/trpc/emailAuth.resetPassword", passwordResetRateLimiter);
 
+  // Sitemap (before tRPC so it's served as XML, not JSON)
+  app.get("/sitemap.xml", async (req, res) => {
+    const { handleSitemap } = await import("../sitemap");
+    return handleSitemap(req, res);
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

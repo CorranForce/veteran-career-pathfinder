@@ -58,11 +58,11 @@
 
 ### Blog Setup
 - [x] Create /blog route and layout
-- [ ] Write first blog post: "Army 25U to IT Career: Complete Guide"
-- [ ] Write second post: "AI Tools Every Veteran Should Use for Job Search"
+- [x] Write first blog post: "Army 25U to IT Career: Complete Guide"
+- [x] Write second post: "AI Tools Every Veteran Should Use for Job Search"
 - [ ] Write third post: "Caesar's Strategy Applied to Career Transitions"
-- [ ] Implement blog post SEO optimization
-- [ ] Add social sharing buttons
+- [x] Implement blog post SEO optimization (PostSEO component, og:*, twitter:card, canonical)
+- [x] Add social sharing buttons (LinkedIn, X/Twitter, Copy Link on BlogPost page)
 
 ### Video Integration
 - [ ] Embed YouTube video in hero section
@@ -119,6 +119,7 @@
 - [ ] Add schema markup (Organization, Article, FAQ)
 - [ ] Improve internal linking structure
 - [ ] Optimize images with alt text
+- [x] Add sitemap.xml generator endpoint (auto-includes all published blog posts)
 - [ ] Submit sitemap to Google Search Console
 - [ ] Create backlink strategy
 
@@ -1567,3 +1568,11 @@
 - [x] Add per-post SEO meta tags to BlogPost page (title, meta description, og:title, og:description, og:image, og:url, twitter:card)
 - [x] Add canonical URL tag to BlogPost page
 - [x] Add SEO meta tags to Blog listing page
+
+## Sprint: Second Blog Post, Social Sharing & Sitemap
+
+- [ ] Write "AI Tools Every Veteran Should Use for Job Search" blog post
+- [ ] Insert second blog post into DB and publish it
+- [ ] Add social sharing buttons to BlogPost page (LinkedIn, X/Twitter, copy link)
+- [ ] Add sitemap.xml generator endpoint (home, blog listing, all published posts)
+- [ ] Mark first blog post item in Phase 2 as complete

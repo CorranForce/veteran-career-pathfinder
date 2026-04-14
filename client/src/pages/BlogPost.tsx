@@ -1,6 +1,7 @@
 import { Link, useParams } from "wouter";
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { Calendar, Clock, ArrowLeft, User, Loader2, BookOpen } from "lucide-react";
+import { Calendar, Clock, ArrowLeft, User, Loader2, BookOpen, Share2, Linkedin, Twitter, Link2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Streamdown } from "streamdown";
@@ -148,6 +149,13 @@ export default function BlogPost() {
         </div>
       </article>
 
+      {/* Social Sharing */}
+      <section className="py-10 border-t">
+        <div className="container mx-auto max-w-4xl">
+          <SocialShare title={post.title} url={postUrl} />
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto text-center max-w-3xl">
@@ -192,6 +200,87 @@ export default function BlogPost() {
           <p>&copy; {new Date().getFullYear()} Pathfinder. All rights reserved.</p>
         </div>
       </footer>
+    </div>
+  );
+}
+
+/** Social sharing row — LinkedIn, X/Twitter, and copy-link */
+function SocialShare({ title, url }: { title: string; url: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const encodedUrl = encodeURIComponent(url);
+  const encodedTitle = encodeURIComponent(title);
+
+  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const el = document.createElement("textarea");
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <Share2 className="h-4 w-4" />
+        <span className="text-sm font-medium">Share this article</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <a
+          href={linkedInUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on LinkedIn"
+        >
+          <Button variant="outline" size="sm" className="gap-2">
+            <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+            LinkedIn
+          </Button>
+        </a>
+        <a
+          href={twitterUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Share on X (Twitter)"
+        >
+          <Button variant="outline" size="sm" className="gap-2">
+            <Twitter className="h-4 w-4" />
+            X / Twitter
+          </Button>
+        </a>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={handleCopy}
+          aria-label="Copy link to clipboard"
+        >
+          {copied ? (
+            <>
+              <Check className="h-4 w-4 text-green-500" />
+              Copied!
+            </>
+          ) : (
+            <>
+              <Link2 className="h-4 w-4" />
+              Copy Link
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   );
 }
