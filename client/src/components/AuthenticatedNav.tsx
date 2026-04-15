@@ -18,7 +18,8 @@ import {
   Settings,
   LogOut,
   User,
-  ChevronDown
+  ChevronDown,
+  Shield
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -45,6 +46,7 @@ export function AuthenticatedNav() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/tools", label: "Tools", icon: LayoutDashboard },
+    { href: "/mos-translator", label: "MOS Translator", icon: Shield },
     { href: "/templates", label: "Templates", icon: FileText },
     { href: "/downloads", label: "Downloads", icon: Download },
   ];

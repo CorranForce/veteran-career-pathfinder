@@ -1691,3 +1691,26 @@
 - [x] Move Google OAuth callback to server-side Express handler (server/googleOAuthCallback.ts) to fix SameSite/Cloudflare cookie-stripping issue
 - [ ] Verify Google Cloud Console has https://pathfinder.casa/auth/google/callback as an authorized redirect URI
 - [ ] Re-test Google login on pathfinder.casa after fix
+
+## Sprint: Fix Stuck Google OAuth & Interactive MOS Translator (Apr 15, 2026)
+
+### Google OAuth Fix
+- [x] Diagnose stuck Google OAuth — /auth/google/callback not under /api/ prefix, Cloudflare serves SPA instead of Express
+- [x] Move Google OAuth callback route to /api/auth/google/callback in index.ts
+- [x] Update redirect URI in googleAuth.ts and googleOAuthCallback.ts to /api/auth/google/callback
+- [x] Remove client-side GoogleCallback.tsx tRPC mutation (server now handles full flow)
+- [ ] Add https://pathfinder.casa/api/auth/google/callback to Google Cloud Console authorized redirect URIs (Allen action required)
+- [ ] Re-test Google login on pathfinder.casa after publishing
+
+### Interactive MOS Translator
+- [x] Deep research: 20+ MOS codes across Army, Navy, USMC, Air Force, Coast Guard
+- [x] Add mosCodes, mosCareerPaths, mosTranslatorSessions tables to schema
+- [x] Run db:push to create tables
+- [x] Seed 20 MOS codes and 51 civilian career paths
+- [x] Build server/routers/mosTranslator.ts (search, getByCode, getCareerPaths, logSession)
+- [x] Register mosTranslatorRouter in routers.ts
+- [x] Build client/src/pages/MOSTranslator.tsx (hero, search, branch filter, result cards, detail panel with career paths, salary, certifications, 30-day action plan)
+- [x] Register /mos-translator route in App.tsx
+- [x] Add MOS Translator to Home.tsx public nav
+- [x] Add MOS Translator to AuthenticatedNav (with Shield icon)
+- [x] All 241 tests pass, TypeScript 0 errors

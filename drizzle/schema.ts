@@ -638,3 +638,102 @@ export const platformAgentLogs = mysqlTable("platform_agent_logs", {
 
 export type PlatformAgentLog = typeof platformAgentLogs.$inferSelect;
 export type InsertPlatformAgentLog = typeof platformAgentLogs.$inferInsert;
+
+/**
+ * MOS Codes — master list of Military Occupational Specialties across all branches
+ */
+export const mosCodes = mysqlTable("mos_codes", {
+  id: int("id").autoincrement().primaryKey(),
+
+  // Identifier
+  code: varchar("code", { length: 20 }).notNull().unique(), // e.g. "25U", "11B", "IT", "3D1X2"
+  branch: mysqlEnum("branch", ["army", "navy", "air_force", "marine_corps", "coast_guard", "space_force"]).notNull(),
+
+  // Description
+  title: varchar("title", { length: 255 }).notNull(), // e.g. "Signal Support Systems Specialist"
+  description: text("description").notNull(),
+
+  // Categorization
+  category: varchar("category", { length: 100 }).notNull(), // e.g. "Technology", "Healthcare", "Combat", "Logistics"
+
+  // Key transferable skills (JSON array of strings)
+  keySkills: text("keySkills").notNull(),
+
+  // Civilian keywords for search
+  searchKeywords: text("searchKeywords"), // comma-separated keywords
+
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MosCode = typeof mosCodes.$inferSelect;
+export type InsertMosCode = typeof mosCodes.$inferInsert;
+
+
+/**
+ * Civilian Career Paths — each MOS maps to multiple civilian career options
+ */
+export const civilianCareerPaths = mysqlTable("civilian_career_paths", {
+  id: int("id").autoincrement().primaryKey(),
+
+  mosId: int("mosId").notNull(), // FK to mosCodes.id
+
+  // Career details
+  jobTitle: varchar("jobTitle", { length: 255 }).notNull(), // e.g. "Cybersecurity Analyst"
+  industry: varchar("industry", { length: 100 }).notNull(), // e.g. "Technology", "Healthcare"
+  description: text("description").notNull(),
+
+  // Salary data (in USD per year)
+  salaryMin: int("salaryMin").notNull(), // e.g. 70000
+  salaryMax: int("salaryMax").notNull(), // e.g. 140000
+  salaryMedian: int("salaryMedian"), // e.g. 105000
+
+  // Difficulty of transition (1=easy, 2=moderate, 3=requires significant retraining)
+  transitionDifficulty: mysqlEnum("transitionDifficulty", ["easy", "moderate", "challenging"]).notNull(),
+
+  // Time to first civilian job in this field (months)
+  timeToHireMonths: int("timeToHireMonths"),
+
+  // Required certifications (JSON array of strings)
+  requiredCerts: text("requiredCerts").notNull(), // e.g. ["CompTIA Security+", "CEH"]
+
+  // Recommended certifications (JSON array)
+  recommendedCerts: text("recommendedCerts"),
+
+  // Skills that transfer directly (JSON array)
+  transferableSkills: text("transferableSkills").notNull(),
+
+  // Skills gap (what they need to learn, JSON array)
+  skillsGap: text("skillsGap"),
+
+  // Example employers
+  exampleEmployers: text("exampleEmployers"), // JSON array
+
+  // Is this the top/recommended path for this MOS?
+  isTopPath: boolean("isTopPath").default(false).notNull(),
+
+  displayOrder: int("displayOrder").default(0).notNull(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CivilianCareerPath = typeof civilianCareerPaths.$inferSelect;
+export type InsertCivilianCareerPath = typeof civilianCareerPaths.$inferInsert;
+
+
+/**
+ * MOS Translator Sessions — tracks user searches for analytics
+ */
+export const mosTranslatorSessions = mysqlTable("mos_translator_sessions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"), // null for anonymous users
+  mosCode: varchar("mosCode", { length: 20 }).notNull(),
+  branch: varchar("branch", { length: 50 }),
+  ipHash: varchar("ipHash", { length: 64 }), // hashed IP for rate limiting
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type MosTranslatorSession = typeof mosTranslatorSessions.$inferSelect;
+export type InsertMosTranslatorSession = typeof mosTranslatorSessions.$inferInsert;

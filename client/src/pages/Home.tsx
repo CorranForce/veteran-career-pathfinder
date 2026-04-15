@@ -130,6 +130,9 @@ export default function Home() {
               <a href="/pricing">Pricing</a>
             </Button>
             <Button variant="ghost" asChild>
+              <a href="/mos-translator">MOS Translator</a>
+            </Button>
+            <Button variant="ghost" asChild>
               <a href="/blog">Blog</a>
             </Button>
             <Button variant="ghost" asChild>
