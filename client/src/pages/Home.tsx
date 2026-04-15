@@ -17,7 +17,10 @@ import {
   Compass,
   MapPin,
   HelpCircle,
-  Mail
+  Mail,
+  Bot,
+  Cpu,
+  Star,
 } from "lucide-react";
 import {
   Accordion,
@@ -35,6 +38,7 @@ import { StructuredData } from "@/components/StructuredData";
 import { AnnouncementsCard } from "@/components/AnnouncementsCard";
 import { LandingAnnouncementBanner } from "@/components/LandingAnnouncementBanner";
 import { ContentGate } from "@/components/ContentGate";
+import { AboutCreatorSection } from "./AboutCreatorSection";
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -720,6 +724,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* About the Creator Section */}
+      <AboutCreatorSection />
 
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">

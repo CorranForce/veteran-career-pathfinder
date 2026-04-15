@@ -31,6 +31,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import Unsubscribe from "./pages/Unsubscribe";
+import SubscriptionPreferences from "./pages/SubscriptionPreferences";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -66,6 +67,7 @@ function Router() {
       <Route path={"/terms"} component={TermsOfService} />
       <Route path={"/refund"} component={RefundPolicy} />
       <Route path={"/unsubscribe"} component={Unsubscribe} />
+      <Route path={"/subscription-preferences"} component={SubscriptionPreferences} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

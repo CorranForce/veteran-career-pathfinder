@@ -47,6 +47,7 @@ import {
   TriangleAlert,
   Save,
   Loader2,
+  Wrench,
 } from "lucide-react";
 
 // ─── types ───────────────────────────────────────────────────────────────────
@@ -549,6 +550,22 @@ export default function ProductManagementPage() {
     onError: (err) => toast.error(`Sync failed: ${err.message}`, { id: "sync" }),
   });
 
+  const repairMutation = trpc.stripeProducts.repairProducts.useMutation({
+    onMutate: () => toast.loading("Repairing Stripe product links…", { id: "repair" }),
+    onSuccess: (res) => {
+      if (res.repaired.length === 0) {
+        toast.success("All products are already valid — no repairs needed", { id: "repair" });
+      } else {
+        toast.success(
+          `Repaired ${res.repaired.length} product(s): ${res.repaired.map((r) => r.name).join(", ")}`,
+          { id: "repair" }
+        );
+      }
+      utils.stripeProducts.listProducts.invalidate();
+    },
+    onError: (err) => toast.error(`Repair failed: ${err.message}`, { id: "repair" }),
+  });
+
   const active = productList.filter((p) => p.status !== "archived");
   const archived = productList.filter((p) => p.status === "archived");
 
@@ -574,6 +591,19 @@ export default function ProductManagementPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => repairMutation.mutate()}
+            disabled={repairMutation.isPending}
+            title="Detect stale Stripe IDs and auto-create replacements"
+          >
+            {repairMutation.isPending ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Wrench className="h-4 w-4 mr-2" />
+            )}
+            Repair Products
+          </Button>
           <Button
             variant="outline"
             onClick={() => syncMutation.mutate()}

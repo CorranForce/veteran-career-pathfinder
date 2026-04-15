@@ -1621,3 +1621,31 @@
 - [x] Test unsubscribe — invalid token returns error
 - [x] Test updatePreferences — updates subscription preferences
 - [x] Run pnpm test and confirm all new tests pass (241/241 passing)
+
+## Sprint: About Creator, Subscription Prefs, CSV Export & Stripe Sync Fix (Apr 15, 2026)
+
+### Stripe Product Sync Fix
+- [x] Diagnose why products show as invalid in Stripe health check (stale price IDs in DB from different test session)
+- [x] Audit products table in DB vs actual Stripe products/prices (found correct IDs: prod_UBvtbI2nBreOWD / prod_UBvtObIRUeyxPZ)
+- [x] Add auto-repair logic: repairProducts adminProcedure — detects stale IDs, creates new prices in Stripe, updates DB
+- [x] Add "Repair Products" button in Product Management UI to trigger sync
+- [ ] Verify health check passes after repair (requires live Stripe test session)
+
+### About the Creator Section
+- [x] Add AboutCreator section component to Home.tsx (after FAQ, before CTA)
+- [x] Include photo placeholder, Army 25U background, RPA/AI expertise, mission statement
+- [ ] Add smooth scroll anchor from nav (optional)
+
+### Subscription Preferences Page
+- [x] Create SubscriptionPreferences.tsx at /subscription-preferences
+- [x] Load current preferences via trpc.blogSubscription.getMySubscription (by logged-in user email)
+- [x] Allow toggling new posts / features / bug fixes preferences
+- [x] Show current subscription status (active/unsubscribed/not subscribed)
+- [ ] Add link to this page from user account settings / profile (optional)
+- [x] Register /subscription-preferences route in App.tsx
+
+### CSV Export for Blog Email List
+- [x] Add blogSubscription.getAllSubscribers query to Admin.tsx
+- [x] Add handleExportBlogSubscribersCSV function with all preference columns
+- [x] Add Blog Subscribers card with table and Export CSV button to Admin.tsx
+- [x] TypeScript compiles cleanly (0 errors), all 241 tests pass

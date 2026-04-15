@@ -457,6 +457,108 @@ export const stripeProductsRouter = router({
   }),
 
   /**
+   * Repair Products: for each active DB product whose Stripe product or price ID
+   * is stale/missing, create a fresh Stripe product + price and update the DB.
+   *
+   * This is safe to run at any time — it only touches products that fail
+   * Stripe validation. Existing valid products are left untouched.
+   */
+  repairProducts: platformOwnerProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB unavailable" });
+
+    const allActive = await db
+      .select()
+      .from(products)
+      .where(eq(products.status, "active"));
+
+    const repaired: Array<{ id: number; name: string; newProductId: string; newPriceId: string }> = [];
+    const skipped: Array<{ id: number; name: string; reason: string }> = [];
+
+    for (const product of allActive) {
+      // Step 1: check if the Stripe product ID is still valid
+      let stripeProductId = product.stripeProductId;
+      let stripePriceId = product.stripePriceId;
+      let productValid = false;
+      let priceValid = false;
+
+      if (stripeProductId) {
+        try {
+          const sp = await stripe.products.retrieve(stripeProductId);
+          productValid = sp.active;
+        } catch {
+          productValid = false;
+        }
+      }
+
+      if (stripePriceId) {
+        try {
+          const sp = await stripe.prices.retrieve(stripePriceId);
+          priceValid = sp.active;
+        } catch {
+          priceValid = false;
+        }
+      }
+
+      // If both are valid, skip
+      if (productValid && priceValid) {
+        skipped.push({ id: product.id, name: product.name, reason: "already valid" });
+        continue;
+      }
+
+      try {
+        // Step 2: create a new Stripe product if needed
+        if (!productValid) {
+          const newStripeProduct = await stripe.products.create({
+            name: product.name,
+            description: product.description ?? undefined,
+            metadata: { source: "pathfinder_repair", db_product_id: String(product.id) },
+          });
+          stripeProductId = newStripeProduct.id;
+          priceValid = false; // must also create a new price under the new product
+        }
+
+        // Step 3: create a new Stripe price if needed
+        if (!priceValid) {
+          const priceData: Parameters<typeof stripe.prices.create>[0] = {
+            product: stripeProductId!,
+            unit_amount: product.price,
+            currency: product.currency,
+          };
+          if (product.isRecurring && product.billingInterval) {
+            priceData.recurring = {
+              interval: product.billingInterval as "month" | "year",
+            };
+          }
+          const newPrice = await stripe.prices.create(priceData);
+          stripePriceId = newPrice.id;
+        }
+
+        // Step 4: update DB with new IDs
+        await db
+          .update(products)
+          .set({ stripeProductId, stripePriceId })
+          .where(eq(products.id, product.id));
+
+        repaired.push({
+          id: product.id,
+          name: product.name,
+          newProductId: stripeProductId!,
+          newPriceId: stripePriceId!,
+        });
+      } catch (err: any) {
+        skipped.push({
+          id: product.id,
+          name: product.name,
+          reason: `repair failed: ${err?.message ?? "unknown error"}`,
+        });
+      }
+    }
+
+    return { repaired, skipped };
+  }),
+
+  /**
    * Count active subscribers (completed purchases with a stripeSubscriptionId) for a product.
    * Used to warn admins before switching a recurring product to one-time.
    */

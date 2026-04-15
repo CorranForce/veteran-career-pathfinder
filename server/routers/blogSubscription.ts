@@ -220,6 +220,38 @@ export const blogSubscriptionRouter = router({
     }),
 
   /**
+   * Get subscription status for the currently logged-in user (by their account email).
+   * Returns null if no subscription exists.
+   */
+  getMySubscription: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+
+      const userEmail = ctx.user.email;
+      if (!userEmail) return null;
+
+      const [subscriber] = await db
+        .select()
+        .from(blogSubscribers)
+        .where(eq(blogSubscribers.email, userEmail))
+        .limit(1);
+
+      if (!subscriber) return null;
+
+      return {
+        email: subscriber.email,
+        status: subscriber.status,
+        isVerified: subscriber.isVerified,
+        subscribeToNewPosts: subscriber.subscribeToNewPosts,
+        subscribeToFeatures: subscriber.subscribeToFeatures,
+        subscribeToBugFixes: subscriber.subscribeToBugFixes,
+        subscribedAt: subscriber.subscribedAt,
+        unsubscribeToken: subscriber.unsubscribeToken,
+      };
+    }),
+
+  /**
    * Get all subscribers (admin only)
    */
   getAllSubscribers: adminProcedure

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Download, Mail, TrendingUp, Users, Calendar, Loader2, ArrowLeft } from "lucide-react";
+import { Download, Mail, TrendingUp, Users, Calendar, Loader2, ArrowLeft, Rss } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ export default function Admin() {
   const { data: subscribers, isLoading: subsLoading } = trpc.email.getAll.useQuery();
   const { data: analytics, isLoading: analyticsLoading } = trpc.email.getAnalytics.useQuery();
   const { data: engagement, isLoading: engagementLoading } = trpc.email.getEngagement.useQuery();
+  const { data: blogSubscribers, isLoading: blogSubsLoading } = trpc.blogSubscription.getAllSubscribers.useQuery();
 
   const handleExportCSV = () => {
     if (!subscribers || subscribers.length === 0) {
@@ -50,7 +51,38 @@ export default function Admin() {
     toast.success("Subscriber list exported successfully!");
   };
 
-  if (authLoading || subsLoading || analyticsLoading || engagementLoading) {
+  const handleExportBlogSubscribersCSV = () => {
+    if (!blogSubscribers || blogSubscribers.length === 0) {
+      toast.error("No blog subscribers to export");
+      return;
+    }
+    const headers = ["Email", "Status", "Verified", "New Posts", "Features", "Bug Fixes", "Subscribed Date"];
+    const rows = blogSubscribers.map((sub) => [
+      sub.email,
+      sub.status,
+      sub.isVerified ? "Yes" : "No",
+      sub.subscribeToNewPosts ? "Yes" : "No",
+      sub.subscribeToFeatures ? "Yes" : "No",
+      sub.subscribeToBugFixes ? "Yes" : "No",
+      sub.subscribedAt ? new Date(sub.subscribedAt).toLocaleDateString() : "",
+    ]);
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `blog-subscribers-${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Blog subscriber list exported successfully!");
+  };
+
+  if (authLoading || subsLoading || analyticsLoading || engagementLoading || blogSubsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -264,6 +296,85 @@ export default function Admin() {
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {new Date(subscriber.createdAt).toLocaleDateString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Blog Subscriber List */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Rss className="h-5 w-5 text-primary" />
+                  Blog Subscribers
+                </CardTitle>
+                <CardDescription>
+                  {blogSubscribers?.length || 0} total blog newsletter subscribers
+                </CardDescription>
+              </div>
+              <Button onClick={handleExportBlogSubscribersCSV} disabled={!blogSubscribers || blogSubscribers.length === 0}>
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!blogSubscribers || blogSubscribers.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No blog subscribers yet. The subscription form on the landing page will populate this list.
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-x-auto">
+                <Table className="min-w-[700px]">
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Verified</TableHead>
+                      <TableHead>New Posts</TableHead>
+                      <TableHead>Features</TableHead>
+                      <TableHead>Bug Fixes</TableHead>
+                      <TableHead>Subscribed</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {blogSubscribers.map((sub) => (
+                      <TableRow key={sub.id}>
+                        <TableCell className="font-medium">{sub.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={sub.status === "active" ? "default" : "secondary"}>
+                            {sub.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={sub.isVerified ? "default" : "outline"}>
+                            {sub.isVerified ? "Verified" : "Pending"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={sub.subscribeToNewPosts ? "default" : "secondary"}>
+                            {sub.subscribeToNewPosts ? "Yes" : "No"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={sub.subscribeToFeatures ? "default" : "secondary"}>
+                            {sub.subscribeToFeatures ? "Yes" : "No"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={sub.subscribeToBugFixes ? "default" : "secondary"}>
+                            {sub.subscribeToBugFixes ? "Yes" : "No"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {sub.subscribedAt ? new Date(sub.subscribedAt).toLocaleDateString() : "-"}
                         </TableCell>
                       </TableRow>
                     ))}
