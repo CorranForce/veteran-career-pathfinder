@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageFooter } from "@/components/PageFooter";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 import {
   Search,
   ChevronRight,
@@ -23,6 +24,11 @@ import {
   Star,
   Zap,
   Shield,
+  Lock,
+  Sparkles,
+  Copy,
+  ExternalLink,
+  ArrowRight,
 } from "lucide-react";
 
 const BRANCH_OPTIONS = [
@@ -272,7 +278,7 @@ function CareerPathCard({ path, index }: { path: CareerPath; index: number }) {
 }
 
 export default function MOSTranslator() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [query, setQuery] = useState("");
   const [branch, setBranch] = useState("all");
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
@@ -298,6 +304,24 @@ export default function MOSTranslator() {
     { code: selectedCode!, userId: user?.id },
     { enabled: !!selectedCode, staleTime: 5 * 60 * 1000 }
   );
+
+  const { data: accessData } = trpc.payment.getAccessLevel.useQuery(
+    undefined,
+    { enabled: isAuthenticated }
+  );
+  const hasPremiumAccess = isAuthenticated && (accessData?.level === "premium" || accessData?.level === "pro");
+
+  // Build the pre-filled prompt for the selected MOS
+  const prefilledPrompt = useMemo(() => {
+    if (!mosDetail) return "";
+    const { mos } = mosDetail;
+    return `# AI Veteran Career Transition Strategist\n\nYou are an expert AI career advisor specializing in military-to-civilian career transitions.\n\n## My Military Background\n\n- **Branch of Service:** ${formatBranch(mos.branch)}\n- **MOS / Rating / AFSC:** ${mos.code} — ${mos.title}\n- **Rank (Current or Highest Held):** [Enter your rank]\n- **Years of Service:** [Enter years]\n- **Key Duties & Responsibilities:** ${mos.description}\n- **Key Achievements (Awards, eval bullets, major missions):** [Describe your top achievements]\n- **Civilian Interests:** [e.g., tech, management, security, healthcare]\n- **Location Preference:** [City/State or Remote]\n\n## Instructions\n\nBased on my ${mos.code} background, please provide:\n1. A plain-English translation of my military skills for civilian employers\n2. My top 3-4 civilian career paths with salary ranges and day-to-day descriptions\n3. An honest skills gap analysis (what I have vs. what I need)\n4. A specific 30-day action plan with weekly milestones to land my first civilian role\n\nFocus on actionable steps, not generic advice. Speak to me like a trusted advisor, not a recruiter.`;
+  }, [mosDetail]);
+
+  const handleCopyPrompt = () => {
+    navigator.clipboard.writeText(prefilledPrompt);
+    toast.success("Prompt copied! Paste it into ChatGPT or Claude to get your personalized analysis.");
+  };
 
   const showResults = debouncedQuery.length >= 1;
   const showDetail = !!selectedCode;
@@ -512,23 +536,121 @@ export default function MOSTranslator() {
                     )}
                   </div>
 
-                  {/* CTA */}
-                  <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/5 border border-primary/20 text-center space-y-4">
-                    <h3 className="text-xl font-bold">Ready to Build Your Transition Plan?</h3>
-                    <p className="text-muted-foreground max-w-xl mx-auto">
-                      Use the AI Career Advisor to get a personalized 30-day action plan, resume guidance,
-                      and interview prep tailored to your MOS and target career.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button size="lg" onClick={() => window.location.href = "/tools"}>
-                        Get My Action Plan
-                        <ChevronRight className="ml-2 h-4 w-4" />
-                      </Button>
-                      <Button size="lg" variant="outline" onClick={() => window.location.href = "/resume"}>
-                        Build My Resume
-                      </Button>
+                  {/* Get Full AI Analysis CTA */}
+                  {hasPremiumAccess ? (
+                    /* Premium/Pro: Show the pre-filled prompt ready to copy */
+                    <div className="rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/10 via-accent/5 to-primary/5 overflow-hidden">
+                      <div className="p-6 border-b border-primary/20">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="p-2 rounded-full bg-primary/20">
+                            <Sparkles className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold">Your {mosDetail?.mos.code} AI Analysis Prompt</h3>
+                            <p className="text-sm text-muted-foreground">Pre-filled with your MOS data — paste into ChatGPT or Claude</p>
+                          </div>
+                          <Badge className="ml-auto bg-primary/20 text-primary border-primary/30">
+                            <Star className="h-3 w-3 mr-1" /> Premium
+                          </Badge>
+                        </div>
+                        <div className="bg-background/60 rounded-xl border border-border/50 p-4 max-h-48 overflow-y-auto">
+                          <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono leading-relaxed">{prefilledPrompt}</pre>
+                        </div>
+                      </div>
+                      <div className="p-4 flex flex-col sm:flex-row gap-3">
+                        <Button size="lg" className="flex-1 gap-2" onClick={handleCopyPrompt}>
+                          <Copy className="h-4 w-4" />
+                          Copy Full Prompt
+                        </Button>
+                        <Button size="lg" variant="outline" className="flex-1 gap-2" asChild>
+                          <a href="https://chat.openai.com" target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                            Open ChatGPT
+                          </a>
+                        </Button>
+                        <Button size="lg" variant="outline" className="flex-1 gap-2" asChild>
+                          <a href="https://claude.ai" target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                            Open Claude
+                          </a>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    /* Free / unauthenticated: Locked premium CTA */
+                    <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 overflow-hidden">
+                      {/* Teaser — blurred prompt preview */}
+                      <div className="relative p-6 pb-0">
+                        <div className="bg-background/60 rounded-xl border border-border/50 p-4 max-h-32 overflow-hidden select-none pointer-events-none">
+                          <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-mono leading-relaxed opacity-60">{prefilledPrompt.slice(0, 400)}...</pre>
+                        </div>
+                        {/* Gradient fade */}
+                        <div className="absolute bottom-0 left-6 right-6 h-20 bg-gradient-to-t from-card/90 to-transparent rounded-b-xl" />
+                      </div>
+
+                      {/* Lock wall */}
+                      <div className="p-6 text-center space-y-4">
+                        <div className="flex justify-center">
+                          <div className="p-3 rounded-full bg-primary/10 border border-primary/20">
+                            <Lock className="h-6 w-6 text-primary" />
+                          </div>
+                        </div>
+                        <Badge className="bg-accent/20 text-accent-foreground border-accent/30 gap-1">
+                          <Sparkles className="h-3 w-3" /> Premium Feature
+                        </Badge>
+                        <h3 className="text-xl font-bold">Get Your {mosDetail?.mos.code} AI Analysis Prompt</h3>
+                        <p className="text-muted-foreground max-w-md mx-auto text-sm leading-relaxed">
+                          Unlock a pre-filled AI prompt customized for your {mosDetail?.mos.code} background — ready to paste into ChatGPT or Claude for a personalized 30-day career transition plan.
+                        </p>
+
+                        {/* Feature list */}
+                        <ul className="text-left space-y-2 max-w-sm mx-auto">
+                          {[
+                            `MOS ${mosDetail?.mos.code} pre-filled in the prompt`,
+                            "Civilian skills translation included",
+                            "30-day action plan framework",
+                            "Resume & LinkedIn optimization prompts",
+                            "Interview prep for your target roles",
+                          ].map((f) => (
+                            <li key={f} className="flex items-start gap-2 text-sm">
+                              <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                              <span>{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        {/* CTA buttons */}
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                          {!isAuthenticated ? (
+                            <>
+                              <Button size="lg" asChild>
+                                <Link href="/signup">
+                                  Create Free Account <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                              </Button>
+                              <Button size="lg" variant="outline" asChild>
+                                <Link href="/login">Sign In</Link>
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button size="lg" asChild>
+                                <Link href="/pricing">
+                                  Unlock for $29 <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                              </Button>
+                              <Button size="lg" variant="outline" asChild>
+                                <Link href="/pricing">View All Plans</Link>
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                        {isAuthenticated && (
+                          <p className="text-xs text-muted-foreground">One-time payment · Lifetime access · No subscription required</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-16">

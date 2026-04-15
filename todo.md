@@ -1714,3 +1714,11 @@
 - [x] Add MOS Translator to Home.tsx public nav
 - [x] Add MOS Translator to AuthenticatedNav (with Shield icon)
 - [x] All 241 tests pass, TypeScript 0 errors
+
+## Sprint: MOS Translator "Get Full AI Analysis" CTA (Apr 15, 2026)
+
+- [x] Add premium CTA card to the MOS detail panel (below career paths)
+- [x] CTA pre-fills the Pathfinder prompt with the selected MOS code/title
+- [x] Free users see locked teaser with blurred prompt preview + signup/upgrade CTA
+- [x] Premium/Pro users see full pre-filled prompt with Copy and Open ChatGPT/Claude buttons
+- [x] Toast notification on copy: "Prompt copied! Paste it into ChatGPT or Claude"
