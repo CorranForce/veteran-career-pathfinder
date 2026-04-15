@@ -42,7 +42,7 @@
 
 ### Basic Content
 - [ ] Write "About the Creator" section (your veteran story)
-- [ ] Create FAQ section
+- [x] Create FAQ section
 - [ ] Add privacy policy page
 - [ ] Add terms of service page
 - [ ] Create refund policy
@@ -116,7 +116,7 @@
 ### SEO Optimization
 - [ ] Conduct keyword research for veteran career terms
 - [ ] Optimize all page titles and meta descriptions
-- [x] Add schema markup (Organization, Article, FAQ)
+- [x] Add schema markup (Organization, Article, FAQ, FAQPage JSON-LD)
 - [ ] Improve internal linking structure
 - [ ] Optimize images with alt text
 - [x] Add sitemap.xml generator endpoint (auto-includes all published blog posts)
@@ -232,7 +232,7 @@
 - [x] Create success page (post-purchase)
 - [x] Add routes to App.tsx
 - [x] Update Home navigation to link to pricing
-- [ ] Implement "has purchased" checks to gate premium content
+- [x] Implement "has purchased" checks to gate premium content (ContentGate component wired in Home.tsx)
 - [ ] Test payment flow end-to-end
 - [ ] Configure Stripe products in dashboard
 - [ ] Test webhook delivery
@@ -710,10 +710,10 @@
 - [x] Create unified AuthenticatedNav component with consistent menu
 - [x] Apply AuthenticatedNav to Dashboard page
 - [x] Apply AuthenticatedNav to PlatformOwnerDashboard page
-- [ ] Apply AuthenticatedNav to AdminDashboard page
+- [x] Apply AuthenticatedNav to AdminDashboard page (uses DashboardLayout)
 - [x] Apply AuthenticatedNav to AdminTemplates page
 - [x] Apply AuthenticatedNav to ResumeTemplates page
-- [ ] Apply AuthenticatedNav to Pricing page when authenticated
+- [x] Apply AuthenticatedNav to Pricing page when authenticated (Pricing.tsx has auth-aware nav)
 - [x] Test navigation consistency across all pages
 - [x] Verify mobile responsiveness of navigation
 
@@ -915,10 +915,10 @@
 ### SEO Improvements
 - [x] Add "Blog" link to main navigation menu (Home, Pricing pages)
 - [x] Write 2 more SEO-optimized blog articles (5 total articles)
-- [ ] Enhance FAQ section with more questions and structured data
+- [x] Enhance FAQ section with more questions and structured data (6-question FAQ accordion + FAQPage JSON-LD added to Home.tsx)
 - [ ] Create case studies/success stories page
 - [ ] Improve internal linking between all pages
-- [ ] Add more Schema.org structured data (FAQPage, HowTo)
+- [x] Add more Schema.org structured data — FAQPage done; HowTo not yet implemented
 - [x] Update sitemap.xml with new blog article URLs
 - [ ] Add breadcrumb navigation for better SEO
 
@@ -1051,9 +1051,9 @@
 - [x] Implement edit product tier API
 - [x] Implement archive product (soft delete) API
 - [x] Implement disable/enable product API
-- [ ] Add product management UI in platform-owner dashboard
-- [ ] Update checkout flow to respect product status
-- [ ] Ensure Stripe product/price mapping integrity
+- [x] Add product management UI in platform-owner dashboard (/admin/products route with ProductManagementPage)
+- [x] Update checkout flow to respect product status (payment.ts queries only status='active' products)
+- [x] Ensure Stripe product/price mapping integrity (Stripe health card + drift detector validates this)
 - [ ] Test historical purchases remain intact
 
 ### 2. Stripe Purchase Logging
@@ -1218,7 +1218,7 @@
 - [x] Add Organization schema to homepage
 - [x] Add WebSite schema with search action to homepage
 - [ ] Add HowTo schema for guides/tutorials (when applicable)
-- [ ] Add FAQPage schema if FAQ section exists (when applicable)
+- [x] Add FAQPage schema if FAQ section exists (when applicable) — FAQPage JSON-LD added to Home.tsx
 - [ ] Validate structured data with Google Rich Results Test (user action)
 
 ## Dynamic Announcements System (Feb 19, 2026)
@@ -1246,7 +1246,7 @@
 - [x] Add save button with disabled state until changes are made
 - [x] Add success/error toast notifications
 - [x] Write vitest tests for profile APIs (17 tests, 15 passing)
-- [ ] Add profile link to navigation menu
+- [x] Add profile link to navigation menu (in Home.tsx authenticated nav + DashboardLayout user menu)
 - [x] Test profile page functionality end-to-end
 
 
@@ -1272,15 +1272,15 @@
 - [x] Research job search tactics and networking for veterans
 - [x] Compile research findings into comprehensive blog post
 - [x] Create blog post with actionable tips and resources
-- [ ] Add blog subscription database schema (email, subscribed_at, preferences)
-- [ ] Create subscription APIs (subscribe, unsubscribe, manage preferences)
-- [ ] Implement email notification system for new blog posts
-- [ ] Build subscription form component for blog pages
-- [ ] Add subscription confirmation email with double opt-in
-- [ ] Create unsubscribe functionality with one-click links
-- [ ] Integrate subscription with announcement system
-- [ ] Add subscription management page for users
-- [ ] Write vitest tests for subscription APIs
+- [x] Add blog subscription database schema (blogSubscribers table in drizzle/schema.ts)
+- [x] Create subscription APIs (subscribe, unsubscribe, updatePreferences, verifyEmail, getAllSubscribers, sendBlogUpdate procedures)
+- [x] Implement email notification system for new blog posts (sendBlogUpdateNotification in email.ts + sendBlogUpdate adminProcedure)
+- [x] Build subscription form component for blog pages (EmailCaptureForm component, used on Home.tsx FAQ section)
+- [x] Add subscription confirmation email with double opt-in (verifyEmail procedure + sendBlogSubscriptionVerification email)
+- [x] Create unsubscribe functionality with one-click links (unsubscribe procedure with token-based auth)
+- [x] Integrate subscription with announcement system (sendBlogUpdate procedure sends by type: newPost/feature/bugfix)
+- [ ] Add subscription management page for users (no /unsubscribe or /subscription-preferences route yet)
+- [ ] Write vitest tests for subscription APIs (no blogSubscription.test.ts file)
 - [ ] Test subscription flow end-to-end
 
 
@@ -1480,7 +1480,7 @@
 - [x] Add webhook last-delivery timestamp check to Stripe health check
 - [x] Add pagination (default 10) to Revenue Overview
 - [x] Update Stripe Health card footer to relative timestamp with exact-time tooltip
-- [ ] Switch Stripe to live mode (update STRIPE_SECRET_KEY and VITE_STRIPE_PUBLISHABLE_KEY to live keys)
+- [x] Switch Stripe to live mode (live keys configured in production at pathfinder.casa; sandbox uses test keys by design)
 - [x] Add 'Sync to Env' button in Pricing Management to auto-update STRIPE_PREMIUM_PRICE_ID and STRIPE_PRO_PRICE_ID
 - [x] Implement automatic Stripe test/live mode switching based on environment
 - [x] Move View Analysis and ReAnalyze buttons to new row in My Resumes card
@@ -1519,7 +1519,7 @@
 - [x] Register blog router in main app router
 - [x] Build BlogManagement card component in PlatformOwnerDashboard (list, create, edit, delete, publish/unpublish)
 - [x] Add pagination (5 per page) to blog post list in admin
-- [ ] Wire existing /blog page to pull posts from DB instead of static data
+- [x] Wire existing /blog page to pull posts from DB instead of static data (trpc.blog.getPublished)
 
 ### Announcement Enhancements
 - [x] Add `visibleOnLandingPage` boolean column to announcements table
@@ -1571,11 +1571,11 @@
 
 ## Sprint: Second Blog Post, Social Sharing & Sitemap
 
-- [ ] Write "AI Tools Every Veteran Should Use for Job Search" blog post
-- [ ] Insert second blog post into DB and publish it
-- [ ] Add social sharing buttons to BlogPost page (LinkedIn, X/Twitter, copy link)
-- [ ] Add sitemap.xml generator endpoint (home, blog listing, all published posts)
-- [ ] Mark first blog post item in Phase 2 as complete
+- [x] Write "AI Tools Every Veteran Should Use for Job Search" blog post
+- [x] Insert second blog post into DB and publish it (slug: ai-tools-veteran-job-search)
+- [x] Add social sharing buttons to BlogPost page (LinkedIn, X/Twitter, copy link)
+- [x] Add sitemap.xml generator endpoint (home, blog listing, all published posts)
+- [x] Mark first blog post item in Phase 2 as complete
 
 ## Sprint: robots.txt
 
