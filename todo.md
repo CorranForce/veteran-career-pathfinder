@@ -1651,3 +1651,13 @@
 - [x] Add handleExportBlogSubscribersCSV function with all preference columns
 - [x] Add Blog Subscribers card with table and Export CSV button to Admin.tsx
 - [x] TypeScript compiles cleanly (0 errors), all 241 tests pass
+
+## Sprint: Stripe Tier Fix (Apr 15, 2026)
+
+- [x] Diagnose why Pricing page shows "no active product assigned to Premium or Pro tier"
+- [x] Root cause: products id=1 (Pro) and id=2 (Premium) had status='archived' in DB; tier values were correct
+- [x] Root cause 2: checkStripeDrift in platformAgent.ts was auto-archiving products daily because live Stripe key couldn't find test-mode product IDs
+- [x] Fix: reactivate products id=1 and id=2 in DB (status='active', archivedAt=NULL)
+- [x] Fix: update checkStripeDrift to auto-repair (create new Stripe products/prices in current mode) instead of just archiving — breaks the archive loop
+- [x] TypeScript compiles cleanly (0 errors), 241/241 tests pass
+- [ ] Verify Pricing page displays correctly on pathfinder.casa after next deployment
