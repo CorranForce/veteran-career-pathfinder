@@ -1580,3 +1580,9 @@
 ## Sprint: robots.txt
 
 - [x] Add robots.txt to public directory with sitemap pointer and crawl rules
+
+## Sprint: FAQ Section
+
+- [x] Add collapsible FAQ section to landing page (6 questions: MOS, all branches, how to use, Premium, free trial, which AI)
+- [x] Add JSON-LD FAQPage schema markup for SEO (rich snippet eligible)
+- [x] Google Search Console sitemap submission confirmed by user

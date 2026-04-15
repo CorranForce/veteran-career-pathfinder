@@ -15,8 +15,15 @@ import {
   TrendingUp,
   Shield,
   Compass,
-  MapPin
+  MapPin,
+  HelpCircle
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import MobileNav from "@/components/MobileNav";
 import { NotificationBell } from "@/components/NotificationBell";
 import { getLoginUrl, getSignupUrl } from "@/const";
@@ -71,6 +78,36 @@ export default function Home() {
           target: 'https://vetcarepath-tzppwpga.manus.space/blog?q={search_term_string}',
           queryInput: 'required name=search_term_string',
         }}
+      />
+      {/* SEO: FAQPage structured data for rich snippets */}
+      <StructuredData
+        type="FAQPage"
+        items={[
+          {
+            question: "What is an MOS, and do I need to know mine?",
+            answer: "MOS stands for Military Occupational Specialty — it's the Army's code for your job role (e.g., 25U = Signal Support Systems Specialist, 11B = Infantryman). Every branch has an equivalent: the Navy uses NEC/Rating, the Air Force uses AFSC, the Marines use MOS, and the Coast Guard uses Rating. You don't need to know the exact code — just your job title and primary duties. Pathfinder understands all branch terminology and will translate your experience into civilian language regardless of how you describe it."
+          },
+          {
+            question: "Does Pathfinder work for all military branches?",
+            answer: "Yes — Pathfinder is designed for veterans and transitioning service members from all six branches: Army, Navy, Marine Corps, Air Force, Space Force, and Coast Guard. It also works for National Guard and Reserve members entering the civilian workforce. The AI understands branch-specific terminology, rank structures, and duty descriptions across all services."
+          },
+          {
+            question: "How do I use the Pathfinder prompt?",
+            answer: "It's a three-step process. First, copy the Pathfinder prompt from the section on the homepage. Second, open any AI assistant — ChatGPT, Claude, Gemini, or similar — and paste the prompt. Third, fill in your details where indicated: your branch, MOS/job title, rank, years of service, key duties, notable achievements, and what kind of work environment you prefer. The AI will respond with 3–4 concrete civilian career paths, a skills gap analysis, and a 30-day action plan tailored to your background."
+          },
+          {
+            question: "What's included in Premium, and is it worth it?",
+            answer: "The free tier gives you the core Pathfinder prompt — a powerful starting point. Pathfinder Premium adds the full suite of specialized prompts: a resume rewriter that converts military language to civilian bullet points, an interview prep module with likely questions for your target role, a LinkedIn profile optimizer, a salary negotiation script, and a networking outreach template for veteran-friendly employers."
+          },
+          {
+            question: "Is there a free trial or money-back guarantee?",
+            answer: "The core Pathfinder prompt is completely free — no credit card, no sign-up required. For Premium and Pro tiers, you can create a free account and explore the platform before upgrading. If you upgrade and feel the content doesn't deliver value, reach out within 7 days and we'll make it right."
+          },
+          {
+            question: "Which AI assistant should I use with the prompt?",
+            answer: "The Pathfinder prompt is designed to work with any major AI assistant. ChatGPT (GPT-4o) and Claude (Sonnet or Opus) tend to produce the most detailed career path analyses. Google Gemini and Microsoft Copilot also work well. The free tiers of ChatGPT and Claude are sufficient for the core prompt."
+          }
+        ]}
       />
       <ExitIntentPopup />
       <SimpleContactButton />
@@ -582,6 +619,80 @@ export default function Home() {
                 </a>
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center space-y-4 mb-12">
+              <div className="flex items-center justify-center gap-2">
+                <HelpCircle className="h-6 w-6 text-primary" />
+                <Badge className="bg-accent text-accent-foreground">FAQ</Badge>
+              </div>
+              <h2 className="text-4xl font-bold">Frequently Asked Questions</h2>
+              <p className="text-xl text-muted-foreground">
+                Everything you need to know before you start your transition
+              </p>
+            </div>
+
+            <Accordion type="single" collapsible className="space-y-2">
+              <AccordionItem value="mos" className="bg-card rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold text-lg py-5 hover:no-underline">
+                  What is an MOS, and do I need to know mine?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                  MOS stands for <strong>Military Occupational Specialty</strong> — it's the Army's code for your job role (e.g., 25U = Signal Support Systems Specialist, 11B = Infantryman). Every branch has an equivalent: the Navy uses NEC/Rating, the Air Force uses AFSC, the Marines use MOS, and the Coast Guard uses Rating. You don't need to know the exact code — just your job title and primary duties. Pathfinder understands all branch terminology and will translate your experience into civilian language regardless of how you describe it.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="branches" className="bg-card rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold text-lg py-5 hover:no-underline">
+                  Does Pathfinder work for all military branches?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                  Yes — Pathfinder is designed for veterans and transitioning service members from <strong>all six branches</strong>: Army, Navy, Marine Corps, Air Force, Space Force, and Coast Guard. It also works for National Guard and Reserve members entering the civilian workforce. The AI understands branch-specific terminology, rank structures, and duty descriptions across all services, so you can describe your background in whatever terms feel natural.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="how-to-use" className="bg-card rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold text-lg py-5 hover:no-underline">
+                  How do I use the Pathfinder prompt?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                  It's a three-step process. First, copy the Pathfinder prompt from the section below. Second, open any AI assistant — ChatGPT, Claude, Gemini, or similar — and paste the prompt. Third, fill in your details where indicated: your branch, MOS/job title, rank, years of service, key duties, notable achievements, and what kind of work environment you prefer. The AI will respond with 3–4 concrete civilian career paths, a skills gap analysis, and a 30-day action plan tailored to your background. No account required for the free prompt.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="premium" className="bg-card rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold text-lg py-5 hover:no-underline">
+                  What's included in Premium, and is it worth it?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                  The free tier gives you the core Pathfinder prompt — a powerful starting point. <strong>Pathfinder Premium</strong> adds the full suite of specialized prompts: a resume rewriter that converts military language to civilian bullet points, an interview prep module with likely questions for your target role, a LinkedIn profile optimizer, a salary negotiation script, and a networking outreach template for veteran-friendly employers. If you're serious about landing a role in the next 90 days, Premium pays for itself in the first interview. You can explore all tiers on the <a href="/pricing" className="text-primary underline underline-offset-2 hover:opacity-80">Pricing page</a>.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="free-trial" className="bg-card rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold text-lg py-5 hover:no-underline">
+                  Is there a free trial or money-back guarantee?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                  The core Pathfinder prompt is completely free — no credit card, no sign-up required. For Premium and Pro tiers, you can create a free account and explore the platform before upgrading. If you upgrade and feel the content doesn't deliver value, reach out within 7 days and we'll make it right. Veterans have given enough — we're not in the business of adding financial stress to your transition.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="ai-assistant" className="bg-card rounded-lg border px-6">
+                <AccordionTrigger className="text-left font-semibold text-lg py-5 hover:no-underline">
+                  Which AI assistant should I use with the prompt?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                  The Pathfinder prompt is designed to work with any major AI assistant. <strong>ChatGPT (GPT-4o)</strong> and <strong>Claude (Sonnet or Opus)</strong> tend to produce the most detailed career path analyses. Google Gemini and Microsoft Copilot also work well. The free tiers of ChatGPT and Claude are sufficient for the core prompt — you don't need a paid AI subscription to get value from Pathfinder.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </div>
         </div>
       </section>
