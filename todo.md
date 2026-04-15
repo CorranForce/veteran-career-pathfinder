@@ -1688,5 +1688,6 @@
 ## Sprint: Fix Google OAuth on pathfinder.casa (Apr 15, 2026)
 
 - [x] Set FRONTEND_URL env var to https://pathfinder.casa so Google OAuth redirect URI resolves correctly
+- [x] Move Google OAuth callback to server-side Express handler (server/googleOAuthCallback.ts) to fix SameSite/Cloudflare cookie-stripping issue
 - [ ] Verify Google Cloud Console has https://pathfinder.casa/auth/google/callback as an authorized redirect URI
 - [ ] Re-test Google login on pathfinder.casa after fix

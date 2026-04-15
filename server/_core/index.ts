@@ -78,6 +78,14 @@ async function startServer() {
     return handleSitemap(req, res);
   });
 
+  // Server-side Google OAuth callback — handles the redirect from Google directly
+  // so the session cookie is set in a first-party navigation response (not a
+  // client-side fetch), which avoids SameSite / Cloudflare cookie-stripping issues.
+  app.get("/auth/google/callback", async (req, res) => {
+    const { handleGoogleOAuthCallback } = await import("../googleOAuthCallback");
+    return handleGoogleOAuthCallback(req, res);
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
