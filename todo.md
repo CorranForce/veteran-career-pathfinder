@@ -1592,3 +1592,32 @@
 - [x] Add "FAQ" anchor link to desktop and mobile nav (href="#faq" desktop, href="/#faq" mobile)
 - [x] Add id="faq" to the FAQ section element
 - [x] Add email capture CTA below the FAQ accordion ("Still have questions? Join our newsletter") using existing EmailCaptureForm with source="faq-section"
+
+## Sprint: Legal Pages, Unsubscribe Page & Blog Subscription Tests (Apr 15, 2026)
+
+### Legal Pages (Privacy, Terms, Refund)
+- [x] Create PrivacyPolicy.tsx page at /privacy
+- [x] Create TermsOfService.tsx page at /terms
+- [x] Create RefundPolicy.tsx page at /refund
+- [x] Register all three routes in App.tsx
+- [x] Add legal footer links to Home.tsx footer
+- [x] Add legal footer links to Pricing.tsx footer (already existed)
+
+### Blog Unsubscribe Confirmation Page
+- [x] Create Unsubscribe.tsx page at /unsubscribe (reads ?token= from URL)
+- [x] Wire trpc.blogSubscription.unsubscribe mutation on page load
+- [x] Show success/error state with clear messaging and link back to home
+- [x] Register /unsubscribe route in App.tsx
+
+### Blog Subscription Vitest Tests
+- [x] Create server/routers/blogSubscription.test.ts
+- [x] Test subscribe — new email creates subscriber with pending status
+- [x] Test subscribe — duplicate active email returns already-subscribed error
+- [x] Test subscribe — previously unsubscribed email reactivates subscription
+- [x] Test verifyEmail — valid token verifies subscriber
+- [x] Test verifyEmail — invalid token returns error
+- [x] Test verifyEmail — expired token returns error
+- [x] Test unsubscribe — valid token marks subscriber as unsubscribed
+- [x] Test unsubscribe — invalid token returns error
+- [x] Test updatePreferences — updates subscription preferences
+- [x] Run pnpm test and confirm all new tests pass (241/241 passing)
