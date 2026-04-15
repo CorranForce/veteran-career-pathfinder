@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert, Bell } from "lucide-react";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
+import { Link } from "wouter";
 
 
 export default function AccountSettings() {
@@ -306,6 +307,30 @@ export default function AccountSettings() {
         </CardContent>
       </Card>
       <NotificationPreferences />
+
+      {/* Email newsletter preferences */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <Bell className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Email Newsletter Preferences</h3>
+                <p className="text-sm text-muted-foreground">
+                  Choose which Pathfinder email updates you receive
+                </p>
+              </div>
+            </div>
+            <Link href="/subscription-preferences">
+              <Button variant="outline" size="sm" className="bg-background">
+                Manage Preferences
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

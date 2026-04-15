@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Shield, Bot, Cpu, CheckCircle2, Star } from "lucide-react";
+import { Shield, Bot, Cpu, CheckCircle2, Star, Linkedin, Youtube } from "lucide-react";
 
 export function AboutCreatorSection() {
   const credentials = [
@@ -103,6 +104,40 @@ export function AboutCreatorSection() {
                   — Allen, Founder of Pathfinder
                 </footer>
               </blockquote>
+
+              {/* Social links */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="gap-2 bg-background"
+                >
+                  <a
+                    href="https://www.linkedin.com/in/allen-p-davis-jr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="h-4 w-4 text-[#0A66C2]" />
+                    LinkedIn
+                  </a>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="gap-2 bg-background"
+                >
+                  <a
+                    href="https://www.youtube.com/@AllenDavis-AI"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Youtube className="h-4 w-4 text-[#FF0000]" />
+                    YouTube
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

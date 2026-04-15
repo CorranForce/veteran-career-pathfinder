@@ -1661,3 +1661,9 @@
 - [x] Fix: update checkStripeDrift to auto-repair (create new Stripe products/prices in current mode) instead of just archiving — breaks the archive loop
 - [x] TypeScript compiles cleanly (0 errors), 241/241 tests pass
 - [ ] Verify Pricing page displays correctly on pathfinder.casa after next deployment
+
+## Sprint: Social Links & Email Preferences Nav (Apr 15, 2026)
+
+- [x] Add LinkedIn button (https://www.linkedin.com/in/allen-p-davis-jr) to AboutCreatorSection.tsx
+- [x] Add YouTube button (https://www.youtube.com/@AllenDavis-AI) to AboutCreatorSection.tsx
+- [x] Add "Manage Email Preferences" card with link to /subscription-preferences in Account Settings page
