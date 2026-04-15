@@ -116,11 +116,11 @@
 ### SEO Optimization
 - [ ] Conduct keyword research for veteran career terms
 - [ ] Optimize all page titles and meta descriptions
-- [ ] Add schema markup (Organization, Article, FAQ)
+- [x] Add schema markup (Organization, Article, FAQ)
 - [ ] Improve internal linking structure
 - [ ] Optimize images with alt text
 - [x] Add sitemap.xml generator endpoint (auto-includes all published blog posts)
-- [ ] Submit sitemap to Google Search Console
+- [x] Submit sitemap to Google Search Console (confirmed by user Apr 14 2026)
 - [ ] Create backlink strategy
 
 ### Referral Program
@@ -1586,3 +1586,9 @@
 - [x] Add collapsible FAQ section to landing page (6 questions: MOS, all branches, how to use, Premium, free trial, which AI)
 - [x] Add JSON-LD FAQPage schema markup for SEO (rich snippet eligible)
 - [x] Google Search Console sitemap submission confirmed by user
+
+## Sprint: FAQ Nav Link & Email CTA
+
+- [x] Add "FAQ" anchor link to desktop and mobile nav (href="#faq" desktop, href="/#faq" mobile)
+- [x] Add id="faq" to the FAQ section element
+- [x] Add email capture CTA below the FAQ accordion ("Still have questions? Join our newsletter") using existing EmailCaptureForm with source="faq-section"

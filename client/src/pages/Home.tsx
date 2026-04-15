@@ -16,7 +16,8 @@ import {
   Shield,
   Compass,
   MapPin,
-  HelpCircle
+  HelpCircle,
+  Mail
 } from "lucide-react";
 import {
   Accordion,
@@ -126,6 +127,9 @@ export default function Home() {
             </Button>
             <Button variant="ghost" asChild>
               <a href="/blog">Blog</a>
+            </Button>
+            <Button variant="ghost" asChild>
+              <a href="#faq">FAQ</a>
             </Button>
             {isAuthenticated ? (
               <>
@@ -624,7 +628,7 @@ export default function Home() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-muted/30">
+      <section id="faq" className="py-20 bg-muted/30">
         <div className="container mx-auto">
           <div className="max-w-3xl mx-auto">
             <div className="text-center space-y-4 mb-12">
@@ -693,6 +697,26 @@ export default function Home() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
+
+            {/* Email capture CTA below FAQ */}
+            <div className="mt-10 rounded-xl border bg-card p-6 text-center space-y-4 shadow-sm">
+              <div className="flex items-center justify-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                <p className="font-semibold text-lg">Still have questions?</p>
+              </div>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Join our newsletter for weekly transition tips, new prompt releases, and veteran career resources — delivered straight to your inbox.
+              </p>
+              <div className="max-w-md mx-auto">
+                <EmailCaptureForm
+                  source="faq-section"
+                  placeholder="Enter your military email or personal email"
+                  buttonText="Join the Newsletter"
+                  compact
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">No spam. Unsubscribe anytime. We respect your service and your inbox.</p>
+            </div>
           </div>
         </div>
       </section>
