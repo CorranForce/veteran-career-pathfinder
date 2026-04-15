@@ -1629,11 +1629,13 @@
 - [x] Audit products table in DB vs actual Stripe products/prices (found correct IDs: prod_UBvtbI2nBreOWD / prod_UBvtObIRUeyxPZ)
 - [x] Add auto-repair logic: repairProducts adminProcedure — detects stale IDs, creates new prices in Stripe, updates DB
 - [x] Add "Repair Products" button in Product Management UI to trigger sync
-- [ ] Verify health check passes after repair (requires live Stripe test session)
+- [x] Reactivate Pro and Premium products in DB (status was incorrectly set to archived; both now active with valid Stripe IDs)
+- [ ] Verify health check passes after repair (requires authenticated browser session on pathfinder.casa)
 
 ### About the Creator Section
 - [x] Add AboutCreator section component to Home.tsx (after FAQ, before CTA)
 - [x] Include photo placeholder, Army 25U background, RPA/AI expertise, mission statement
+- [x] Replace placeholder with Allen's actual headshot photo (CDN uploaded)
 - [ ] Add smooth scroll anchor from nav (optional)
 
 ### Subscription Preferences Page

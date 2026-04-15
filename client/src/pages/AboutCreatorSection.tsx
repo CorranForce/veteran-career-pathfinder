@@ -23,13 +23,14 @@ export function AboutCreatorSection() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Photo + credential cards column */}
             <div className="flex flex-col items-center lg:items-start gap-6">
-              {/* Avatar placeholder */}
+              {/* Headshot */}
               <div className="relative">
-                <div className="w-52 h-52 rounded-2xl bg-gradient-to-br from-primary/20 via-accent/20 to-secondary/30 flex items-center justify-center shadow-xl border-2 border-primary/20 overflow-hidden">
-                  <div className="flex flex-col items-center gap-2 text-primary/60">
-                    <Shield className="h-24 w-24" />
-                    <span className="text-xs font-medium uppercase tracking-wider">U.S. Army</span>
-                  </div>
+                <div className="w-52 h-52 rounded-2xl shadow-xl border-2 border-primary/20 overflow-hidden">
+                  <img
+                    src="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/allen-headshot_1663b33b.jpg"
+                    alt="Allen — Founder of Pathfinder, U.S. Army Veteran"
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
                 <div className="absolute -bottom-3 -right-3 bg-primary text-primary-foreground rounded-full px-3 py-1 text-xs font-bold shadow">
                   Veteran
