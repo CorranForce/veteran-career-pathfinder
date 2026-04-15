@@ -1684,3 +1684,9 @@
 - [x] Pricing page must read price/name/description from DB products (via trpc) not hardcoded values
 - [x] Checkout session must use the DB product's stripePrice ID (not env var price IDs)
 - [ ] Verify Active Products on /admin/products shows the same prices as /pricing (verify after next deployment)
+
+## Sprint: Fix Google OAuth on pathfinder.casa (Apr 15, 2026)
+
+- [x] Set FRONTEND_URL env var to https://pathfinder.casa so Google OAuth redirect URI resolves correctly
+- [ ] Verify Google Cloud Console has https://pathfinder.casa/auth/google/callback as an authorized redirect URI
+- [ ] Re-test Google login on pathfinder.casa after fix
