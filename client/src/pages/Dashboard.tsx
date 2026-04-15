@@ -1,3 +1,4 @@
+import { PageFooter } from "@/components/PageFooter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AuthenticatedNav } from "@/components/AuthenticatedNav";
 import { trpc } from "@/lib/trpc";
@@ -358,6 +359,7 @@ export default function Dashboard() {
           <ResumeList />
         </div>
       </div>
+      <PageFooter />
     </div>
   );
 }

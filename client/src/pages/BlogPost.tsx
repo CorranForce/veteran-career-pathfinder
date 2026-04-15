@@ -1,3 +1,4 @@
+import { PageFooter } from "@/components/PageFooter";
 import { Link, useParams } from "wouter";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
@@ -194,12 +195,7 @@ export default function BlogPost() {
         </section>
       )}
 
-      {/* Footer */}
-      <footer className="py-12 border-t">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Pathfinder. All rights reserved.</p>
-        </div>
-      </footer>
+      <PageFooter />
     </div>
   );
 }

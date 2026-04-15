@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { PageFooter } from "@/components/PageFooter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -578,7 +580,9 @@ export default function ProductManagementPage() {
   const showTierWarning = !isLoading && missingTiers.length > 0;
 
   return (
-    <div className="container max-w-5xl py-8 space-y-8">
+    <div className="min-h-screen flex flex-col">
+      <AuthenticatedNav />
+      <div className="container max-w-5xl py-8 space-y-8 flex-1">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -742,6 +746,8 @@ export default function ProductManagementPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
+      <PageFooter />
     </div>
   );
 }

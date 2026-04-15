@@ -1667,3 +1667,20 @@
 - [x] Add LinkedIn button (https://www.linkedin.com/in/allen-p-davis-jr) to AboutCreatorSection.tsx
 - [x] Add YouTube button (https://www.youtube.com/@AllenDavis-AI) to AboutCreatorSection.tsx
 - [x] Add "Manage Email Preferences" card with link to /subscription-preferences in Account Settings page
+
+## Sprint: Nav/Footer Coverage & Pricing Master Fix (Apr 15, 2026)
+
+### Nav & Footer on All Pages
+- [x] Audit all routes in App.tsx to identify pages missing nav/footer
+- [x] Add nav+footer to /admin/products (ProductManagementPage)
+- [x] Add nav+footer to /admin/analytics (AdminDashboard)
+- [x] Add nav+footer to /admin/templates (AdminTemplates)
+- [x] Add nav+footer to /privacy, /terms, /refund (legal pages)
+- [x] Add nav+footer to /unsubscribe page
+- [x] Add nav+footer to /subscription-preferences page
+- [x] Verify all other pages (Blog, BlogPost, Pricing, Profile, AccountSettings, etc.) have consistent nav+footer — PageFooter added to AccountSettings, Blog, BlogPost, Dashboard, Downloads, Profile, ProfileEdit, Success
+
+### Pricing Management as Master Source
+- [x] Pricing page must read price/name/description from DB products (via trpc) not hardcoded values
+- [x] Checkout session must use the DB product's stripePrice ID (not env var price IDs)
+- [ ] Verify Active Products on /admin/products shows the same prices as /pricing (verify after next deployment)

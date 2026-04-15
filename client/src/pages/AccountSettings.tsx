@@ -1,3 +1,4 @@
+import { PageFooter } from "@/components/PageFooter";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -331,6 +332,7 @@ export default function AccountSettings() {
           </div>
         </CardContent>
       </Card>
+      <PageFooter />
     </div>
   );
 }

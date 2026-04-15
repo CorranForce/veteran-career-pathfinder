@@ -1,3 +1,4 @@
+import { PageFooter } from "@/components/PageFooter";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AuthenticatedNav } from "@/components/AuthenticatedNav";
@@ -768,6 +769,7 @@ export default function Profile() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <PageFooter />
     </div>
   );
 }

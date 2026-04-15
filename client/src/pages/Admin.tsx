@@ -7,6 +7,8 @@ import { trpc } from "@/lib/trpc";
 import { Download, Mail, TrendingUp, Users, Calendar, Loader2, ArrowLeft, Rss } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { PageFooter } from "@/components/PageFooter";
 
 export default function Admin() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -104,7 +106,8 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
+      <AuthenticatedNav />
       {/* Header */}
       <header className="border-b bg-card">
         <div className="container mx-auto py-4 px-4">
@@ -385,6 +388,7 @@ export default function Admin() {
           </CardContent>
         </Card>
       </main>
+      <PageFooter />
     </div>
   );
 }

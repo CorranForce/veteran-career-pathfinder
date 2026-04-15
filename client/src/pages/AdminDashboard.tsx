@@ -5,6 +5,8 @@ import { Loader2, Users, FileText, TrendingUp, Award, Activity, BarChart3 } from
 import { useLocation } from "wouter";
 import { useEffect } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { PageFooter } from "@/components/PageFooter";
 
 export default function AdminDashboard() {
   const { user, loading: authLoading, isAuthenticated } = useAuth();
@@ -38,7 +40,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
+      <AuthenticatedNav />
       {/* Header */}
       <div className="border-b bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto py-6">
@@ -194,6 +197,7 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+      <PageFooter />
     </div>
   );
 }

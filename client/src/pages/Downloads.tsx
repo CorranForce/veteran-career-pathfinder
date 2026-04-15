@@ -1,3 +1,4 @@
+import { PageFooter } from "@/components/PageFooter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -188,6 +189,7 @@ export default function Downloads() {
           </div>
         </div>
       </main>
+      <PageFooter />
     </div>
   );
 }

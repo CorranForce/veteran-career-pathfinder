@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mail, Target, TrendingUp, Users } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
+import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { PageFooter } from "@/components/PageFooter";
 
 export default function Marketing() {
   const { user } = useAuth();
@@ -25,7 +27,9 @@ export default function Marketing() {
   const { data: upsellCandidates } = trpc.marketing.getUpsellCandidates.useQuery();
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-6">
+    <div className="min-h-screen flex flex-col bg-background">
+      <AuthenticatedNav />
+      <div className="flex-1 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -270,6 +274,8 @@ export default function Marketing() {
           </Card>
         </div>
       </div>
+      </div>
+      <PageFooter />
     </div>
   );
 }

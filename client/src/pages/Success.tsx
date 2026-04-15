@@ -1,3 +1,4 @@
+import { PageFooter } from "@/components/PageFooter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Download, ArrowRight, Shield, FlaskConical } from "lucide-react";
@@ -126,14 +127,7 @@ export default function Success() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 border-t bg-card">
-        <div className="container mx-auto text-center">
-          <p className="text-sm text-muted-foreground">
-            © 2025 Pathfinder. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <PageFooter />
     </div>
   );
 }

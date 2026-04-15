@@ -1,5 +1,6 @@
 import { trpc } from "@/lib/trpc";
 import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { PageFooter } from "@/components/PageFooter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +37,7 @@ export default function ResumeTemplates() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       {isAuthenticated ? <AuthenticatedNav /> : (
         <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto flex items-center justify-between h-16 px-4">
@@ -169,6 +170,7 @@ export default function ResumeTemplates() {
           </Button>
         </div>
       </section>
+      <PageFooter />
     </div>
   );
 }

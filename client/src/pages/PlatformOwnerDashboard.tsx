@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AuthenticatedNav } from "@/components/AuthenticatedNav";
+import { PageFooter } from "@/components/PageFooter";
 import { AdminActivityLog } from "@/components/AdminActivityLog";
 import { AnnouncementManagement } from "@/components/AnnouncementManagement";
 import { trpc } from "@/lib/trpc";
@@ -238,7 +239,7 @@ export default function PlatformOwnerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <AuthenticatedNav />
       
       {/* Page Header */}
@@ -886,6 +887,7 @@ export default function PlatformOwnerDashboard() {
           <PlatformAgentCard />
         </div>
       </div>
+      <PageFooter />
     </div>
   );
 }
