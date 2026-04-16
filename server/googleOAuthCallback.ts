@@ -121,6 +121,11 @@ export async function handleGoogleOAuthCallback(req: Request, res: Response) {
     });
 
     // Redirect to the intended destination
+    // The client stores the intended path in sessionStorage under 'loginNext'.
+    // For server-side Google OAuth we can't read sessionStorage, but we can
+    // pass the next path via the OAuth state param (set by the client when
+    // initiating the flow). For now, default to /tools — the client-side
+    // Login page handles the ?next= redirect for email/password logins.
     const nextPath = "/tools";
     return res.redirect(`${frontendUrl}${nextPath}`);
   } catch (err: any) {

@@ -1751,3 +1751,16 @@
 - [x] Fix getSubscriptionStatus to return planName "Platform Owner (Full Access)" for platform_owner
 - [x] Hide welcome modal and upgrade CTAs for platform_owner (AuthenticatedWelcomeGate + SubscriptionStatusCard)
 - [x] 241/241 tests pass, TypeScript 0 errors, checkpoint saved
+
+## Sprint: Checkout Fix & Pricing Audit (Apr 16, 2026)
+
+- [x] Root cause 1: DB products had invalid Stripe price IDs (price_1TMXlJ... / price_1TMXlH...) that don't exist in the test Stripe account
+- [x] Root cause 2: ENV STRIPE_TEST_PREMIUM_PRICE_ID pointed to an inactive Stripe price (price_1TDY1Q...)
+- [x] Root cause 3: handleCheckout in Pricing.tsx redirected to /signup before auth state resolved (race condition)
+- [x] Fix: Created new active Premium price in Stripe ($29.00, price_1TMtiJLzLu2AI2sMqd6jS574) on existing product
+- [x] Fix: Updated DB products table — premium.stripePriceId = price_1TMtiJLzLu2AI2sMqd6jS574, pro.stripePriceId = price_1TDY1RLzLu2AI2sMcDJVRJ0U
+- [x] Fix: Updated STRIPE_TEST_PREMIUM_PRICE_ID and STRIPE_PREMIUM_PRICE_ID env vars to new active price
+- [x] Fix: handleCheckout now waits for authLoading to resolve before redirecting; redirects to /login?next=/pricing (not /signup)
+- [x] Audit: Pro price was hardcoded as 2999 cents ($29.99) in shared/products.ts fallback — fixed to 999 cents ($9.99)
+- [x] Audit: Premium price was hardcoded as 19700 cents in shared/products.ts fallback — fixed to 2900 cents ($29.00)
+- [x] 241/241 tests pass, TypeScript 0 errors

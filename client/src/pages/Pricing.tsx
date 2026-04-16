@@ -20,7 +20,7 @@ function fmt(cents: number): string {
 }
 
 export default function PricingNew() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [testBannerDismissed, setTestBannerDismissed] = useState(false);
 
   // Detect Stripe mode to show test-mode warning banner
@@ -50,9 +50,15 @@ export default function PricingNew() {
   });
 
   const handleCheckout = (productId: "PREMIUM" | "PRO") => {
+    // Wait for auth state to resolve before deciding — avoids redirect on slow loads
+    if (authLoading) {
+      toast.info("Loading, please try again in a moment...");
+      return;
+    }
     if (!isAuthenticated) {
-      toast.info("Please sign up or log in to continue");
-      window.location.href = getSignupUrl();
+      toast.info("Please log in or sign up to continue");
+      // Redirect to login with ?next=/pricing so user lands back here after auth
+      window.location.href = `/login?next=${encodeURIComponent("/pricing")}`;
       return;
     }
     createCheckoutMutation.mutate({ productId });
