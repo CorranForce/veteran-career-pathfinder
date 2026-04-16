@@ -1732,3 +1732,13 @@
 - [x] Add "Upgrade to Premium" item to user dropdown menu (visible on mobile too, hidden for premium/pro users)
 - [x] All upgrade buttons link to /pricing
 - [x] 241/241 tests pass, TypeScript 0 errors
+
+## Sprint: First-Login Welcome Modal (Apr 16, 2026)
+
+- [x] Add hasSeenWelcome boolean column to users table in schema.ts
+- [x] Run pnpm db:push to migrate the schema (migration 0033_neat_dreadnoughts.sql)
+- [x] Add markWelcomeSeen tRPC procedure (auth.markWelcomeSeen) in routers.ts + markUserWelcomeSeen() in db.ts
+- [x] Build WelcomeModal.tsx component with Free vs Premium comparison, Most Popular badge, and upgrade CTA
+- [x] Wire WelcomeModal into App.tsx via AuthenticatedWelcomeGate wrapper (checks auth.me.hasSeenWelcome)
+- [x] Modal shows once per user (hasSeenWelcome = false), dismissed permanently on close/upgrade click
+- [x] 241/241 tests pass, TypeScript 0 errors

@@ -215,6 +215,18 @@ export async function updateUserStripeCustomerId(userId: number, stripeCustomerI
     .where(eq(users.id, userId));
 }
 
+export async function markUserWelcomeSeen(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update user: database not available");
+    return;
+  }
+
+  await db.update(users)
+    .set({ hasSeenWelcome: true })
+    .where(eq(users.id, userId));
+}
+
 export async function createPurchase(purchase: InsertPurchase) {
   const db = await getDb();
   if (!db) {

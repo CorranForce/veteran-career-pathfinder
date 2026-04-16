@@ -1,7 +1,8 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import * as db from "./db";
 import { paymentRouter } from "./routers/payment";
 import { emailRouter } from "./routers/email";
 import { marketingRouter } from "./routers/marketing";
@@ -36,6 +37,11 @@ export const appRouter = router({
       return {
         success: true,
       } as const;
+    }),
+    /** Mark the welcome modal as seen for the current user (called once on dismiss) */
+    markWelcomeSeen: protectedProcedure.mutation(async ({ ctx }) => {
+      await db.markUserWelcomeSeen(ctx.user.id);
+      return { success: true };
     }),
   }),
 

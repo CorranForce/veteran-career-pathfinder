@@ -33,6 +33,32 @@ import RefundPolicy from "./pages/RefundPolicy";
 import Unsubscribe from "./pages/Unsubscribe";
 import SubscriptionPreferences from "./pages/SubscriptionPreferences";
 import MOSTranslator from "./pages/MOSTranslator";
+import { WelcomeModal } from "./components/WelcomeModal";
+import { useState, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
+
+/**
+ * Thin wrapper that shows the first-login welcome modal once for authenticated users
+ * who have not yet dismissed it (hasSeenWelcome === false).
+ */
+function AuthenticatedWelcomeGate({ children }: { children: React.ReactNode }) {
+  const { data: user } = trpc.auth.me.useQuery();
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // Only show modal if user is authenticated and hasn't seen the welcome yet
+    if (user && user.hasSeenWelcome === false) {
+      setShowModal(true);
+    }
+  }, [user]);
+
+  return (
+    <>
+      {children}
+      <WelcomeModal open={showModal} onClose={() => setShowModal(false)} />
+    </>
+  );
+}
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -91,7 +117,9 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <AuthenticatedWelcomeGate>
+            <Router />
+          </AuthenticatedWelcomeGate>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

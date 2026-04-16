@@ -46,6 +46,9 @@ export const users = mysqlTable("users", {
 
   // Force password change on next login (set for auto-generated passwords, e.g. Google OAuth)
   mustChangePassword: boolean("mustChangePassword").default(false).notNull(),
+
+  // Onboarding: set to true once the user dismisses the first-login welcome modal
+  hasSeenWelcome: boolean("hasSeenWelcome").default(false).notNull(),
 });
 
 export type User = typeof users.$inferSelect;
