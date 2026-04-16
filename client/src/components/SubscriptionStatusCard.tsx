@@ -117,9 +117,10 @@ export default function SubscriptionStatusCard() {
           </div>
         ) : !subscription ? (
           <p className="text-sm text-muted-foreground">Unable to load subscription data.</p>
-        ) : subscription.tier === "free" ? (
-          /* ── Free Tier ── */
-          <div className="space-y-4">
+         ) : subscription.tier === "free" ? (
+          /* ── Free Tier — Premium-focused upgrade banner ── */
+          <div className="space-y-5">
+            {/* Current plan row */}
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
@@ -132,18 +133,58 @@ export default function SubscriptionStatusCard() {
               </div>
               <StatusBadge status="active" />
             </div>
-
             <Separator />
 
-            <div className="rounded-lg bg-primary/5 border border-primary/20 p-4 space-y-3">
-              <p className="text-sm font-medium">Unlock the full Pathfinder experience</p>
-              <p className="text-sm text-muted-foreground">
-                Upgrade to Premium for one-time lifetime access, or Pro for monthly support, webinars, and community.
-              </p>
-              <Button onClick={handleUpgrade} size="sm" className="gap-2">
-                <ArrowUpCircle className="h-4 w-4" />
-                View Upgrade Options
-              </Button>
+            {/* Premium upgrade card */}
+            <div className="rounded-xl bg-gradient-to-br from-amber-50 via-orange-50 to-amber-100 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-amber-900/30 border-2 border-amber-300 dark:border-amber-700 p-5 space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-amber-400/20 flex items-center justify-center flex-shrink-0">
+                    <Star className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-amber-900 dark:text-amber-200 text-base">Upgrade to Premium</p>
+                    <p className="text-sm text-amber-700 dark:text-amber-400">One-time payment · Lifetime access</p>
+                  </div>
+                </div>
+                <Badge className="bg-amber-500 text-white border-0 text-xs shrink-0">Most Popular</Badge>
+              </div>
+
+              {/* Feature list */}
+              <ul className="space-y-2">
+                {[
+                  "Full AI Veteran Career Transition Prompt",
+                  "MOS-specific pre-filled analysis for any code",
+                  "Unlimited prompt copies & AI assistant access",
+                  "Priority access to new features & templates",
+                ].map((feature) => (
+                  <li key={feature} className="flex items-center gap-2 text-sm text-amber-800 dark:text-amber-300">
+                    <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                <Button
+                  onClick={handleUpgrade}
+                  className="gap-2 bg-amber-600 hover:bg-amber-700 text-white flex-1"
+                  size="sm"
+                >
+                  <ArrowUpCircle className="h-4 w-4" />
+                  Upgrade to Premium Now
+                </Button>
+                <Button
+                  onClick={handleUpgrade}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 border-amber-400 text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:border-amber-600 dark:hover:bg-amber-950/30"
+                >
+                  <Zap className="h-4 w-4" />
+                  Compare All Plans
+                </Button>
+              </div>
             </div>
           </div>
         ) : subscription.tier === "premium" ? (

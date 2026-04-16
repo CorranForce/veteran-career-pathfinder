@@ -19,7 +19,8 @@ import {
   LogOut,
   User,
   ChevronDown,
-  Shield
+  Shield,
+  Star
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -59,6 +60,10 @@ export function AuthenticatedNav() {
       icon: Settings 
     });
   }
+
+  // Show upgrade CTA only for free-tier users
+  const { data: accessData } = trpc.payment.getAccessLevel.useQuery();
+  const isFreeUser = !accessData || accessData.level === "free";
 
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
@@ -101,7 +106,19 @@ export function AuthenticatedNav() {
           })}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Premium upgrade CTA — only shown to free-tier users */}
+          {isFreeUser && (
+            <Link href="/pricing">
+              <Button
+                size="sm"
+                className="gap-1.5 bg-amber-500 hover:bg-amber-600 text-white hidden sm:flex"
+              >
+                <Star className="h-3.5 w-3.5" />
+                Upgrade
+              </Button>
+            </Link>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="gap-2">
@@ -141,6 +158,18 @@ export function AuthenticatedNav() {
                 <DropdownMenuSeparator />
               </div>
 
+              {/* Upgrade CTA in dropdown for free-tier users (visible on mobile too) */}
+              {isFreeUser && (
+                <>
+                  <Link href="/pricing">
+                    <DropdownMenuItem className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-medium">
+                      <Star className="h-4 w-4" />
+                      Upgrade to Premium
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <Link href="/tools">
                 <DropdownMenuItem className="flex items-center gap-2">
                   <User className="h-4 w-4" />

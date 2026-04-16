@@ -1722,3 +1722,13 @@
 - [x] Free users see locked teaser with blurred prompt preview + signup/upgrade CTA
 - [x] Premium/Pro users see full pre-filled prompt with Copy and Open ChatGPT/Claude buttons
 - [x] Toast notification on copy: "Prompt copied! Paste it into ChatGPT or Claude"
+
+## Sprint: Free Tier Default + Premium Upgrade CTAs (Apr 16, 2026)
+
+- [x] Audit googleOAuthCallback.ts — new users created with role: "user"; tier is dynamic from purchases table (no stored tier field)
+- [x] Audit createGoogleUser in db.ts — confirmed role: "user", getAccessLevel returns "free" by default for users with no purchases
+- [x] Replace basic upgrade card in SubscriptionStatusCard with prominent amber Premium banner (feature list, Most Popular badge, two CTA buttons)
+- [x] Add amber "Upgrade" button to AuthenticatedNav desktop header (hidden for premium/pro users)
+- [x] Add "Upgrade to Premium" item to user dropdown menu (visible on mobile too, hidden for premium/pro users)
+- [x] All upgrade buttons link to /pricing
+- [x] 241/241 tests pass, TypeScript 0 errors
