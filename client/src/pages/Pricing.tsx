@@ -4,10 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Loader2, Shield, Menu, Star, X, AlertTriangle } from "lucide-react";
+import {
+  CheckCircle2,
+  Loader2,
+  Shield,
+  Menu,
+  Star,
+  X,
+  AlertTriangle,
+  Crown,
+  ExternalLink,
+} from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
-import { getSignupUrl } from "@/const";
 import { PRODUCTS } from "@shared/products";
 
 /** Format cents to a USD string, e.g. 2900 → "$29.00" */
@@ -22,6 +31,7 @@ function fmt(cents: number): string {
 export default function PricingNew() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [testBannerDismissed, setTestBannerDismissed] = useState(false);
+  const [memberBannerDismissed, setMemberBannerDismissed] = useState(false);
 
   // Detect Stripe mode to show test-mode warning banner
   const { data: stripeMode } = trpc.stripeProducts.getStripeMode.useQuery(undefined, {
@@ -31,11 +41,22 @@ export default function PricingNew() {
 
   // Live prices from Stripe — falls back to shared/products.ts values while loading
   const { data: livePrices } = trpc.payment.getLivePrices.useQuery(undefined, {
-    staleTime: 5 * 60 * 1000, // cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Fetch the user's current subscription/access level (only when logged in)
+  const { data: subscriptionStatus } = trpc.payment.getSubscriptionStatus.useQuery(undefined, {
+    enabled: isAuthenticated,
+    staleTime: 2 * 60 * 1000,
   });
 
   const premiumCents = livePrices?.premium.amountCents ?? PRODUCTS.PREMIUM.price;
   const proCents = livePrices?.pro.amountCents ?? PRODUCTS.PRO.price;
+
+  // Derive the user's current tier
+  const isPlatformOwner = user?.role === "platform_owner";
+  const currentTier = isPlatformOwner ? "owner" : (subscriptionStatus?.tier ?? "free");
+  const hasPaidAccess = currentTier === "premium" || currentTier === "pro" || currentTier === "owner";
 
   const createCheckoutMutation = trpc.payment.createCheckoutSession.useMutation({
     onSuccess: (data) => {
@@ -49,20 +70,132 @@ export default function PricingNew() {
     },
   });
 
+  const createPortalMutation = trpc.payment.createPortalSession.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        toast.info("Opening billing portal...");
+        window.open(data.url, "_blank");
+      }
+    },
+    onError: (error) => {
+      toast.error(`Billing portal error: ${error.message}`);
+    },
+  });
+
   const handleCheckout = (productId: "PREMIUM" | "PRO") => {
-    // Wait for auth state to resolve before deciding — avoids redirect on slow loads
     if (authLoading) {
       toast.info("Loading, please try again in a moment...");
       return;
     }
     if (!isAuthenticated) {
       toast.info("Please log in or sign up to continue");
-      // Redirect to login with ?next=/pricing so user lands back here after auth
       window.location.href = `/login?next=${encodeURIComponent("/pricing")}`;
       return;
     }
     createCheckoutMutation.mutate({ productId });
   };
+
+  const handleManageBilling = () => {
+    createPortalMutation.mutate();
+  };
+
+  // Determine the CTA for each tier card
+  const freeCta = (
+    <Button variant="outline" className="w-full" asChild>
+      <a href={isAuthenticated ? "/tools" : "/signup"}>
+        {isAuthenticated ? "Go to Dashboard" : "Get Started Free"}
+      </a>
+    </Button>
+  );
+
+  const premiumCta = (() => {
+    if (currentTier === "owner") {
+      return (
+        <Button className="w-full" disabled>
+          <Crown className="mr-2 h-4 w-4" />
+          Platform Owner Access
+        </Button>
+      );
+    }
+    if (currentTier === "premium" || currentTier === "pro") {
+      return (
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={handleManageBilling}
+          disabled={createPortalMutation.isPending}
+        >
+          {createPortalMutation.isPending ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Opening...</>
+          ) : (
+            <><ExternalLink className="mr-2 h-4 w-4" />Manage Billing</>
+          )}
+        </Button>
+      );
+    }
+    return (
+      <Button
+        className="w-full"
+        onClick={() => handleCheckout("PREMIUM")}
+        disabled={createCheckoutMutation.isPending}
+      >
+        {createCheckoutMutation.isPending ? (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+        ) : (
+          "Get Premium Access"
+        )}
+      </Button>
+    );
+  })();
+
+  const proCta = (() => {
+    if (currentTier === "owner") {
+      return (
+        <Button className="w-full border-accent text-accent" variant="outline" disabled>
+          <Crown className="mr-2 h-4 w-4" />
+          Platform Owner Access
+        </Button>
+      );
+    }
+    if (currentTier === "pro") {
+      return (
+        <Button
+          variant="outline"
+          className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+          onClick={handleManageBilling}
+          disabled={createPortalMutation.isPending}
+        >
+          {createPortalMutation.isPending ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Opening...</>
+          ) : (
+            <><ExternalLink className="mr-2 h-4 w-4" />Manage Billing</>
+          )}
+        </Button>
+      );
+    }
+    return (
+      <Button
+        variant="outline"
+        className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+        onClick={() => handleCheckout("PRO")}
+        disabled={createCheckoutMutation.isPending}
+      >
+        {createCheckoutMutation.isPending ? (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
+        ) : (
+          "Start Pro Membership"
+        )}
+      </Button>
+    );
+  })();
+
+  // Badge to show on the card matching the user's current plan
+  const currentPlanLabel = (() => {
+    if (currentTier === "owner") return "Your Plan";
+    if (currentTier === "pro") return "Your Plan";
+    if (currentTier === "premium") return "Your Plan";
+    return null;
+  })();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -81,6 +214,33 @@ export default function PricingNew() {
               onClick={() => setTestBannerDismissed(true)}
               className="text-yellow-700 dark:text-yellow-400 hover:opacity-70 flex-shrink-0"
               aria-label="Dismiss test mode banner"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Already-a-member banner */}
+      {hasPaidAccess && !memberBannerDismissed && (
+        <div className="bg-green-500/10 border-b border-green-500/30 px-4 py-2.5">
+          <div className="container mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+              <p className="text-sm font-medium">
+                {isPlatformOwner
+                  ? "You have Platform Owner access — all features are unlocked."
+                  : `You already have ${subscriptionStatus?.planName ?? "paid"} access. Your content is available in your `}
+                {!isPlatformOwner && (
+                  <a href="/tools" className="underline font-semibold">Dashboard</a>
+                )}
+                {!isPlatformOwner && "."}
+              </p>
+            </div>
+            <button
+              onClick={() => setMemberBannerDismissed(true)}
+              className="text-green-700 dark:text-green-400 hover:opacity-70 flex-shrink-0"
+              aria-label="Dismiss member banner"
             >
               <X className="h-4 w-4" />
             </button>
@@ -172,7 +332,12 @@ export default function PricingNew() {
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 
             {/* Free Tier */}
-            <Card className="border-2">
+            <Card className={`border-2 relative ${currentTier === "free" && isAuthenticated ? "ring-2 ring-muted-foreground/30" : ""}`}>
+              {currentTier === "free" && isAuthenticated && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <Badge variant="secondary" className="px-4 py-1">Your Current Plan</Badge>
+                </div>
+              )}
               <CardHeader>
                 <CardTitle className="text-2xl">{PRODUCTS.FREE.name}</CardTitle>
                 <CardDescription>{PRODUCTS.FREE.description}</CardDescription>
@@ -191,25 +356,29 @@ export default function PricingNew() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  asChild
-                >
-                  <a href={isAuthenticated ? "/tools" : "/signup"}>
-                    Get Started Free
-                  </a>
-                </Button>
+                {freeCta}
               </CardFooter>
             </Card>
 
             {/* Premium Tier - Most Popular */}
-            <Card className="border-4 border-primary relative shadow-xl">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-4 py-1">
-                  <Star className="h-3 w-3 mr-1 inline" />
-                  Most Popular
-                </Badge>
+            <Card className={`border-4 border-primary relative shadow-xl ${currentTier === "premium" ? "ring-4 ring-primary/40" : ""}`}>
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {currentTier === "premium" && currentPlanLabel ? (
+                  <Badge className="bg-green-600 text-white px-4 py-1">
+                    <CheckCircle2 className="h-3 w-3 mr-1 inline" />
+                    {currentPlanLabel}
+                  </Badge>
+                ) : currentTier === "owner" ? (
+                  <Badge className="bg-purple-600 text-white px-4 py-1">
+                    <Crown className="h-3 w-3 mr-1 inline" />
+                    Owner Access
+                  </Badge>
+                ) : (
+                  <Badge className="bg-primary text-primary-foreground px-4 py-1">
+                    <Star className="h-3 w-3 mr-1 inline" />
+                    Most Popular
+                  </Badge>
+                )}
               </div>
               <CardHeader>
                 <CardTitle className="text-2xl">{livePrices?.premium.name ?? PRODUCTS.PREMIUM.name}</CardTitle>
@@ -247,25 +416,20 @@ export default function PricingNew() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button
-                  className="w-full"
-                  onClick={() => handleCheckout("PREMIUM")}
-                  disabled={createCheckoutMutation.isPending}
-                >
-                  {createCheckoutMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Get Premium Access"
-                  )}
-                </Button>
+                {premiumCta}
               </CardFooter>
             </Card>
 
             {/* Pro Tier */}
-            <Card className="border-2 border-accent">
+            <Card className={`border-2 border-accent relative ${currentTier === "pro" ? "ring-4 ring-accent/40" : ""}`}>
+              {currentTier === "pro" && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-green-600 text-white px-4 py-1">
+                    <CheckCircle2 className="h-3 w-3 mr-1 inline" />
+                    Your Plan
+                  </Badge>
+                </div>
+              )}
               <CardHeader>
                 <CardTitle className="text-2xl">{livePrices?.pro.name ?? PRODUCTS.PRO.name}</CardTitle>
                 <CardDescription>{livePrices?.pro.description ?? PRODUCTS.PRO.description}</CardDescription>
@@ -302,21 +466,7 @@ export default function PricingNew() {
                 </div>
               </CardContent>
               <CardFooter>
-                <Button
-                  variant="outline"
-                  className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                  onClick={() => handleCheckout("PRO")}
-                  disabled={createCheckoutMutation.isPending}
-                >
-                  {createCheckoutMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Start Pro Membership"
-                  )}
-                </Button>
+                {proCta}
               </CardFooter>
             </Card>
 

@@ -1764,3 +1764,12 @@
 - [x] Audit: Pro price was hardcoded as 2999 cents ($29.99) in shared/products.ts fallback — fixed to 999 cents ($9.99)
 - [x] Audit: Premium price was hardcoded as 19700 cents in shared/products.ts fallback — fixed to 2900 cents ($29.00)
 - [x] 241/241 tests pass, TypeScript 0 errors
+
+## Sprint: Pricing Page — Already a Member State (Apr 16, 2026)
+
+- [x] Fetch user's current subscription status on /pricing page
+- [x] Show "Current Plan" badge on the tier card matching the user's plan
+- [x] Replace checkout button with "Manage Billing" button for the user's current tier
+- [x] Lower-tier cards show appropriate CTAs (Go to Dashboard for free, Manage Billing for paid)
+- [x] Platform owner sees "Owner Access" purple badge with disabled button on both paid cards
+- [x] Show a dismissible green "You already have access" banner at the top for paid users
