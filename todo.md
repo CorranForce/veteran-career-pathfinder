@@ -1742,3 +1742,12 @@
 - [x] Wire WelcomeModal into App.tsx via AuthenticatedWelcomeGate wrapper (checks auth.me.hasSeenWelcome)
 - [x] Modal shows once per user (hasSeenWelcome = false), dismissed permanently on close/upgrade click
 - [x] 241/241 tests pass, TypeScript 0 errors
+
+## Sprint: Platform Owner Tier Fix (Apr 16, 2026)
+
+- [x] Audit getAccessLevel 2014 confirmed it only checked purchases table, never ctx.user.role
+- [x] Audit googleOAuthCallback.ts 2014 confirmed owner gets platform_owner role via OWNER_OPEN_ID check
+- [x] Fix getAccessLevel to return "premium" for platform_owner role (no purchase required)
+- [x] Fix getSubscriptionStatus to return planName "Platform Owner (Full Access)" for platform_owner
+- [x] Hide welcome modal and upgrade CTAs for platform_owner (AuthenticatedWelcomeGate + SubscriptionStatusCard)
+- [x] 241/241 tests pass, TypeScript 0 errors, checkpoint saved

@@ -46,8 +46,8 @@ function AuthenticatedWelcomeGate({ children }: { children: React.ReactNode }) {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    // Only show modal if user is authenticated and hasn't seen the welcome yet
-    if (user && user.hasSeenWelcome === false) {
+    // Only show modal if user is authenticated, not the platform owner, and hasn't seen the welcome yet
+    if (user && user.hasSeenWelcome === false && user.role !== "platform_owner") {
       setShowModal(true);
     }
   }, [user]);

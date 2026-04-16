@@ -137,6 +137,8 @@ export const paymentRouter = router({
    * Used to gate content on the prompt/content pages.
    */
   getAccessLevel: protectedProcedure.query(async ({ ctx }) => {
+    // Platform owner always has full (premium) access — no purchase required
+    if (ctx.user.role === "platform_owner") return { level: "premium" as const };
     const [hasPro, hasPremium] = await Promise.all([
       hasUserPurchased(ctx.user.id, "pro_subscription"),
       hasUserPurchased(ctx.user.id, "premium_prompt"),
@@ -153,6 +155,20 @@ export const paymentRouter = router({
    * - For Free: returns free tier info.
    */
   getSubscriptionStatus: protectedProcedure.query(async ({ ctx }) => {
+    // Platform owner always has full access — show as Premium (Owner) with no billing info
+    if (ctx.user.role === "platform_owner") {
+      return {
+        tier: "premium" as const,
+        planName: "Platform Owner (Full Access)",
+        status: "active" as string,
+        nextBillingDate: null,
+        cancelAtPeriodEnd: false,
+        purchasedAt: null,
+        amount: 0,
+        currency: "usd",
+        stripeSubscriptionId: null,
+      };
+    }
     // Check for Pro subscription first (highest tier)
     const db = await getDb();
     if (!db) return { tier: "free" as const, planName: "Free", status: "active" as const };

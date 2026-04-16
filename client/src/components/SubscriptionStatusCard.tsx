@@ -188,7 +188,7 @@ export default function SubscriptionStatusCard() {
             </div>
           </div>
         ) : subscription.tier === "premium" ? (
-          /* ── Premium One-Time ── */
+          /* ── Premium / Platform Owner ── */
           <div className="space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3">
@@ -196,8 +196,12 @@ export default function SubscriptionStatusCard() {
                   <Star className="h-4 w-4 text-amber-600" />
                 </div>
                 <div>
-                  <p className="font-semibold">Premium Prompt Access</p>
-                  <p className="text-sm text-muted-foreground">One-time purchase · Lifetime access</p>
+                  <p className="font-semibold">{subscription.planName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {subscription.planName === "Platform Owner (Full Access)"
+                      ? "Full access to all features — no purchase required"
+                      : "One-time purchase · Lifetime access"}
+                  </p>
                 </div>
               </div>
               <StatusBadge status="active" />
@@ -233,15 +237,17 @@ export default function SubscriptionStatusCard() {
 
             <Separator />
 
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <p className="text-sm text-muted-foreground">
-                Want monthly webinars and community access?
-              </p>
-              <Button variant="outline" size="sm" onClick={handleUpgrade} className="gap-2">
-                <Zap className="h-4 w-4" />
-                Upgrade to Pro
-              </Button>
-            </div>
+            {subscription.planName !== "Platform Owner (Full Access)" && (
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <p className="text-sm text-muted-foreground">
+                  Want monthly webinars and community access?
+                </p>
+                <Button variant="outline" size="sm" onClick={handleUpgrade} className="gap-2">
+                  <Zap className="h-4 w-4" />
+                  Upgrade to Pro
+                </Button>
+              </div>
+            )}
           </div>
         ) : (
           /* ── Pro Subscription ── */
