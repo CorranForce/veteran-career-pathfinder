@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { platformOwnerProcedure, router } from "../_core/trpc";
+import { platformOwnerProcedure, publicProcedure, router } from "../_core/trpc";
 import { stripe, getStripeMode as detectStripeMode, getActivePriceId } from "../stripe";
 import { getDb } from "../db";
 import { products, stripeHealthPings, purchases } from "../../drizzle/schema";
@@ -427,7 +427,7 @@ export const stripeProductsRouter = router({
   /**
    * Return the current Stripe key mode (test or live) so the UI can display a badge.
    */
-  getStripeMode: platformOwnerProcedure.query(() => {
+  getStripeMode: publicProcedure.query(() => {
     const mode = detectStripeMode();
     return {
       mode,
