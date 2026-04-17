@@ -9,9 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert, Bell } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert, Bell, CreditCard, Crown, Loader2, ArrowUpRight, AlertTriangle } from "lucide-react";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 
 export default function AccountSettings() {
@@ -31,6 +32,19 @@ export default function AccountSettings() {
 
   const settingsQuery = trpc.accountSettings.getSettings.useQuery();
   const connectedAccountsQuery = trpc.accountSettings.getConnectedAccounts.useQuery();
+  const subscriptionQuery = trpc.payment.getSubscriptionStatus.useQuery();
+
+  const createPortalMutation = trpc.payment.createPortalSession.useMutation({
+    onSuccess: (data) => {
+      if (data.url) {
+        toast.info("Opening billing portal...");
+        window.open(data.url, "_blank");
+      }
+    },
+    onError: (error) => {
+      toast.error(`Billing portal error: ${error.message}`);
+    },
+  });
 
   // Detect ?mustChange=1 from login redirect
   const mustChangeFromUrl = new URLSearchParams(window.location.search).get("mustChange") === "1";
@@ -307,6 +321,107 @@ export default function AccountSettings() {
           )}
         </CardContent>
       </Card>
+      {/* Billing & Subscription */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle>Billing &amp; Subscription</CardTitle>
+              <CardDescription>Your current plan and payment details</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {subscriptionQuery.isLoading ? (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Loading subscription info...</span>
+            </div>
+          ) : (() => {
+            const sub = subscriptionQuery.data;
+            const isPlatformOwner = user?.role === "platform_owner";
+            const tier = sub?.tier ?? "free";
+            const planName = sub?.planName ?? "Free";
+
+            const tierBadge = (() => {
+              if (isPlatformOwner) return <Badge className="bg-purple-600 text-white"><Crown className="h-3 w-3 mr-1" />Platform Owner</Badge>;
+              if (tier === "pro") return <Badge className="bg-accent text-accent-foreground">Pro</Badge>;
+              if (tier === "premium") return <Badge className="bg-primary text-primary-foreground">Premium</Badge>;
+              return <Badge variant="secondary">Free</Badge>;
+            })();
+
+            return (
+              <div className="space-y-4">
+                {/* Plan row */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <p className="font-semibold">{planName}</p>
+                    {sub?.purchasedAt && tier !== "free" && !isPlatformOwner && (
+                      <p className="text-xs text-muted-foreground">
+                        {tier === "premium" ? "Purchased" : "Started"}{" "}
+                        {new Date(sub.purchasedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                  {tierBadge}
+                </div>
+
+                {/* Next billing / cancel warning */}
+                {sub?.nextBillingDate && !sub.cancelAtPeriodEnd && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>Next billing date: <strong>{new Date(sub.nextBillingDate).toLocaleDateString()}</strong></span>
+                  </div>
+                )}
+                {sub?.cancelAtPeriodEnd && sub.nextBillingDate && (
+                  <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/30">
+                    <AlertTriangle className="h-4 w-4 text-amber-600" />
+                    <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
+                      Your Pro subscription will cancel on{" "}
+                      <strong>{new Date(sub.nextBillingDate).toLocaleDateString()}</strong>. You will retain access until then.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <Separator />
+
+                {/* CTA */}
+                {isPlatformOwner ? (
+                  <p className="text-sm text-muted-foreground">Platform owners have full access to all features with no billing required.</p>
+                ) : tier === "free" ? (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button asChild>
+                      <Link href="/pricing">
+                        <ArrowUpRight className="mr-2 h-4 w-4" />
+                        Upgrade to Premium
+                      </Link>
+                    </Button>
+                    <Button variant="outline" asChild>
+                      <Link href="/pricing">View All Plans</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="outline"
+                    onClick={() => createPortalMutation.mutate()}
+                    disabled={createPortalMutation.isPending}
+                  >
+                    {createPortalMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Opening...</>
+                    ) : (
+                      <><CreditCard className="mr-2 h-4 w-4" />Manage Billing</>
+                    )}
+                  </Button>
+                )}
+              </div>
+            );
+          })()}
+        </CardContent>
+      </Card>
+
       <NotificationPreferences />
 
       {/* Email newsletter preferences */}

@@ -1773,3 +1773,11 @@
 - [x] Lower-tier cards show appropriate CTAs (Go to Dashboard for free, Manage Billing for paid)
 - [x] Platform owner sees "Owner Access" purple badge with disabled button on both paid cards
 - [x] Show a dismissible green "You already have access" banner at the top for paid users
+
+## Sprint: Billing & Subscription Card on Account Settings (Apr 17, 2026)
+
+- [x] Add BillingSubscriptionCard component to AccountSettings.tsx
+- [x] Show current plan name, status, next billing date (for Pro), and purchase date (for Premium)
+- [x] Show "Manage Billing" button (Stripe portal) for paid users; "Upgrade to Premium" link for free users
+- [x] Platform owner sees "Platform Owner (Full Access)" with no billing button
+- [x] Show cancel-at-period-end warning if subscription is set to cancel
