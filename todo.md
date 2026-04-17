@@ -1781,3 +1781,10 @@
 - [x] Show "Manage Billing" button (Stripe portal) for paid users; "Upgrade to Premium" link for free users
 - [x] Platform owner sees "Platform Owner (Full Access)" with no billing button
 - [x] Show cancel-at-period-end warning if subscription is set to cancel
+
+## Sprint: Remove Pricing Management UI (Apr 17, 2026)
+
+- [x] Remove PricingManagement component from ProductManagementPage.tsx
+- [x] Delete PricingManagement.tsx component file
+- [x] Removed orphaned admin procedures (getPricingConfig, updateTierPrice, syncPriceIdsToEnv)
+- [x] Confirmed /pricing page reads prices from active products via getLivePrices procedure
