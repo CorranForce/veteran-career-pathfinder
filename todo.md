@@ -1788,3 +1788,11 @@
 - [x] Delete PricingManagement.tsx component file
 - [x] Removed orphaned admin procedures (getPricingConfig, updateTierPrice, syncPriceIdsToEnv)
 - [x] Confirmed /pricing page reads prices from active products via getLivePrices procedure
+
+## Sprint: Revenue Trend Chart (Apr 17, 2026)
+
+- [x] Replace Revenue Chart Placeholder with real Recharts ComposedChart using revenueByMonth data
+- [x] Show month labels on X-axis, dollar amounts on Y-axis
+- [x] Add tooltip showing revenue and transaction count per month
+- [x] Handle empty state (no data yet) gracefully with descriptive message
+- [x] Add transaction count as a secondary Bar series on right Y-axis

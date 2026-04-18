@@ -61,6 +61,18 @@ import {
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Bar,
+  ComposedChart,
+  Legend,
+} from "recharts";
 import { useLocation } from "wouter";
 import ActivityFeed from "@/components/ActivityFeed";
 import { ProductManagement } from "@/components/ProductManagement";
@@ -367,14 +379,104 @@ export default function PlatformOwnerDashboard() {
               ))}
             </div>
 
-            {/* Revenue Chart Placeholder */}
-            <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
-              <div className="text-center text-muted-foreground">
-                <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Revenue Trend (Last 12 Months)</p>
-                <p className="text-xs">Chart visualization coming soon</p>
+            {/* Revenue Trend Chart */}
+            {revenueLoading ? (
+              <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            </div>
+            ) : !revenueAnalytics?.revenueByMonth || revenueAnalytics.revenueByMonth.length === 0 ? (
+              <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                <div className="text-center text-muted-foreground">
+                  <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm font-medium">Revenue Trend (Last 12 Months)</p>
+                  <p className="text-xs">No completed purchases yet — data will appear here once sales come in.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-muted-foreground">Revenue Trend (Last 12 Months)</p>
+                <ResponsiveContainer width="100%" height={260}>
+                  <ComposedChart
+                    data={revenueAnalytics.revenueByMonth.map((row: any) => ({
+                      month: (() => {
+                        const [year, mon] = String(row.month).split("-");
+                        return new Date(Number(year), Number(mon) - 1, 1).toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+                      })(),
+                      revenue: Number(row.revenue) / 100,
+                      transactions: Number(row.count),
+                    }))}
+                    margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      yAxisId="revenue"
+                      orientation="left"
+                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickFormatter={(v) => `$${v % 1 === 0 ? v : v.toFixed(2)}`}
+                      width={56}
+                    />
+                    <YAxis
+                      yAxisId="count"
+                      orientation="right"
+                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      axisLine={false}
+                      tickLine={false}
+                      allowDecimals={false}
+                      width={32}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        background: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                        fontSize: 12,
+                      }}
+                      formatter={(value: number, name: string) =>
+                        name === "revenue"
+                          ? [`$${value.toFixed(2)}`, "Revenue"]
+                          : [value, "Transactions"]
+                      }
+                    />
+                    <Legend
+                      wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+                      formatter={(value) => value === "revenue" ? "Revenue" : "Transactions"}
+                    />
+                    <Area
+                      yAxisId="revenue"
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={2}
+                      fill="url(#revenueGradient)"
+                      dot={{ r: 3, fill: "hsl(var(--primary))", strokeWidth: 0 }}
+                      activeDot={{ r: 5 }}
+                    />
+                    <Bar
+                      yAxisId="count"
+                      dataKey="transactions"
+                      fill="hsl(var(--accent))"
+                      opacity={0.6}
+                      radius={[3, 3, 0, 0]}
+                      maxBarSize={24}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            )}
 
             {/* Recent Purchases Table */}
             <div className="mt-6">
