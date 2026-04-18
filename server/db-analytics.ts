@@ -84,9 +84,9 @@ export async function getRecentPurchases() {
 }
 
 /**
- * Get revenue by month for the last 12 months
+ * Get revenue by month for the last N months (default 12)
  */
-export async function getRevenueByMonth() {
+export async function getRevenueByMonth(months: 3 | 6 | 12 = 12) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get revenue by month: database not available");
@@ -103,12 +103,41 @@ export async function getRevenueByMonth() {
     WHERE status = 'completed'
     GROUP BY DATE_FORMAT(createdAt, '%Y-%m')
     ORDER BY DATE_FORMAT(createdAt, '%Y-%m') DESC
-    LIMIT 12
+    LIMIT ${months}
   `);
 
   // Convert result to expected format
   const rows = Array.isArray(result) ? result : (result as any).rows || [];
   return rows.reverse(); // Show oldest to newest
+}
+
+/**
+ * Get revenue split by product tier (premium vs pro)
+ */
+export async function getRevenueByTier() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get revenue by tier: database not available");
+    return [];
+  }
+
+  const result = await db.execute(sql`
+    SELECT 
+      productType,
+      SUM(amount) as revenue,
+      COUNT(*) as count
+    FROM purchases
+    WHERE status = 'completed'
+    GROUP BY productType
+    ORDER BY revenue DESC
+  `);
+
+  const rows = Array.isArray(result) ? result : (result as any).rows || [];
+  return rows.map((row: any) => ({
+    tier: row.productType === "premium_prompt" ? "Premium" : row.productType === "pro_subscription" ? "Pro" : String(row.productType),
+    revenue: Number(row.revenue),
+    count: Number(row.count),
+  }));
 }
 
 /**

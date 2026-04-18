@@ -72,6 +72,9 @@ import {
   Bar,
   ComposedChart,
   Legend,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import { useLocation } from "wouter";
 import ActivityFeed from "@/components/ActivityFeed";
@@ -101,6 +104,9 @@ export default function PlatformOwnerDashboard() {
   const [revPage, setRevPage] = useState(1);
   const REV_PAGE_SIZE = 5;
 
+  // Revenue chart date range
+  const [revMonths, setRevMonths] = useState<3 | 6 | 12>(12);
+
   // Fetch all users with pagination
   const { data: usersData, isLoading: usersLoading, refetch: refetchUsers } = trpc.admin.getAllUsers.useQuery(
     { page: currentPage, pageSize },
@@ -124,7 +130,7 @@ export default function PlatformOwnerDashboard() {
 
   // Fetch revenue analytics
   const { data: revenueAnalytics, isLoading: revenueLoading } = trpc.admin.getRevenueAnalytics.useQuery(
-    undefined,
+    { months: revMonths },
     { enabled: isAuthenticated && user?.role === "platform_owner" }
   );
 
@@ -379,104 +385,200 @@ export default function PlatformOwnerDashboard() {
               ))}
             </div>
 
-            {/* Revenue Trend Chart */}
-            {revenueLoading ? (
-              <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : !revenueAnalytics?.revenueByMonth || revenueAnalytics.revenueByMonth.length === 0 ? (
-              <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
-                <div className="text-center text-muted-foreground">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm font-medium">Revenue Trend (Last 12 Months)</p>
-                  <p className="text-xs">No completed purchases yet — data will appear here once sales come in.</p>
+            {/* Revenue Charts Row: Trend + Tier Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Revenue Trend Chart (2/3 width) */}
+              <div className="lg:col-span-2 space-y-3">
+                {/* Header row: label + date-range toggle */}
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-muted-foreground">Revenue Trend</p>
+                  <div className="flex items-center gap-1 bg-muted rounded-md p-0.5">
+                    {([3, 6, 12] as const).map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => setRevMonths(m)}
+                        className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${
+                          revMonths === m
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {m}mo
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {revenueLoading ? (
+                  <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : !revenueAnalytics?.revenueByMonth || revenueAnalytics.revenueByMonth.length === 0 ? (
+                  <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                    <div className="text-center text-muted-foreground">
+                      <BarChart3 className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm font-medium">No data for this period</p>
+                      <p className="text-xs">Completed purchases will appear here once sales come in.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <ComposedChart
+                      data={revenueAnalytics.revenueByMonth.map((row: any) => ({
+                        month: (() => {
+                          const [year, mon] = String(row.month).split("-");
+                          return new Date(Number(year), Number(mon) - 1, 1).toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+                        })(),
+                        revenue: Number(row.revenue) / 100,
+                        transactions: Number(row.count),
+                      }))}
+                      margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
+                    >
+                      <defs>
+                        <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis
+                        dataKey="month"
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        yAxisId="revenue"
+                        orientation="left"
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={(v) => `$${v % 1 === 0 ? v : v.toFixed(2)}`}
+                        width={56}
+                      />
+                      <YAxis
+                        yAxisId="count"
+                        orientation="right"
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        axisLine={false}
+                        tickLine={false}
+                        allowDecimals={false}
+                        width={32}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          background: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: 12,
+                        }}
+                        formatter={(value: number, name: string) =>
+                          name === "revenue"
+                            ? [`$${value.toFixed(2)}`, "Revenue"]
+                            : [value, "Transactions"]
+                        }
+                      />
+                      <Legend
+                        wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+                        formatter={(value) => value === "revenue" ? "Revenue" : "Transactions"}
+                      />
+                      <Area
+                        yAxisId="revenue"
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={2}
+                        fill="url(#revenueGradient)"
+                        dot={{ r: 3, fill: "hsl(var(--primary))", strokeWidth: 0 }}
+                        activeDot={{ r: 5 }}
+                      />
+                      <Bar
+                        yAxisId="count"
+                        dataKey="transactions"
+                        fill="hsl(var(--accent))"
+                        opacity={0.6}
+                        radius={[3, 3, 0, 0]}
+                        maxBarSize={24}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                )}
               </div>
-            ) : (
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Revenue Trend (Last 12 Months)</p>
-                <ResponsiveContainer width="100%" height={260}>
-                  <ComposedChart
-                    data={revenueAnalytics.revenueByMonth.map((row: any) => ({
-                      month: (() => {
-                        const [year, mon] = String(row.month).split("-");
-                        return new Date(Number(year), Number(mon) - 1, 1).toLocaleDateString("en-US", { month: "short", year: "2-digit" });
-                      })(),
-                      revenue: Number(row.revenue) / 100,
-                      transactions: Number(row.count),
-                    }))}
-                    margin={{ top: 4, right: 16, left: 0, bottom: 0 }}
-                  >
-                    <defs>
-                      <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.02} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="month"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      yAxisId="revenue"
-                      orientation="left"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      tickFormatter={(v) => `$${v % 1 === 0 ? v : v.toFixed(2)}`}
-                      width={56}
-                    />
-                    <YAxis
-                      yAxisId="count"
-                      orientation="right"
-                      tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
-                      axisLine={false}
-                      tickLine={false}
-                      allowDecimals={false}
-                      width={32}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        background: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "8px",
-                        fontSize: 12,
-                      }}
-                      formatter={(value: number, name: string) =>
-                        name === "revenue"
-                          ? [`$${value.toFixed(2)}`, "Revenue"]
-                          : [value, "Transactions"]
-                      }
-                    />
-                    <Legend
-                      wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
-                      formatter={(value) => value === "revenue" ? "Revenue" : "Transactions"}
-                    />
-                    <Area
-                      yAxisId="revenue"
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      fill="url(#revenueGradient)"
-                      dot={{ r: 3, fill: "hsl(var(--primary))", strokeWidth: 0 }}
-                      activeDot={{ r: 5 }}
-                    />
-                    <Bar
-                      yAxisId="count"
-                      dataKey="transactions"
-                      fill="hsl(var(--accent))"
-                      opacity={0.6}
-                      radius={[3, 3, 0, 0]}
-                      maxBarSize={24}
-                    />
-                  </ComposedChart>
-                </ResponsiveContainer>
+
+              {/* Tier Revenue Donut (1/3 width) */}
+              <div className="space-y-3">
+                <p className="text-sm font-medium text-muted-foreground">Revenue by Tier</p>
+                {revenueLoading ? (
+                  <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : !revenueAnalytics?.revenueByTier || revenueAnalytics.revenueByTier.length === 0 ? (
+                  <div className="h-64 flex items-center justify-center bg-muted/30 rounded-lg">
+                    <div className="text-center text-muted-foreground">
+                      <DollarSign className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                      <p className="text-xs">No tier data yet</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4">
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie
+                          data={revenueAnalytics.revenueByTier.map((t: any) => ({
+                            name: t.tier,
+                            value: Number(t.revenue) / 100,
+                          }))}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={52}
+                          outerRadius={78}
+                          paddingAngle={3}
+                          dataKey="value"
+                        >
+                          {revenueAnalytics.revenueByTier.map((_: any, index: number) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={index === 0 ? "hsl(var(--primary))" : "hsl(var(--accent))"}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            background: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            fontSize: 12,
+                          }}
+                          formatter={(value: number) => [`$${value.toFixed(2)}`, "Revenue"]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    {/* Legend */}
+                    <div className="w-full space-y-2">
+                      {revenueAnalytics.revenueByTier.map((t: any, i: number) => {
+                        const total = revenueAnalytics.revenueByTier.reduce((s: number, x: any) => s + Number(x.revenue), 0);
+                        const pct = total > 0 ? Math.round((Number(t.revenue) / total) * 100) : 0;
+                        return (
+                          <div key={t.tier} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="inline-block w-2.5 h-2.5 rounded-full"
+                                style={{ background: i === 0 ? "hsl(var(--primary))" : "hsl(var(--accent))" }}
+                              />
+                              <span className="font-medium">{t.tier}</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="font-semibold">${(Number(t.revenue) / 100).toFixed(2)}</span>
+                              <span className="text-muted-foreground text-xs ml-1">({pct}%)</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Recent Purchases Table */}
             <div className="mt-6">

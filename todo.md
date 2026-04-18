@@ -1796,3 +1796,12 @@
 - [x] Add tooltip showing revenue and transaction count per month
 - [x] Handle empty state (no data yet) gracefully with descriptive message
 - [x] Add transaction count as a secondary Bar series on right Y-axis
+
+## Sprint: Revenue Chart Enhancements (Apr 17, 2026)
+
+- [x] Update getRevenueByMonth DB helper to accept a limit parameter (3, 6, or 12)
+- [x] Update getRevenueAnalytics tRPC procedure to accept and pass through the months parameter
+- [x] Add Last 3 / 6 / 12 months toggle buttons above the Revenue Trend chart
+- [x] Add getRevenueByTier DB helper returning Premium vs Pro revenue totals
+- [x] Add getRevenueByTier to getRevenueAnalytics return value
+- [x] Add Premium vs Pro donut chart next to the Revenue Trend chart

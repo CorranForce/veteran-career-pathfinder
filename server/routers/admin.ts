@@ -1,7 +1,7 @@
 import { router, platformOwnerProcedure } from "../_core/trpc";
 import { z } from "zod";
 import { getDb, logAdminActivity, getAdminActivityLogs, getAdminActivityLogsForUser } from "../db";
-import { getTotalRevenue, getMonthlyRevenue, getTotalPurchaseCount, getRecentPurchases, getRevenueByMonth, getAverageOrderValue, getLTVAnalytics } from "../db-analytics";
+import { getTotalRevenue, getMonthlyRevenue, getTotalPurchaseCount, getRecentPurchases, getRevenueByMonth, getRevenueByTier, getAverageOrderValue, getLTVAnalytics } from "../db-analytics";
 import { users, purchases, resumes } from "../../drizzle/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -341,25 +341,30 @@ export const adminRouter = router({
   /**
    * Get revenue analytics (platform owner only)
    */
-  getRevenueAnalytics: platformOwnerProcedure.query(async () => {
-    const [totalRevenue, monthlyRevenue, totalPurchases, recentPurchases, revenueByMonth, avgOrderValue] = await Promise.all([
-      getTotalRevenue(),
-      getMonthlyRevenue(),
-      getTotalPurchaseCount(),
-      getRecentPurchases(),
-      getRevenueByMonth(),
-      getAverageOrderValue(),
-    ]);
+  getRevenueAnalytics: platformOwnerProcedure
+    .input(z.object({ months: z.union([z.literal(3), z.literal(6), z.literal(12)]).default(12) }).optional())
+    .query(async ({ input }) => {
+      const months = (input?.months ?? 12) as 3 | 6 | 12;
+      const [totalRevenue, monthlyRevenue, totalPurchases, recentPurchases, revenueByMonth, avgOrderValue, revenueByTier] = await Promise.all([
+        getTotalRevenue(),
+        getMonthlyRevenue(),
+        getTotalPurchaseCount(),
+        getRecentPurchases(),
+        getRevenueByMonth(months),
+        getAverageOrderValue(),
+        getRevenueByTier(),
+      ]);
 
-    return {
-      totalRevenue,
-      monthlyRevenue,
-      totalPurchases,
-      avgOrderValue,
-      recentPurchases,
-      revenueByMonth,
-    };
-  }),
+      return {
+        totalRevenue,
+        monthlyRevenue,
+        totalPurchases,
+        avgOrderValue,
+        recentPurchases,
+        revenueByMonth,
+        revenueByTier,
+      };
+    }),
 
   /**
    * Get customer lifetime value analytics (platform owner only)
