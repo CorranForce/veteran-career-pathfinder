@@ -20,7 +20,8 @@ import {
   User,
   ChevronDown,
   Shield,
-  Star
+  Star,
+  CreditCard
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -174,6 +175,12 @@ export function AuthenticatedNav() {
                 <DropdownMenuItem className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Profile Settings
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/account">
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Billing & Subscription
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />

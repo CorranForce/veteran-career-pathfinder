@@ -1805,3 +1805,9 @@
 - [x] Add getRevenueByTier DB helper returning Premium vs Pro revenue totals
 - [x] Add getRevenueByTier to getRevenueAnalytics return value
 - [x] Add Premium vs Pro donut chart next to the Revenue Trend chart
+
+## Sprint: Revenue Test Data + Billing Sidebar + Success Page (Apr 17, 2026)
+
+- [x] Seed 12 months of test purchase data into the DB for the revenue chart (72 records, Premium + Pro)
+- [x] Add Billing & Subscription link to AuthenticatedNav user dropdown (all logged-in users)
+- [x] Enhance /success page with personalized welcome message, unlocked content grid, and billing link
