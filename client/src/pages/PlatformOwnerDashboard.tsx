@@ -44,6 +44,7 @@ import {
   DollarSign,
   FileText,
   TrendingUp,
+  TrendingDown,
   Loader2,
   Shield,
   Home,
@@ -57,6 +58,9 @@ import {
   Trash2,
   Eye,
   UserCog,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -280,47 +284,107 @@ export default function PlatformOwnerDashboard() {
       <div className="container mx-auto py-8">
         {/* Analytics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {[
-            {
-              key: 'total-users',
-              title: 'Total Users',
-              icon: Users,
-              value: analytics?.totalUsers || 0,
-              subtitle: `+${analytics?.newUsersThisMonth || 0} new this month`
-            },
-            {
-              key: 'total-revenue',
-              title: 'Total Revenue',
-              icon: DollarSign,
-              value: `$${((analytics?.totalRevenue || 0) / 100).toFixed(2)}`,
-              subtitle: 'Total revenue'
-            },
-            {
-              key: 'resumes-analyzed',
-              title: 'Resumes Analyzed',
-              icon: FileText,
-              value: analytics?.totalResumes || 0,
-              subtitle: `+${analytics?.resumesThisMonth || 0} total`
-            },
-            {
-              key: 'avg-ats-score',
-              title: 'Avg ATS Score',
-              icon: TrendingUp,
-              value: analytics?.averageAtsScore ? Math.round(analytics.averageAtsScore) : '—',
-              subtitle: 'Platform average'
-            }
-          ].map((card) => (
-            <Card key={card.key}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
-                <card.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{card.value}</div>
-                <p className="text-xs text-muted-foreground">{card.subtitle}</p>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Total Users */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {analyticsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (analytics?.totalUsers ?? 0).toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                {(analytics?.newUsersThisMonth ?? 0) > 0 ? (
+                  <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Minus className="h-3.5 w-3.5 text-muted-foreground" />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  <span className={(analytics?.newUsersThisMonth ?? 0) > 0 ? "text-emerald-500 font-medium" : ""}>
+                    +{analytics?.newUsersThisMonth ?? 0}
+                  </span>{" "}
+                  new in the last 30 days
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* All-Time Revenue */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">All-Time Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {analyticsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  `$${((analytics?.totalRevenue ?? 0) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                )}
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                {(analytics?.revenueThisMonth ?? 0) > 0 ? (
+                  <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Minus className="h-3.5 w-3.5 text-muted-foreground" />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  <span className={(analytics?.revenueThisMonth ?? 0) > 0 ? "text-emerald-500 font-medium" : ""}>
+                    +${((analytics?.revenueThisMonth ?? 0) / 100).toFixed(2)}
+                  </span>{" "}
+                  in the last 30 days
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Resumes Analyzed */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Resumes Analyzed</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {analyticsLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (analytics?.totalResumes ?? 0).toLocaleString()}
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                {(analytics?.resumesThisMonth ?? 0) > 0 ? (
+                  <ArrowUpRight className="h-3.5 w-3.5 text-emerald-500" />
+                ) : (
+                  <Minus className="h-3.5 w-3.5 text-muted-foreground" />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  <span className={(analytics?.resumesThisMonth ?? 0) > 0 ? "text-emerald-500 font-medium" : ""}>
+                    +{analytics?.resumesThisMonth ?? 0}
+                  </span>{" "}
+                  in the last 30 days
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Avg ATS Score */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Avg ATS Score</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {analyticsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : analytics?.averageAtsScore ? (
+                  `${Math.round(analytics.averageAtsScore)}/100`
+                ) : (
+                  "—"
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Platform average across all resumes</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Product Management */}

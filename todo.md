@@ -1811,3 +1811,12 @@
 - [x] Seed 12 months of test purchase data into the DB for the revenue chart (72 records, Premium + Pro)
 - [x] Add Billing & Subscription link to AuthenticatedNav user dropdown (all logged-in users)
 - [x] Enhance /success page with personalized welcome message, unlocked content grid, and billing link
+
+## Sprint: Platform Owner Dashboard KPI Cards (Apr 18, 2026)
+
+- [x] getTotalRevenue and total user count already existed in getSiteAnalytics — no new DB helpers needed
+- [x] Enhanced "Total Users" KPI card with +N new in last 30 days trend indicator (green arrow)
+- [x] Enhanced "All-Time Revenue" KPI card with full locale-formatted total and +$X.XX last 30 days indicator
+- [x] Enhanced "Resumes Analyzed" card with last-30-days trend indicator
+- [x] Enhanced "Avg ATS Score" card to show /100 suffix for clarity
+- [x] All four cards show loading spinners while data fetches
