@@ -1826,3 +1826,11 @@
 - [x] Add payingUsers (COUNT DISTINCT userId from completed purchases) to getSiteAnalytics
 - [x] Add Paying Users KPI card to Platform Owner Dashboard (5th card, xl:grid-cols-5)
 - [x] Show conversion rate (payingUsers / totalUsers %) as the card sub-metric in primary color
+
+## Sprint: Google OAuth 403 Fix (Apr 19, 2026)
+
+- [ ] Audit GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars are set and valid
+- [ ] Audit authorized redirect URIs in Google Cloud Console match the app callback URL
+- [ ] Audit googleAuth router — confirm redirect_uri sent to Google matches what's registered
+- [ ] Audit googleOAuthCallback handler for any error that could cause a 403 response
+- [ ] Fix any mismatch and verify OAuth flow end-to-end
