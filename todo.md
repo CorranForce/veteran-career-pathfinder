@@ -1820,3 +1820,9 @@
 - [x] Enhanced "Resumes Analyzed" card with last-30-days trend indicator
 - [x] Enhanced "Avg ATS Score" card to show /100 suffix for clarity
 - [x] All four cards show loading spinners while data fetches
+
+## Sprint: Paying Users KPI Card (Apr 18, 2026)
+
+- [x] Add payingUsers (COUNT DISTINCT userId from completed purchases) to getSiteAnalytics
+- [x] Add Paying Users KPI card to Platform Owner Dashboard (5th card, xl:grid-cols-5)
+- [x] Show conversion rate (payingUsers / totalUsers %) as the card sub-metric in primary color

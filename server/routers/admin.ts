@@ -303,6 +303,13 @@ export const adminRouter = router({
       .where(sql`${resumes.atsScore} IS NOT NULL`);
     const averageAtsScore = avgAtsScoreResult[0]?.avg || 0;
 
+    // Unique paying customers (distinct userId with at least one completed purchase)
+    const payingUsersResult = await db
+      .select({ count: sql<number>`COUNT(DISTINCT ${purchases.userId})` })
+      .from(purchases)
+      .where(eq(purchases.status, "completed"));
+    const payingUsers = payingUsersResult[0]?.count || 0;
+
     return {
       totalUsers,
       newUsersThisMonth,
@@ -311,6 +318,7 @@ export const adminRouter = router({
       totalResumes,
       resumesThisMonth,
       averageAtsScore,
+      payingUsers,
     };
   }),
 
