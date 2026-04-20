@@ -380,7 +380,7 @@ export default function AccountSettings() {
                   <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/30">
                     <AlertTriangle className="h-4 w-4 text-amber-600" />
                     <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
-                      Your Pro subscription will cancel on{" "}
+                      Your subscription will cancel on{" "}
                       <strong>{new Date(sub.nextBillingDate).toLocaleDateString()}</strong>. You will retain access until then.
                     </AlertDescription>
                   </Alert>

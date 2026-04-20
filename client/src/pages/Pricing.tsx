@@ -51,12 +51,11 @@ export default function PricingNew() {
   });
 
   const premiumCents = livePrices?.premium.amountCents ?? PRODUCTS.PREMIUM.price;
-  const proCents = livePrices?.pro.amountCents ?? PRODUCTS.PRO.price;
 
   // Derive the user's current tier
   const isPlatformOwner = user?.role === "platform_owner";
   const currentTier = isPlatformOwner ? "owner" : (subscriptionStatus?.tier ?? "free");
-  const hasPaidAccess = currentTier === "premium" || currentTier === "pro" || currentTier === "owner";
+  const hasPaidAccess = currentTier === "premium" || currentTier === "owner";
 
   const createCheckoutMutation = trpc.payment.createCheckoutSession.useMutation({
     onSuccess: (data) => {
@@ -82,7 +81,7 @@ export default function PricingNew() {
     },
   });
 
-  const handleCheckout = (productId: "PREMIUM" | "PRO") => {
+  const handleCheckout = () => {
     if (authLoading) {
       toast.info("Loading, please try again in a moment...");
       return;
@@ -92,7 +91,7 @@ export default function PricingNew() {
       window.location.href = `/login?next=${encodeURIComponent("/pricing")}`;
       return;
     }
-    createCheckoutMutation.mutate({ productId });
+    createCheckoutMutation.mutate({ productId: "PREMIUM" });
   };
 
   const handleManageBilling = () => {
@@ -117,7 +116,7 @@ export default function PricingNew() {
         </Button>
       );
     }
-    if (currentTier === "premium" || currentTier === "pro") {
+    if (currentTier === "premium") {
       return (
         <Button
           className="w-full"
@@ -136,7 +135,7 @@ export default function PricingNew() {
     return (
       <Button
         className="w-full"
-        onClick={() => handleCheckout("PREMIUM")}
+        onClick={handleCheckout}
         disabled={createCheckoutMutation.isPending}
       >
         {createCheckoutMutation.isPending ? (
@@ -146,55 +145,6 @@ export default function PricingNew() {
         )}
       </Button>
     );
-  })();
-
-  const proCta = (() => {
-    if (currentTier === "owner") {
-      return (
-        <Button className="w-full border-accent text-accent" variant="outline" disabled>
-          <Crown className="mr-2 h-4 w-4" />
-          Platform Owner Access
-        </Button>
-      );
-    }
-    if (currentTier === "pro") {
-      return (
-        <Button
-          variant="outline"
-          className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-          onClick={handleManageBilling}
-          disabled={createPortalMutation.isPending}
-        >
-          {createPortalMutation.isPending ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Opening...</>
-          ) : (
-            <><ExternalLink className="mr-2 h-4 w-4" />Manage Billing</>
-          )}
-        </Button>
-      );
-    }
-    return (
-      <Button
-        variant="outline"
-        className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-        onClick={() => handleCheckout("PRO")}
-        disabled={createCheckoutMutation.isPending}
-      >
-        {createCheckoutMutation.isPending ? (
-          <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing...</>
-        ) : (
-          "Start Pro Membership"
-        )}
-      </Button>
-    );
-  })();
-
-  // Badge to show on the card matching the user's current plan
-  const currentPlanLabel = (() => {
-    if (currentTier === "owner") return "Your Plan";
-    if (currentTier === "pro") return "Your Plan";
-    if (currentTier === "premium") return "Your Plan";
-    return null;
   })();
 
   return (
@@ -286,7 +236,7 @@ export default function PricingNew() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px]">
-              <div className="flex flex-col gap-4 mt-8">
+              <div className="flex flex-col gap-3 mt-8">
                 <Button variant="ghost" className="justify-start" asChild>
                   <a href="/">Home</a>
                 </Button>
@@ -329,7 +279,7 @@ export default function PricingNew() {
       {/* Pricing Tiers */}
       <section className="py-20">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
 
             {/* Free Tier */}
             <Card className={`border-2 relative ${currentTier === "free" && isAuthenticated ? "ring-2 ring-muted-foreground/30" : ""}`}>
@@ -363,10 +313,10 @@ export default function PricingNew() {
             {/* Premium Tier - Most Popular */}
             <Card className={`border-4 border-primary relative shadow-xl ${currentTier === "premium" ? "ring-4 ring-primary/40" : ""}`}>
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-2">
-                {currentTier === "premium" && currentPlanLabel ? (
+                {currentTier === "premium" ? (
                   <Badge className="bg-green-600 text-white px-4 py-1">
                     <CheckCircle2 className="h-3 w-3 mr-1 inline" />
-                    {currentPlanLabel}
+                    Your Plan
                   </Badge>
                 ) : currentTier === "owner" ? (
                   <Badge className="bg-purple-600 text-white px-4 py-1">
@@ -420,56 +370,6 @@ export default function PricingNew() {
               </CardFooter>
             </Card>
 
-            {/* Pro Tier */}
-            <Card className={`border-2 border-accent relative ${currentTier === "pro" ? "ring-4 ring-accent/40" : ""}`}>
-              {currentTier === "pro" && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <Badge className="bg-green-600 text-white px-4 py-1">
-                    <CheckCircle2 className="h-3 w-3 mr-1 inline" />
-                    Your Plan
-                  </Badge>
-                </div>
-              )}
-              <CardHeader>
-                <CardTitle className="text-2xl">{livePrices?.pro.name ?? PRODUCTS.PRO.name}</CardTitle>
-                <CardDescription>{livePrices?.pro.description ?? PRODUCTS.PRO.description}</CardDescription>
-                <div className="mt-4 space-y-1">
-                  <div className="flex items-baseline gap-2">
-                    {livePrices ? (
-                      <span className="text-4xl font-bold">{fmt(proCents)}</span>
-                    ) : (
-                      <span className="text-4xl font-bold animate-pulse text-muted-foreground">
-                        Loading...
-                      </span>
-                    )}
-                    <span className="text-muted-foreground">
-                      {livePrices?.pro.isRecurring
-                        ? `/${livePrices.pro.billingInterval ?? "month"}`
-                        : "one-time"}
-                    </span>
-                  </div>
-                  {(livePrices?.pro.yearlyDiscountPercent ?? 0) > 0 && (
-                    <Badge className="bg-green-500/15 text-green-600 border-green-500/30 text-xs">
-                      Save {livePrices!.pro.yearlyDiscountPercent}% vs. monthly
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  {PRODUCTS.PRO.features.map((feature: string, index: number) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                      <span className="text-sm font-medium">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter>
-                {proCta}
-              </CardFooter>
-            </Card>
-
           </div>
 
           {/* Trust Indicators */}
@@ -495,17 +395,17 @@ export default function PricingNew() {
           <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-lg mb-2">What's the difference between Premium and Pro?</h3>
+              <h3 className="font-semibold text-lg mb-2">What does Premium include?</h3>
               <p className="text-muted-foreground">
-                Premium gives you lifetime access to our complete career transition toolkit with a one-time payment.
-                Pro adds ongoing support with monthly webinars, community access, and resume reviews for active job seekers.
+                Premium gives you lifetime access to our complete career transition toolkit with a one-time payment —
+                including the full Pathfinder prompt suite, resume rewriter, interview prep module, LinkedIn optimizer,
+                salary negotiation scripts, and networking templates.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-lg mb-2">Can I upgrade from Premium to Pro later?</h3>
+              <h3 className="font-semibold text-lg mb-2">Is there a recurring fee?</h3>
               <p className="text-muted-foreground">
-                Yes! You can upgrade to Pro membership at any time. Your Premium purchase gives you all the core materials,
-                and Pro adds the community and ongoing support.
+                No. Pathfinder Premium is a one-time purchase with lifetime access. Pay once, use it forever.
               </p>
             </div>
             <div>

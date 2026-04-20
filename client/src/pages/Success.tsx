@@ -11,7 +11,6 @@ import {
   Compass,
   FileText,
   Languages,
-  BookOpen,
   CreditCard,
   Star,
 } from "lucide-react";
@@ -38,8 +37,7 @@ export default function Success() {
     staleTime: 30 * 1000,
   });
 
-  const isPro = subscription?.planName?.toLowerCase().includes("pro");
-  const planLabel = isPro ? "Pathfinder Pro" : "Pathfinder Premium";
+  const planLabel = subscription?.planName ?? "Pathfinder Premium";
   const firstName = user?.name?.split(" ")[0] ?? "Veteran";
 
   // Content unlocked per plan
@@ -64,17 +62,7 @@ export default function Success() {
     },
   ];
 
-  const proUnlocks = [
-    ...premiumUnlocks,
-    {
-      icon: BookOpen,
-      label: "Blog & Guides",
-      description: "Exclusive strategy articles and career playbooks",
-      href: "/blog",
-    },
-  ];
-
-  const unlocks = isPro ? proUnlocks : premiumUnlocks;
+  const unlocks = premiumUnlocks;
 
   return (
     <div className="min-h-screen flex flex-col">

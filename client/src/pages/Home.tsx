@@ -106,7 +106,7 @@ export default function Home() {
           },
           {
             question: "Is there a free trial or money-back guarantee?",
-            answer: "The core Pathfinder prompt is completely free — no credit card, no sign-up required. For Premium and Pro tiers, you can create a free account and explore the platform before upgrading. If you upgrade and feel the content doesn't deliver value, reach out within 7 days and we'll make it right."
+            answer: "The core Pathfinder prompt is completely free — no credit card, no sign-up required. For Premium, you can create a free account and explore the platform before upgrading. If you upgrade and feel the content doesn't deliver value, reach out within 30 days for a full refund — no questions asked."
           },
           {
             question: "Which AI assistant should I use with the prompt?",
@@ -578,7 +578,7 @@ export default function Home() {
                     <div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-2"></div>
                     <div>
                       <p className="font-medium">Private Veteran Community</p>
-                      <p className="text-sm text-muted-foreground">Forum for Pro members to connect, share experiences, and network</p>
+                      <p className="text-sm text-muted-foreground">Forum for Premium members to connect, share experiences, and network</p>
                       <Badge variant="outline" className="mt-1">In Development</Badge>
                     </div>
                   </div>
@@ -691,7 +691,7 @@ export default function Home() {
                   Is there a free trial or money-back guarantee?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
-                  The core Pathfinder prompt is completely free — no credit card, no sign-up required. For Premium and Pro tiers, you can create a free account and explore the platform before upgrading. If you upgrade and feel the content doesn't deliver value, reach out within 7 days and we'll make it right. Veterans have given enough — we're not in the business of adding financial stress to your transition.
+                  The core Pathfinder prompt is completely free — no credit card, no sign-up required. For Premium, you can create a free account and explore the platform before upgrading. If you upgrade and feel the content doesn't deliver value, reach out within 30 days for a full refund — no questions asked. Veterans have given enough — we're not in the business of adding financial stress to your transition.
                 </AccordionContent>
               </AccordionItem>
 

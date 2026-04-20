@@ -1834,3 +1834,15 @@
 - [ ] Audit googleAuth router — confirm redirect_uri sent to Google matches what's registered
 - [ ] Audit googleOAuthCallback handler for any error that could cause a 403 response
 - [ ] Fix any mismatch and verify OAuth flow end-to-end
+
+
+## Pro Tier Removal (Completed)
+
+- [x] Remove Pro tier card from /pricing page (rewritten to 2-column Free + Premium grid)
+- [x] Fix TypeScript error in Success.tsx (removed proUnlocks array and isPro variable)
+- [x] Remove Pro tier mention from Home.tsx FAQ (two instances)
+- [x] Remove "Pro members" text from Home.tsx community section
+- [x] Update AccountSettings.tsx cancel warning to be tier-agnostic
+- [x] Remove unused BookOpen import from Success.tsx
+- [x] Update Pricing.tsx FAQ to remove Pro comparisons
+- [x] Confirm 241/241 tests pass after all changes
