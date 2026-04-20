@@ -1836,6 +1836,16 @@
 - [ ] Fix any mismatch and verify OAuth flow end-to-end
 
 
+## Refer-a-Veteran Feature — Schema & API (Completed)
+
+- [x] Design referral_codes and referral_conversions DB tables
+- [x] Push migration to live database (pnpm db:push)
+- [x] Write db-referral.ts helper functions (get/create code, track clicks/signups/conversions, reward lifecycle)
+- [x] Write server/routers/referral.ts tRPC router (8 procedures: getMyCode, getMyConversions, trackClick, trackSignup, validateCode, recordConversion, issueReward, adminGetAll, adminReverseReward)
+- [x] Register referral router in routers.ts
+- [x] Write 22 Vitest tests covering all procedures and error paths (22/22 pass)
+- [x] TypeScript 0 errors
+
 ## Pro Tier Removal (Completed)
 
 - [x] Remove Pro tier card from /pricing page (rewritten to 2-column Free + Premium grid)

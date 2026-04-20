@@ -740,3 +740,99 @@ export const mosTranslatorSessions = mysqlTable("mos_translator_sessions", {
 
 export type MosTranslatorSession = typeof mosTranslatorSessions.$inferSelect;
 export type InsertMosTranslatorSession = typeof mosTranslatorSessions.$inferInsert;
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Referral System
+// Two-table design:
+//   referral_codes  — one unique code per user (created lazily on first request)
+//   referral_conversions — one row per successful Premium purchase made via a
+//                          referral link, recording the referrer, the new buyer,
+//                          and the reward credit issued to the referrer.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Referral Codes — one shareable code per registered user.
+ * The code is a short random slug (e.g. "VET-A1B2C3") embedded in the
+ * referral URL: /signup?ref=VET-A1B2C3
+ */
+export const referralCodes = mysqlTable("referral_codes", {
+  id: int("id").autoincrement().primaryKey(),
+
+  // The user who owns this referral code
+  userId: int("userId").notNull().unique(),
+
+  // The shareable code slug (e.g. "VET-A1B2C3")
+  code: varchar("code", { length: 32 }).notNull().unique(),
+
+  // Aggregate counters (denormalised for fast dashboard reads)
+  totalClicks: int("totalClicks").default(0).notNull(),
+  totalSignups: int("totalSignups").default(0).notNull(),   // users who signed up via this code
+  totalConversions: int("totalConversions").default(0).notNull(), // signups who then purchased Premium
+
+  // Whether the referrer is eligible to receive rewards
+  isActive: boolean("isActive").default(true).notNull(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReferralCode = typeof referralCodes.$inferSelect;
+export type InsertReferralCode = typeof referralCodes.$inferInsert;
+
+
+/**
+ * Referral Conversions — one row per completed Premium purchase that was
+ * attributed to a referral code.
+ *
+ * Reward mechanics (implemented in the webhook handler):
+ *   - referrerId receives a $5 account credit (stored as rewardCents)
+ *   - refereeId (the new buyer) receives a 10 % discount coupon applied
+ *     automatically at checkout (handled in createCheckoutSession)
+ *
+ * rewardStatus lifecycle:
+ *   pending  → reward queued but not yet applied
+ *   issued   → credit/coupon applied successfully
+ *   failed   → application attempt failed (retryable)
+ *   reversed → purchase was refunded; reward clawed back
+ */
+export const referralConversions = mysqlTable("referral_conversions", {
+  id: int("id").autoincrement().primaryKey(),
+
+  // The referral code that was used
+  referralCodeId: int("referralCodeId").notNull(),
+
+  // The user who shared the link (reward recipient)
+  referrerId: int("referrerId").notNull(),
+
+  // The user who clicked the link and purchased
+  refereeId: int("refereeId").notNull(),
+
+  // The purchase that triggered this conversion
+  purchaseId: int("purchaseId").notNull(),
+
+  // Reward for the referrer (in cents, e.g. 500 = $5.00)
+  rewardCents: int("rewardCents").default(500).notNull(),
+
+  // Discount given to the referee at checkout (basis points, e.g. 1000 = 10 %)
+  refereeDiscountBps: int("refereeDiscountBps").default(1000).notNull(),
+
+  // Stripe coupon ID applied to the referee's checkout session
+  refereeCouponId: varchar("refereeCouponId", { length: 255 }),
+
+  // Reward lifecycle
+  rewardStatus: mysqlEnum("rewardStatus", ["pending", "issued", "failed", "reversed"])
+    .default("pending")
+    .notNull(),
+  rewardIssuedAt: timestamp("rewardIssuedAt"),
+  rewardReversedAt: timestamp("rewardReversedAt"),
+
+  // Optional admin note (e.g. reason for reversal)
+  notes: text("notes"),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ReferralConversion = typeof referralConversions.$inferSelect;
+export type InsertReferralConversion = typeof referralConversions.$inferInsert;
