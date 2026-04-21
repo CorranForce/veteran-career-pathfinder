@@ -1856,3 +1856,14 @@
 - [x] Remove unused BookOpen import from Success.tsx
 - [x] Update Pricing.tsx FAQ to remove Pro comparisons
 - [x] Confirm 241/241 tests pass after all changes
+
+## Stripe Webhook — Referral Conversion Attribution (Completed)
+
+- [x] Add getPurchaseByPaymentIntent and getPurchaseBySubscriptionId helpers to db.ts
+- [x] Update createCheckoutSession to accept referralCode input and resolve it to a numeric referral_code_id embedded in Stripe session metadata
+- [x] Add self-referral guard in checkout (buyer cannot use their own code)
+- [x] Rewrite stripeWebhook.ts: add tryRecordReferralConversion helper called from checkout.session.completed
+- [x] Idempotency guard: skip if purchase already has a conversion row
+- [x] Inactive code guard: skip if referral code is not active
+- [x] Write 7 Vitest tests in stripeWebhook.referral.test.ts (all pass)
+- [x] All 270/270 tests pass, TypeScript 0 errors

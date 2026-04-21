@@ -7,6 +7,7 @@ import { getUserDownloads } from "../services/purchaseFulfillment";
 import { and, eq, desc } from "drizzle-orm";
 import { getDb } from "../db";
 import { purchases } from "../../drizzle/schema";
+import { getReferralCodeBySlug } from "../db-referral";
 
 export const paymentRouter = router({
   /**
@@ -17,6 +18,7 @@ export const paymentRouter = router({
       z.object({
         productId: z.enum(["PREMIUM", "PRO"]),
         couponCode: z.string().optional(),
+        referralCode: z.string().max(32).optional(), // e.g. "VET-ABC123"
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -62,6 +64,26 @@ export const paymentRouter = router({
       const isRecurring = dbProduct ? dbProduct.isRecurring : ("type" in fallbackProduct && fallbackProduct.type === "subscription");
       const billingInterval = dbProduct?.billingInterval ?? ("interval" in fallbackProduct ? fallbackProduct.interval : undefined);
 
+      // ── Referral attribution ────────────────────────────────────────────────
+      // If the caller supplies a referral code slug, look it up and embed the
+      // numeric ID in the Stripe metadata so the webhook can attribute the
+      // conversion without an extra DB query.
+      let resolvedReferralCodeId = "";
+      let resolvedReferralCodeSlug = "";
+      if (input.referralCode) {
+        try {
+          const refRecord = await getReferralCodeBySlug(input.referralCode);
+          if (refRecord && refRecord.isActive && refRecord.userId !== ctx.user.id) {
+            // Prevent self-referral
+            resolvedReferralCodeId = refRecord.id.toString();
+            resolvedReferralCodeSlug = refRecord.code;
+          }
+        } catch (err) {
+          // Non-fatal: log and continue without referral attribution
+          console.warn("[Checkout] Failed to resolve referral code:", err);
+        }
+      }
+
       // Create checkout session with optional coupon
       const sessionConfig: any = {
         customer: customerId,
@@ -71,6 +93,9 @@ export const paymentRouter = router({
           customer_email: ctx.user.email || "",
           customer_name: ctx.user.name || "",
           product_type: productType,
+          // Referral attribution — numeric ID lets the webhook skip a slug→ID lookup.
+          referral_code_id: resolvedReferralCodeId,
+          referral_code_slug: resolvedReferralCodeSlug,
         },
         line_items: [
           activePriceId

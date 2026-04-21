@@ -238,6 +238,29 @@ export async function createPurchase(purchase: InsertPurchase) {
   return result;
 }
 
+export async function getPurchaseByPaymentIntent(paymentIntentId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db
+    .select()
+    .from(purchases)
+    .where(eq(purchases.stripePaymentIntentId, paymentIntentId))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getPurchaseBySubscriptionId(subscriptionId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const rows = await db
+    .select()
+    .from(purchases)
+    .where(eq(purchases.stripeSubscriptionId, subscriptionId))
+    .orderBy(desc(purchases.createdAt))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
 export async function updatePurchaseStatus(
   paymentIntentId: string,
   status: "completed" | "failed" | "cancelled"
