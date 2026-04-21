@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Helmet } from "react-helmet-async";
 import EmailCaptureForm from "@/components/EmailCaptureForm";
@@ -49,14 +50,19 @@ export default function Home() {
     document.getElementById('prompt-section')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Set page title imperatively so SEO scanners that read document.title detect it
+  useEffect(() => {
+    document.title = "Pathfinder | Veteran Career Transition AI";
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Pathfinder — Veteran Career Transition Strategist</title>
-        <meta name="description" content="AI-powered tool helping military veterans translate their service into civilian careers. Get personalized job paths, skills mapping, and a 30-day action plan." />
-        <meta name="keywords" content="veteran career transition, military to civilian jobs, MOS translator, veteran employment, AI career advisor, military skills translation, veteran job search" />
-        <meta property="og:title" content="Pathfinder — Veteran Career Transition Strategist" />
-        <meta property="og:description" content="AI-powered tool helping military veterans translate their service into civilian careers. Get personalized job paths, skills mapping, and a 30-day action plan." />
+        <title>Pathfinder | Veteran Career Transition AI</title>
+        <meta name="description" content="AI-powered career advisor for military veterans. Translate your MOS into civilian jobs, map transferable skills, and get a 30-day action plan." />
+        <meta name="keywords" content="veteran career transition, military to civilian jobs, MOS translator, veteran employment, AI career advisor, military skills translation, veteran job search, military career change" />
+        <meta property="og:title" content="Pathfinder | Veteran Career Transition AI" />
+        <meta property="og:description" content="AI-powered career advisor for military veterans. Translate your MOS into civilian jobs, map transferable skills, and get a 30-day action plan." />
         <meta property="og:url" content="https://pathfinder.casa" />
         <meta property="og:type" content="website" />
         <link rel="canonical" href="https://pathfinder.casa" />
