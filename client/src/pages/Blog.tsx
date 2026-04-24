@@ -35,7 +35,11 @@ export default function Blog() {
       return el;
     };
 
-    const desc = setMeta("description", "Career guides, MOS translation tips, certification roadmaps, and transition strategies written specifically for military veterans entering the civilian workforce.");
+    const desc = setMeta("description", "Career guides, MOS translation tips, certification roadmaps, and transition strategies for military veterans entering the civilian workforce.");
+    const kw = setMeta("keywords", "veteran career blog, military to civilian guide, MOS translation tips, veteran job search, military career resources");
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) { canonical = document.createElement('link'); canonical.setAttribute('rel', 'canonical'); document.head.appendChild(canonical); }
+    canonical.setAttribute('href', 'https://pathfinder.casa/blog');
     const ogTitle = setOg("og:title", "Career Resources & Guides | Pathfinder");
     const ogDesc = setOg("og:description", "Career guides, MOS translation tips, certification roadmaps, and transition strategies written specifically for military veterans.");
     const ogType = setOg("og:type", "website");

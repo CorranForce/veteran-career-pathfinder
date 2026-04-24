@@ -24,6 +24,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { getLoginUrl } from "@/const";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
@@ -146,6 +147,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>My Dashboard | Pathfinder Veteran Career Tools</title>
+        <meta name="description" content="Access your veteran career dashboard. Manage your profile, view AI career analysis, download resume templates, and track your transition progress." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <AuthenticatedNav />
 
       {/* Dashboard Content */}

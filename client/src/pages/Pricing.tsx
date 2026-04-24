@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -147,8 +148,18 @@ export default function PricingNew() {
     );
   })();
 
+  useEffect(() => {
+    document.title = "Pricing | Pathfinder Veteran Career Platform";
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
+      <Helmet>
+        <title>Pricing | Pathfinder Veteran Career Platform</title>
+        <meta name="description" content="Free and Premium plans for military veterans. Unlock AI career paths, MOS translation, resume templates, and a 30-day action plan. Start free today." />
+        <meta name="keywords" content="veteran career transition pricing, military career tools, MOS translator, veteran resume builder, AI career advisor cost" />
+        <link rel="canonical" href="https://pathfinder.casa/pricing" />
+      </Helmet>
       {/* Test-mode banner */}
       {isTestMode && !testBannerDismissed && (
         <div className="bg-yellow-500/15 border-b border-yellow-500/30 px-4 py-2.5">

@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { PageFooter } from "@/components/PageFooter";
@@ -326,8 +327,18 @@ export default function MOSTranslator() {
   const showResults = debouncedQuery.length >= 1;
   const showDetail = !!selectedCode;
 
+  useEffect(() => {
+    document.title = "MOS Translator | Military to Civilian Career Pathfinder";
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <Helmet>
+        <title>MOS Translator | Military to Civilian Career Pathfinder</title>
+        <meta name="description" content="Translate your Military Occupational Specialty (MOS) into civilian job titles, salary ranges, and career paths. Free MOS lookup for all branches." />
+        <meta name="keywords" content="MOS translator, military occupational specialty, military to civilian jobs, MOS to civilian, veteran job search, military skills translation" />
+        <link rel="canonical" href="https://pathfinder.casa/mos-translator" />
+      </Helmet>
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between h-16">
