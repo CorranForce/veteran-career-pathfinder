@@ -1867,3 +1867,11 @@
 - [x] Inactive code guard: skip if referral code is not active
 - [x] Write 7 Vitest tests in stripeWebhook.referral.test.ts (all pass)
 - [x] All 270/270 tests pass, TypeScript 0 errors
+
+## Open Graph Images
+
+- [x] Generate og-home.png (1200x630) for landing page
+- [x] Generate og-pricing.png (1200x630) for pricing page
+- [x] Generate og-mos-translator.png (1200x630) for MOS Translator page
+- [x] Upload all three as static webdev assets
+- [x] Wire og:image meta tags into Home.tsx, Pricing.tsx, MOSTranslator.tsx

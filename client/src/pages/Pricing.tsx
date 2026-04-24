@@ -158,6 +158,18 @@ export default function PricingNew() {
         <title>Pricing | Pathfinder Veteran Career Platform</title>
         <meta name="description" content="Free and Premium plans for military veterans. Unlock AI career paths, MOS translation, resume templates, and a 30-day action plan. Start free today." />
         <meta name="keywords" content="veteran career transition pricing, military career tools, MOS translator, veteran resume builder, AI career advisor cost" />
+        <meta property="og:title" content="Pricing | Pathfinder Veteran Career Platform" />
+        <meta property="og:description" content="Free and Premium plans for military veterans. Unlock AI career paths, MOS translation, resume templates, and a 30-day action plan. Start free today." />
+        <meta property="og:url" content="https://pathfinder.casa/pricing" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-pricing-5L4ifgKg4nforoxg3VVbeq.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Pathfinder Pricing — Free and Premium Plans for Veterans" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Pricing | Pathfinder Veteran Career Platform" />
+        <meta name="twitter:description" content="Free and Premium plans for military veterans. Unlock AI career paths, MOS translation, resume templates, and a 30-day action plan." />
+        <meta name="twitter:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-pricing-5L4ifgKg4nforoxg3VVbeq.png" />
         <link rel="canonical" href="https://pathfinder.casa/pricing" />
       </Helmet>
       {/* Test-mode banner */}

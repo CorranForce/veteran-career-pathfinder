@@ -65,6 +65,14 @@ export default function Home() {
         <meta property="og:description" content="AI-powered career advisor for military veterans. Translate your MOS into civilian jobs, map transferable skills, and get a 30-day action plan." />
         <meta property="og:url" content="https://pathfinder.casa" />
         <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-home-UgWQqaXhJMc49sSdpTpuAb.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Pathfinder — Translate Your Service Into Your Next Mission" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Pathfinder | Veteran Career Transition AI" />
+        <meta name="twitter:description" content="AI-powered career advisor for military veterans. Translate your MOS into civilian jobs, map transferable skills, and get a 30-day action plan." />
+        <meta name="twitter:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-home-UgWQqaXhJMc49sSdpTpuAb.png" />
         <link rel="canonical" href="https://pathfinder.casa" />
       </Helmet>
       {/* SEO: Organization structured data */}
