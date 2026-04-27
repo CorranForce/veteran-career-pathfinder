@@ -836,3 +836,22 @@ export const referralConversions = mysqlTable("referral_conversions", {
 
 export type ReferralConversion = typeof referralConversions.$inferSelect;
 export type InsertReferralConversion = typeof referralConversions.$inferInsert;
+
+// ─── Exit-Intent Email Captures ─────────────────────────────────────────────
+// Stores emails captured by the exit-intent popup before revealing the coupon.
+export const exitIntentCaptures = mysqlTable("exit_intent_captures", {
+  id: int("id").autoincrement().primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  // Stripe coupon code shown to this visitor
+  couponCode: varchar("couponCode", { length: 100 }).notNull().default("5zlB9zup"),
+  // Whether the coupon email was successfully sent
+  emailSent: boolean("emailSent").default(false).notNull(),
+  emailSentAt: timestamp("emailSentAt"),
+  // Whether this lead eventually converted to a paid purchase
+  convertedAt: timestamp("convertedAt"),
+  // IP hash for basic spam/abuse prevention
+  ipHash: varchar("ipHash", { length: 64 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type ExitIntentCapture = typeof exitIntentCaptures.$inferSelect;
+export type InsertExitIntentCapture = typeof exitIntentCaptures.$inferInsert;

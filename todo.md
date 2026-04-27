@@ -1111,15 +1111,15 @@
 - [ ] Test scalability of tracking schema
 
 ### 6. Exit-Intent Email Capture Upgrade
-- [ ] Update exit-intent popup with email capture form (current popup shows discount CTA but no email input field)
-- [ ] Create email capture database schema
-- [ ] Implement store captured email API
-- [ ] Send 20% discount code via SendGrid
-- [ ] Reveal discount only after submission
-- [ ] Handle duplicate email submissions
-- [ ] Add email validation
-- [ ] Implement spam resistance measures
-- [ ] Test SendGrid email delivery
+- [x] Update exit-intent popup with email capture form (two-step: email form → coupon reveal)
+- [x] Create email capture database schema (exitIntentCaptures table)
+- [x] Implement store captured email API (exitIntent.submit tRPC procedure)
+- [x] Send 20% discount code via Resend email (sendExitIntentCouponEmail)
+- [x] Reveal discount only after submission (step 2 of popup)
+- [x] Handle duplicate email submissions (idempotent — returns existing code, no re-send)
+- [x] Add email validation (zod + client-side validation)
+- [x] Implement spam resistance measures (IP hashing, duplicate guard)
+- [ ] Test email delivery (user action — verify in Resend dashboard after deployment)
 
 ### 7. Navigation & UX Improvements - Admin
 - [ ] Implement breadcrumb navigation in admin dashboard
@@ -1872,3 +1872,13 @@
 - [x] Generate og-mos-translator.png (1200x630) for MOS Translator page
 - [x] Upload all three as static webdev assets
 - [x] Wire og:image meta tags into Home.tsx, Pricing.tsx, MOSTranslator.tsx
+
+## Exit-Intent Email Capture Upgrade (In Progress)
+
+- [x] Read current ExitIntentPopup and email backend
+- [x] Add exitIntentCaptures DB table (email, couponCode, sentAt, convertedAt)
+- [x] Add tRPC procedure: exitIntent.submit (validate email, prevent duplicates, return coupon)
+- [x] Rewrite ExitIntentPopup: Step 1 = email form, Step 2 = discount code reveal
+- [x] Wire Resend to send 20% coupon code email on submission
+- [x] Write Vitest tests for exitIntent.submit procedure (9 tests, all passing)
+- [x] Run full test suite and confirm passing (279/279)

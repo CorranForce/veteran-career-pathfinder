@@ -26,6 +26,7 @@ import { notificationsRouter } from "./routers/notifications";
 import { blogRouter } from "./routers/blog";
 import { mosTranslatorRouter } from "./routers/mosTranslator";
 import { referralRouter } from "./routers/referral";
+import { exitIntentRouter } from "./routers/exitIntent";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -70,6 +71,7 @@ export const appRouter = router({
   blog: blogRouter,
   mosTranslator: mosTranslatorRouter,
   referral: referralRouter,
+  exitIntent: exitIntentRouter,
 });
 
 export type AppRouter = typeof appRouter;

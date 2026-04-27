@@ -133,3 +133,79 @@ export async function testResendConnection(): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Send exit-intent coupon email
+ * Delivers the 20% discount code to a visitor who entered their email in the exit popup.
+ */
+export async function sendExitIntentCouponEmail(
+  to: string,
+  couponCode: string
+): Promise<boolean> {
+  try {
+    const discountPercent = 20;
+    const pricingUrl = `${process.env.FRONTEND_URL || "https://pathfinder.casa"}/pricing`;
+
+    const { error, data } = await resend.emails.send({
+      from: "Pathfinder <orders@resend.dev>",
+      to: [to],
+      subject: `Your 20% Veteran Discount Code — ${couponCode}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9fafb; padding: 20px;">
+          <div style="background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+            <h1 style="color: #1e3a5f; font-size: 24px; margin-bottom: 8px;">Your Exclusive Discount Is Ready</h1>
+            <p style="color: #4b5563; font-size: 16px; margin-bottom: 24px;">
+              Thank you for your interest in Pathfinder. Here is your <strong>${discountPercent}% veteran discount</strong> — 
+              use it at checkout to save on the Premium Package.
+            </p>
+
+            <!-- Coupon code box -->
+            <div style="background-color: #fff7ed; border: 2px dashed #f97316; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 24px;">
+              <p style="color: #9a3412; font-size: 13px; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px;">Your Coupon Code</p>
+              <p style="color: #ea580c; font-size: 32px; font-weight: bold; letter-spacing: 4px; margin: 0;">${couponCode}</p>
+              <p style="color: #9a3412; font-size: 13px; margin: 8px 0 0 0;">${discountPercent}% off the Premium Package</p>
+            </div>
+
+            <!-- What you get -->
+            <div style="background-color: #f0f9ff; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+              <p style="color: #1e3a5f; font-weight: bold; margin: 0 0 12px 0;">What's included in Premium:</p>
+              <ul style="color: #374151; font-size: 14px; margin: 0; padding-left: 20px; line-height: 1.8;">
+                <li>Complete AI Career Transition Strategist prompt</li>
+                <li>3–4 detailed civilian career paths with salary data</li>
+                <li>Skills gap analysis &amp; certification roadmap</li>
+                <li>30-day action plan with weekly milestones</li>
+                <li>Resume templates optimized for ATS systems</li>
+                <li>Lifetime access &amp; future updates</li>
+              </ul>
+            </div>
+
+            <a href="${pricingUrl}"
+               style="display: block; background-color: #1e3a5f; color: #ffffff; text-align: center; padding: 14px 24px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-bottom: 16px;">
+              Claim My ${discountPercent}% Discount →
+            </a>
+
+            <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
+              This code is for single use only. If you have questions, reply to this email.
+            </p>
+          </div>
+
+          <p style="color: #9ca3af; font-size: 11px; text-align: center; margin-top: 16px;">
+            Pathfinder — AI-Powered Veteran Career Transition Strategist<br/>
+            You received this because you requested a discount on pathfinder.casa.
+          </p>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error("[Resend] Failed to send exit-intent coupon email:", error);
+      return false;
+    }
+
+    console.log("[Resend] Exit-intent coupon email sent:", data?.id);
+    return true;
+  } catch (err) {
+    console.error("[Resend] Error sending exit-intent coupon email:", err);
+    return false;
+  }
+}
