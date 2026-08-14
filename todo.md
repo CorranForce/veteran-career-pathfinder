@@ -1103,7 +1103,8 @@
 - [x] Implement track referral clicks
 - [x] Implement track referral signups
 - [x] Implement track referral conversions (payment only)
-- [x] Add query param attribution logic
+- [x] Add basic referral-code validation and webhook attribution logic
+- [x] Persist a shared ?ref= code through signup and checkout for end-to-end referral attribution (signup capture, click tracking, secure signup counters, and Stripe metadata)
 - [x] Prevent self-referrals
 - [x] Prevent duplicate credit
 - [x] Add basic abuse prevention

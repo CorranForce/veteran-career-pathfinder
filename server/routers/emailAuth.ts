@@ -18,6 +18,7 @@ export const emailAuthRouter = router({
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
         name: z.string().min(1, "Name is required"),
+        referralCode: z.string().max(32).optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -40,6 +41,18 @@ export const emailAuthRouter = router({
         passwordHash,
         name: input.name,
       });
+
+      // Attribute a successful signup only after the new user exists. Referral
+      // errors must never block account creation, so the flow remains resilient.
+      try {
+        const { recordReferralSignup } = await import("../referralAttribution");
+        await recordReferralSignup({
+          referralCode: input.referralCode,
+          newUserId: userId,
+        });
+      } catch (referralError) {
+        console.error("[EmailAuth] Failed to record referral signup:", referralError);
+      }
 
       // Log signup activity
       await db.logActivity({

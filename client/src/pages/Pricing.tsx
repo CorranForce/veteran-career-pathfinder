@@ -19,6 +19,10 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { PRODUCTS } from "@shared/products";
+import {
+  captureReferralCodeFromSearch,
+  getStoredReferralCode,
+} from "@/lib/referralAttribution";
 
 /** Format cents to a USD string, e.g. 2900 → "$29.00" */
 function fmt(cents: number): string {
@@ -33,6 +37,9 @@ export default function PricingNew() {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [testBannerDismissed, setTestBannerDismissed] = useState(false);
   const [memberBannerDismissed, setMemberBannerDismissed] = useState(false);
+  const [referralCode] = useState(() => {
+    return captureReferralCodeFromSearch(window.location.search) ?? getStoredReferralCode();
+  });
 
   // Detect Stripe mode to show test-mode warning banner
   const { data: stripeMode } = trpc.stripeProducts.getStripeMode.useQuery(undefined, {
@@ -92,7 +99,10 @@ export default function PricingNew() {
       window.location.href = `/login?next=${encodeURIComponent("/pricing")}`;
       return;
     }
-    createCheckoutMutation.mutate({ productId: "PREMIUM" });
+    createCheckoutMutation.mutate({
+      productId: "PREMIUM",
+      referralCode: referralCode ?? undefined,
+    });
   };
 
   const handleManageBilling = () => {

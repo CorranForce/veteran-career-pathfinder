@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,10 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, Mail } from "lucide-react";
+import {
+  captureReferralCodeFromSearch,
+  getStoredReferralCode,
+} from "@/lib/referralAttribution";
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -24,9 +28,20 @@ export default function Signup() {
   );
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [referralCode] = useState(() => {
+    return captureReferralCodeFromSearch(window.location.search) ?? getStoredReferralCode();
+  });
 
   // Read ?next= param to redirect after signup
   const nextPath = new URLSearchParams(window.location.search).get("next") || "/tools";
+
+  const trackClickMutation = trpc.referral.trackClick.useMutation();
+
+  useEffect(() => {
+    if (referralCode) {
+      trackClickMutation.mutate({ code: referralCode });
+    }
+  }, [referralCode]);
 
   const signupMutation = trpc.emailAuth.signup.useMutation({
     onSuccess: () => {
@@ -41,7 +56,12 @@ export default function Signup() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    signupMutation.mutate({ name, email, password });
+    signupMutation.mutate({
+      name,
+      email,
+      password,
+      referralCode: referralCode ?? undefined,
+    });
   };
 
   const getAuthUrl = trpc.googleAuth.getAuthUrl.useQuery();
@@ -71,6 +91,12 @@ export default function Signup() {
               <span className="font-medium">Free account · No credit card required · 30-second signup</span>
             </div>
           </div>
+
+          {referralCode && (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-center text-sm text-primary">
+              You were referred by a fellow veteran. Welcome to Pathfinder.
+            </div>
+          )}
 
           {error && (
             <Alert variant="destructive">
