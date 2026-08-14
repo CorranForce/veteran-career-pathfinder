@@ -35,6 +35,7 @@ import SubscriptionPreferences from "./pages/SubscriptionPreferences";
 import MOSTranslator from "./pages/MOSTranslator";
 import Referrals from "./pages/Referrals";
 import AdminReferrals from "./pages/AdminReferrals";
+import { BackToTop } from "./components/BackToTop";
 import { WelcomeModal } from "./components/WelcomeModal";
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
@@ -123,6 +124,7 @@ function App() {
           <Toaster />
           <AuthenticatedWelcomeGate>
             <Router />
+            <BackToTop />
           </AuthenticatedWelcomeGate>
         </TooltipProvider>
       </ThemeProvider>

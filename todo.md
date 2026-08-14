@@ -1902,3 +1902,7 @@
 ## Purchase Confirmation Email
 
 - [x] Improve the Premium purchase confirmation email with clear first-use steps and direct resource links
+
+## Public-Page Navigation
+
+- [x] Add an accessible Back to Top button to long public pages
