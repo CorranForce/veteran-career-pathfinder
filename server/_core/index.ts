@@ -11,6 +11,7 @@ import {
   signupRateLimiter,
   passwordResetRateLimiter,
 } from "./rateLimiter";
+import { getLegacyDomainRedirectUrl } from "../domainRedirect";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -39,6 +40,23 @@ async function startServer() {
   // Required for express-rate-limit to correctly read X-Forwarded-For IPs
   // and for secure cookies to work in production behind HTTPS termination.
   app.set("trust proxy", 1);
+
+  // Redirect visitor-facing requests from the legacy Manus address to the
+  // preferred public address. API traffic remains on its original route so
+  // Stripe and email-provider webhooks are never interrupted by a redirect.
+  app.use((req, res, next) => {
+    const redirectUrl = getLegacyDomainRedirectUrl({
+      host: req.get("host"),
+      method: req.method,
+      originalUrl: req.originalUrl,
+    });
+
+    if (redirectUrl) {
+      return res.redirect(301, redirectUrl);
+    }
+
+    return next();
+  });
 
   // Stripe webhook MUST be registered BEFORE express.json() to access raw body
   app.post(

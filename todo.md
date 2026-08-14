@@ -1882,3 +1882,9 @@
 - [x] Wire Resend to send 20% coupon code email on submission
 - [x] Write Vitest tests for exitIntent.submit procedure (9 tests, all passing)
 - [x] Run full test suite and confirm passing (279/279)
+
+## Domain Routing
+
+- [x] Configure a permanent 301 redirect from vetcarepath-tzppwpga.manus.space to transition-pathfinder.manus.space for visitor-facing GET/HEAD traffic
+- [x] Preserve legacy /api/* traffic to avoid interrupting Stripe and email-provider webhooks
+- [x] Add unit tests for legacy-domain redirect behavior
