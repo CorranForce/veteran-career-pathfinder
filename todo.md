@@ -1889,3 +1889,4 @@
 - [x] Configure a permanent 301 redirect from vetcarepath-tzppwpga.manus.space to transition-pathfinder.manus.space for visitor-facing GET/HEAD traffic
 - [x] Preserve legacy /api/* traffic to avoid interrupting Stripe and email-provider webhooks
 - [x] Add unit tests for legacy-domain redirect behavior
+- [x] Replace production-facing pathfinder.casa references with transition-pathfinder.manus.space

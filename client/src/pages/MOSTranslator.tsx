@@ -339,7 +339,7 @@ export default function MOSTranslator() {
         <meta name="keywords" content="MOS translator, military occupational specialty, military to civilian jobs, MOS to civilian, veteran job search, military skills translation" />
         <meta property="og:title" content="MOS Translator | Military to Civilian Career Pathfinder" />
         <meta property="og:description" content="Translate your Military Occupational Specialty (MOS) into civilian job titles, salary ranges, and career paths. Free MOS lookup for all branches." />
-        <meta property="og:url" content="https://pathfinder.casa/mos-translator" />
+        <meta property="og:url" content="https://transition-pathfinder.manus.space/mos-translator" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-mos-translator-k2ZER42zarz9YTdUdYNAAM.png" />
         <meta property="og:image:width" content="1200" />
@@ -349,7 +349,7 @@ export default function MOSTranslator() {
         <meta name="twitter:title" content="MOS Translator | Military to Civilian Career Pathfinder" />
         <meta name="twitter:description" content="Translate your Military Occupational Specialty (MOS) into civilian job titles, salary ranges, and career paths. Free MOS lookup for all branches." />
         <meta name="twitter:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-mos-translator-k2ZER42zarz9YTdUdYNAAM.png" />
-        <link rel="canonical" href="https://pathfinder.casa/mos-translator" />
+        <link rel="canonical" href="https://transition-pathfinder.manus.space/mos-translator" />
       </Helmet>
       {/* Navigation */}
       <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">

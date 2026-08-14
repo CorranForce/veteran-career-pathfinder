@@ -59,7 +59,7 @@ export default function BlogPost() {
     );
   }
 
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://pathfinder.casa";
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://transition-pathfinder.manus.space";
   const postUrl = `${siteUrl}/blog/${post.slug}`;
   const seoTitle = post.metaTitle ?? `${post.title} | Pathfinder`;
   const seoDescription = post.metaDescription ?? post.excerpt;

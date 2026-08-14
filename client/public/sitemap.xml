@@ -3,7 +3,7 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://pathfinder.casa/</loc>
+    <loc>https://transition-pathfinder.manus.space/</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -11,7 +11,7 @@
 
   <!-- Pricing -->
   <url>
-    <loc>https://pathfinder.casa/pricing</loc>
+    <loc>https://transition-pathfinder.manus.space/pricing</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -19,7 +19,7 @@
 
   <!-- MOS Translator -->
   <url>
-    <loc>https://pathfinder.casa/mos-translator</loc>
+    <loc>https://transition-pathfinder.manus.space/mos-translator</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -27,7 +27,7 @@
 
   <!-- Blog listing -->
   <url>
-    <loc>https://pathfinder.casa/blog</loc>
+    <loc>https://transition-pathfinder.manus.space/blog</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -35,31 +35,31 @@
 
   <!-- Blog posts -->
   <url>
-    <loc>https://pathfinder.casa/blog/top-10-civilian-jobs-for-infantry-veterans</loc>
+    <loc>https://transition-pathfinder.manus.space/blog/top-10-civilian-jobs-for-infantry-veterans</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/blog/how-to-translate-your-mos-to-resume-language</loc>
+    <loc>https://transition-pathfinder.manus.space/blog/how-to-translate-your-mos-to-resume-language</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/blog/veteran-career-transition-complete-guide</loc>
+    <loc>https://transition-pathfinder.manus.space/blog/veteran-career-transition-complete-guide</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/blog/veteran-resume-mistakes-to-avoid</loc>
+    <loc>https://transition-pathfinder.manus.space/blog/veteran-resume-mistakes-to-avoid</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/blog/veteran-networking-strategies-linkedin</loc>
+    <loc>https://transition-pathfinder.manus.space/blog/veteran-networking-strategies-linkedin</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -67,7 +67,7 @@
 
   <!-- Resume Templates -->
   <url>
-    <loc>https://pathfinder.casa/templates</loc>
+    <loc>https://transition-pathfinder.manus.space/templates</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -75,13 +75,13 @@
 
   <!-- Auth pages -->
   <url>
-    <loc>https://pathfinder.casa/login</loc>
+    <loc>https://transition-pathfinder.manus.space/login</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/signup</loc>
+    <loc>https://transition-pathfinder.manus.space/signup</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
@@ -89,19 +89,19 @@
 
   <!-- Legal / compliance -->
   <url>
-    <loc>https://pathfinder.casa/privacy</loc>
+    <loc>https://transition-pathfinder.manus.space/privacy</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/terms</loc>
+    <loc>https://transition-pathfinder.manus.space/terms</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://pathfinder.casa/refund</loc>
+    <loc>https://transition-pathfinder.manus.space/refund</loc>
     <lastmod>2026-04-22</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

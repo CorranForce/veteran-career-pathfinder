@@ -12,7 +12,7 @@ import { getDb } from "./db";
 import { blogPosts } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-const SITE_URL = (process.env.FRONTEND_URL || "https://pathfinder.casa").replace(/\/$/, "");
+const SITE_URL = (process.env.FRONTEND_URL || "https://transition-pathfinder.manus.space").replace(/\/$/, "");
 
 /** Static pages with their change frequency and priority */
 const STATIC_PAGES: Array<{ path: string; changefreq: string; priority: string }> = [

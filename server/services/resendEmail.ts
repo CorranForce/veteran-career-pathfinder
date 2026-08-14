@@ -144,7 +144,7 @@ export async function sendExitIntentCouponEmail(
 ): Promise<boolean> {
   try {
     const discountPercent = 20;
-    const pricingUrl = `${process.env.FRONTEND_URL || "https://pathfinder.casa"}/pricing`;
+    const pricingUrl = `${process.env.FRONTEND_URL || "https://transition-pathfinder.manus.space"}/pricing`;
 
     const { error, data } = await resend.emails.send({
       from: "Pathfinder <orders@resend.dev>",
@@ -191,7 +191,7 @@ export async function sendExitIntentCouponEmail(
 
           <p style="color: #9ca3af; font-size: 11px; text-align: center; margin-top: 16px;">
             Pathfinder — AI-Powered Veteran Career Transition Strategist<br/>
-            You received this because you requested a discount on pathfinder.casa.
+            You received this because you requested a discount from Pathfinder.
           </p>
         </div>
       `,

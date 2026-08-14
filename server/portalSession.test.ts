@@ -49,16 +49,16 @@ describe("createPortalSession logic", () => {
     });
 
     it("constructs return_url from request origin", () => {
-      const origin = "https://pathfinder.casa";
+      const origin = "https://transition-pathfinder.manus.space";
       const returnUrl = `${origin}/dashboard`;
-      expect(returnUrl).toBe("https://pathfinder.casa/dashboard");
+      expect(returnUrl).toBe("https://transition-pathfinder.manus.space/dashboard");
     });
 
     it("falls back to protocol+host when origin header is missing", () => {
       const protocol = "https";
-      const host = "pathfinder.casa";
+      const host = "transition-pathfinder.manus.space";
       const returnUrl = `${protocol}://${host}/dashboard`;
-      expect(returnUrl).toBe("https://pathfinder.casa/dashboard");
+      expect(returnUrl).toBe("https://transition-pathfinder.manus.space/dashboard");
     });
   });
 
@@ -124,12 +124,12 @@ describe("createPortalSession logic", () => {
       const { stripe } = await import("../server/stripe");
       const session = await stripe.billingPortal.sessions.create({
         customer: "cus_existing456",
-        return_url: "https://pathfinder.casa/dashboard",
+        return_url: "https://transition-pathfinder.manus.space/dashboard",
       });
 
       expect(mockPortalSessionCreate).toHaveBeenCalledWith({
         customer: "cus_existing456",
-        return_url: "https://pathfinder.casa/dashboard",
+        return_url: "https://transition-pathfinder.manus.space/dashboard",
       });
       expect(session.url).toBe(expectedUrl);
     });
@@ -141,7 +141,7 @@ describe("createPortalSession logic", () => {
       const { stripe } = await import("../server/stripe");
       const session = await stripe.billingPortal.sessions.create({
         customer: "cus_test",
-        return_url: "https://pathfinder.casa/dashboard",
+        return_url: "https://transition-pathfinder.manus.space/dashboard",
       });
 
       expect(session.url).toBe(portalUrl);
@@ -156,7 +156,7 @@ describe("createPortalSession logic", () => {
       await expect(
         stripe.billingPortal.sessions.create({
           customer: "cus_invalid",
-          return_url: "https://pathfinder.casa/dashboard",
+          return_url: "https://transition-pathfinder.manus.space/dashboard",
         })
       ).rejects.toThrow("No such customer: 'cus_invalid'");
     });
@@ -174,7 +174,7 @@ describe("createPortalSession logic", () => {
     });
 
     it("return_url must be an absolute HTTPS URL", () => {
-      const returnUrl = "https://pathfinder.casa/dashboard";
+      const returnUrl = "https://transition-pathfinder.manus.space/dashboard";
       expect(returnUrl).toMatch(/^https:\/\//);
       expect(returnUrl).toContain("/dashboard");
     });

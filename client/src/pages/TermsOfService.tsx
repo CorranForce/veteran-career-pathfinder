@@ -31,8 +31,8 @@ export default function TermsOfService() {
               <h2 className="text-2xl font-semibold mb-3">1. Acceptance of Terms</h2>
               <p className="text-muted-foreground leading-relaxed">
                 By accessing or using Pathfinder ("the Service") at{" "}
-                <a href="https://pathfinder.casa" className="text-primary underline underline-offset-2">
-                  pathfinder.casa
+                <a href="https://transition-pathfinder.manus.space" className="text-primary underline underline-offset-2">
+                  transition-pathfinder.manus.space
                 </a>
                 , you agree to be bound by these Terms of Service ("Terms"). If you do not agree to
                 these Terms, please do not use the Service. These Terms apply to all visitors, users,

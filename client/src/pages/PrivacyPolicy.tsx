@@ -33,8 +33,8 @@ export default function PrivacyPolicy() {
                 Welcome to Pathfinder ("we," "our," or "us"). We are committed to protecting your personal
                 information and your right to privacy. This Privacy Policy explains how we collect, use,
                 disclose, and safeguard your information when you visit our website at{" "}
-                <a href="https://pathfinder.casa" className="text-primary underline underline-offset-2">
-                  pathfinder.casa
+                <a href="https://transition-pathfinder.manus.space" className="text-primary underline underline-offset-2">
+                  transition-pathfinder.manus.space
                 </a>{" "}
                 and use our services.
               </p>

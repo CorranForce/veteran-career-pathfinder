@@ -63,7 +63,7 @@ export default function Home() {
         <meta name="keywords" content="veteran career transition, military to civilian jobs, MOS translator, veteran employment, AI career advisor, military skills translation, veteran job search, military career change" />
         <meta property="og:title" content="Pathfinder | Veteran Career Transition AI" />
         <meta property="og:description" content="AI-powered career advisor for military veterans. Translate your MOS into civilian jobs, map transferable skills, and get a 30-day action plan." />
-        <meta property="og:url" content="https://pathfinder.casa" />
+        <meta property="og:url" content="https://transition-pathfinder.manus.space" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-home-UgWQqaXhJMc49sSdpTpuAb.png" />
         <meta property="og:image:width" content="1200" />
@@ -73,14 +73,14 @@ export default function Home() {
         <meta name="twitter:title" content="Pathfinder | Veteran Career Transition AI" />
         <meta name="twitter:description" content="AI-powered career advisor for military veterans. Translate your MOS into civilian jobs, map transferable skills, and get a 30-day action plan." />
         <meta name="twitter:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663037092468/TZPpwPgA6PciQ95BpgomX4/og-home-UgWQqaXhJMc49sSdpTpuAb.png" />
-        <link rel="canonical" href="https://pathfinder.casa" />
+        <link rel="canonical" href="https://transition-pathfinder.manus.space" />
       </Helmet>
       {/* SEO: Organization structured data */}
       <StructuredData
         type="Organization"
         name="Pathfinder"
-        url="https://vetcarepath-tzppwpga.manus.space"
-        logo="https://vetcarepath-tzppwpga.manus.space/logo.png"
+        url="https://transition-pathfinder.manus.space"
+        logo="https://transition-pathfinder.manus.space/logo.png"
         description="AI-powered career transition platform helping military veterans translate their service into civilian careers with personalized job paths and skills mapping."
         sameAs={[
           // Add social media URLs when available
@@ -90,11 +90,11 @@ export default function Home() {
       <StructuredData
         type="WebSite"
         name="Pathfinder - Veteran Career Transition Strategist"
-        url="https://vetcarepath-tzppwpga.manus.space"
+        url="https://transition-pathfinder.manus.space"
         description="AI-powered tool helping veterans translate military service into civilian careers with personalized job paths and skills mapping."
         potentialAction={{
           type: 'SearchAction',
-          target: 'https://vetcarepath-tzppwpga.manus.space/blog?q={search_term_string}',
+          target: 'https://transition-pathfinder.manus.space/blog?q={search_term_string}',
           queryInput: 'required name=search_term_string',
         }}
       />

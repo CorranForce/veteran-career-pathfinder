@@ -135,7 +135,7 @@ export async function sendEmailNotification(opts: DispatchOptions): Promise<void
             : ""
         }
         <hr style="margin-top:32px;border:none;border-top:1px solid #eee"/>
-        <p style="color:#999;font-size:12px">You received this email because you have email notifications enabled. You can manage your preferences in <a href="https://pathfinder.casa/account-settings">Account Settings</a>.</p>
+        <p style="color:#999;font-size:12px">You received this email because you have email notifications enabled. You can manage your preferences in <a href="https://transition-pathfinder.manus.space/account-settings">Account Settings</a>.</p>
       </div>
     `;
 
