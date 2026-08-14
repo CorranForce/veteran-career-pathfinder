@@ -227,7 +227,7 @@ export default function Home() {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img 
                   src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/nMLVtQCUxVmNISWs.png" 
-                  alt="Veteran professional looking toward future career" 
+                  alt="Veteran professional looking toward a civilian career opportunity from an office window" 
                   className="w-full h-auto"
                 />
               </div>
@@ -355,7 +355,7 @@ export default function Home() {
             <div>
               <img 
                 src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/HLabsInJZVDtDwUX.png" 
-                alt="Military to civilian skills translation" 
+                  alt="Illustration of military experience translated into civilian workplace skills" 
                 className="rounded-2xl shadow-xl w-full"
               />
             </div>
@@ -407,7 +407,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <img 
                 src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/vIfMQuTszYmWMpqj.png" 
-                alt="Career planning workspace" 
+                  alt="Career planning workspace for a veteran's civilian job search" 
                 className="w-full h-64 object-cover"
               />
               <CardHeader>
@@ -421,7 +421,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <img 
                 src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663037092468/JaDsvnmtKVMrkAOY.png" 
-                alt="Successful veteran professionals" 
+                  alt="Veterans celebrating a successful civilian career transition" 
                 className="w-full h-64 object-cover"
               />
               <CardHeader>

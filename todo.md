@@ -1910,3 +1910,7 @@
 ## Breadcrumb Navigation
 
 - [x] Add reusable breadcrumbs to public detail and legal pages for orientation and internal linking
+
+## Image Accessibility and SEO
+
+- [x] Audit and improve meaningful image alternative text across public pages
