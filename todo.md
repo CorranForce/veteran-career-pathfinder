@@ -1107,7 +1107,7 @@
 - [x] Prevent self-referrals
 - [x] Prevent duplicate credit
 - [x] Add basic abuse prevention
-- [ ] Create referral dashboard UI for users (backend ready, UI not yet built)
+- [x] Create referral dashboard UI for users (/referrals page with share link, copy/share actions, stats, and conversion history)
 - [ ] Test scalability of tracking schema
 
 ### 6. Exit-Intent Email Capture Upgrade

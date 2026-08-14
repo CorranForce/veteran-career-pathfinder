@@ -33,6 +33,7 @@ import RefundPolicy from "./pages/RefundPolicy";
 import Unsubscribe from "./pages/Unsubscribe";
 import SubscriptionPreferences from "./pages/SubscriptionPreferences";
 import MOSTranslator from "./pages/MOSTranslator";
+import Referrals from "./pages/Referrals";
 import { WelcomeModal } from "./components/WelcomeModal";
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
@@ -96,6 +97,7 @@ function Router() {
       <Route path={"/unsubscribe"} component={Unsubscribe} />
       <Route path={"/subscription-preferences"} component={SubscriptionPreferences} />
       <Route path={"/mos-translator"} component={MOSTranslator} />
+      <Route path={"/referrals"} component={Referrals} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

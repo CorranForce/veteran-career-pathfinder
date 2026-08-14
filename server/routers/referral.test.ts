@@ -56,8 +56,9 @@ function makeCtx(user: AuthenticatedUser | null = makeUser()): TrpcContext {
     user,
     req: {
       protocol: "https",
-      headers: { origin: "https://pathfinder.casa" },
-      get: (header: string) => (header === "host" ? "pathfinder.casa" : ""),
+      headers: { origin: "https://transition-pathfinder.manus.space" },
+      get: (header: string) =>
+        header === "host" ? "transition-pathfinder.manus.space" : "",
     } as unknown as TrpcContext["req"],
     res: {} as TrpcContext["res"],
   };
@@ -106,12 +107,15 @@ describe("referral.getMyCode", () => {
     const result = await caller.referral.getMyCode();
 
     expect(result.code).toBe("VET-ABC123");
-    expect(result.shareUrl).toBe("https://pathfinder.casa/signup?ref=VET-ABC123");
+    expect(result.shareUrl).toBe(
+      "https://transition-pathfinder.manus.space/signup?ref=VET-ABC123"
+    );
     expect(result.totalClicks).toBe(5);
     expect(result.totalSignups).toBe(3);
     expect(result.totalConversions).toBe(2);
     expect(result.estimatedRewardCents).toBe(1000); // 2 × $5
     expect(result.isActive).toBe(true);
+    expect(result.createdAt).toEqual(new Date("2025-06-01"));
   });
 
   it("calls getOrCreateReferralCode with the caller's user ID", async () => {
@@ -143,6 +147,7 @@ describe("referral.getMyConversions", () => {
     expect(result).toHaveLength(1);
     expect(result[0]?.rewardCents).toBe(500);
     expect(result[0]?.rewardStatus).toBe("pending");
+    expect(result[0]?.createdAt).toEqual(new Date("2025-07-01"));
   });
 
   it("returns an empty array when the user has no conversions", async () => {

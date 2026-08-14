@@ -21,7 +21,8 @@ import {
   ChevronDown,
   Shield,
   Star,
-  CreditCard
+  CreditCard,
+  Gift
 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -181,6 +182,12 @@ export function AuthenticatedNav() {
                 <DropdownMenuItem className="flex items-center gap-2">
                   <CreditCard className="h-4 w-4" />
                   Billing & Subscription
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/referrals">
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <Gift className="h-4 w-4" />
+                  Refer a Veteran
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuSeparator />
