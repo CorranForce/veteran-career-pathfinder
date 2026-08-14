@@ -30,7 +30,7 @@ type CaptureRow = {
   email: string;
   couponCode: string;
   emailSent: boolean;
-  convertedAt: null;
+  convertedAt: Date | null;
 };
 
 /** Build a fresh in-memory DB stub around the given store. */
@@ -178,6 +178,23 @@ describe("exitIntent.adminList", () => {
     expect(result.stats.emailSentCount).toBe(1);
     expect(result.stats.convertedCount).toBe(0);
     expect(result.stats.conversionRate).toBe(0);
+  });
+
+  it("reports converted leads and a rounded conversion rate", async () => {
+    store["converted@example.com"] = {
+      id: 3,
+      email: "converted@example.com",
+      couponCode: "5zlB9zup",
+      emailSent: true,
+      convertedAt: new Date("2026-08-14T12:00:00.000Z"),
+    };
+
+    const result = await makeAdminCaller().adminList();
+
+    expect(result.stats.total).toBe(3);
+    expect(result.stats.emailSentCount).toBe(2);
+    expect(result.stats.convertedCount).toBe(1);
+    expect(result.stats.conversionRate).toBe(33);
   });
 
   it("throws FORBIDDEN for non-admin users", async () => {

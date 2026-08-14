@@ -61,6 +61,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
+  Mail,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -140,6 +141,12 @@ export default function PlatformOwnerDashboard() {
 
   // Fetch LTV analytics
   const { data: ltvAnalytics, isLoading: ltvLoading } = trpc.admin.getLTVAnalytics.useQuery(
+    undefined,
+    { enabled: isAuthenticated && user?.role === "platform_owner" }
+  );
+
+  // Fetch exit-intent lead capture performance for platform-owner review
+  const { data: exitIntentData, isLoading: exitIntentLoading } = trpc.exitIntent.adminList.useQuery(
     undefined,
     { enabled: isAuthenticated && user?.role === "platform_owner" }
   );
@@ -434,6 +441,92 @@ export default function PlatformOwnerDashboard() {
           </CardHeader>
           <CardContent>
             <ActivityFeed />
+          </CardContent>
+        </Card>
+
+        {/* Exit-Intent Lead Capture */}
+        <Card className="mb-8">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                Exit-Intent Leads
+              </CardTitle>
+              <CardDescription>
+                Visitors who requested the Premium discount code before leaving the site
+              </CardDescription>
+            </div>
+            <Badge variant="outline">Coupon: 5zlB9zup</Badge>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+              <div className="rounded-lg bg-muted/40 p-4">
+                <p className="text-sm text-muted-foreground">Captured leads</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {exitIntentLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (exitIntentData?.stats.total ?? 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="rounded-lg bg-muted/40 p-4">
+                <p className="text-sm text-muted-foreground">Coupon emails sent</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {exitIntentLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (exitIntentData?.stats.emailSentCount ?? 0).toLocaleString()}
+                </p>
+              </div>
+              <div className="rounded-lg bg-muted/40 p-4">
+                <p className="text-sm text-muted-foreground">Premium conversions</p>
+                <p className="mt-1 text-2xl font-bold">
+                  {exitIntentLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (exitIntentData?.stats.convertedCount ?? 0).toLocaleString()}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {exitIntentData?.stats.conversionRate ?? 0}% of captured leads
+                </p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Captured</TableHead>
+                    <TableHead>Coupon email</TableHead>
+                    <TableHead>Conversion</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {exitIntentLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                        <Loader2 className="mx-auto h-5 w-5 animate-spin" />
+                      </TableCell>
+                    </TableRow>
+                  ) : exitIntentData?.captures && exitIntentData.captures.length > 0 ? (
+                    exitIntentData.captures.slice(0, 10).map((capture) => (
+                      <TableRow key={capture.id}>
+                        <TableCell className="font-medium">{capture.email}</TableCell>
+                        <TableCell>{format(new Date(capture.createdAt), "MMM d, yyyy 'at' h:mm a")}</TableCell>
+                        <TableCell>
+                          <Badge variant={capture.emailSent ? "default" : "secondary"}>
+                            {capture.emailSent ? "Sent" : "Not sent"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={capture.convertedAt ? "default" : "outline"}>
+                            {capture.convertedAt ? "Converted" : "Pending"}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                        No exit-intent leads have been captured yet.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 

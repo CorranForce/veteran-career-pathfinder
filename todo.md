@@ -1890,3 +1890,7 @@
 - [x] Preserve legacy /api/* traffic to avoid interrupting Stripe and email-provider webhooks
 - [x] Add unit tests for legacy-domain redirect behavior
 - [x] Replace production-facing pathfinder.casa references with transition-pathfinder.manus.space
+
+## Exit-Intent Capture Dashboard
+
+- [x] Add exit-intent capture analytics and recent-leads view to the Platform Owner Dashboard
