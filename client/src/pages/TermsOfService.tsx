@@ -1,5 +1,6 @@
 import { Compass } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { PageBreadcrumbs, buildBreadcrumbTrail } from "@/components/PageBreadcrumbs";
 
 export default function TermsOfService() {
   return (
@@ -21,6 +22,7 @@ export default function TermsOfService() {
       {/* Content */}
       <main className="flex-1 py-16">
         <div className="container mx-auto max-w-3xl">
+          <PageBreadcrumbs items={buildBreadcrumbTrail("Terms of Service")} />
           <h1 className="text-4xl font-bold mb-2">Terms of Service</h1>
           <p className="text-muted-foreground mb-8">Last updated: April 15, 2026</p>
           <Separator className="mb-10" />

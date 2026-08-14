@@ -1906,3 +1906,7 @@
 ## Public-Page Navigation
 
 - [x] Add an accessible Back to Top button to long public pages
+
+## Breadcrumb Navigation
+
+- [x] Add reusable breadcrumbs to public detail and legal pages for orientation and internal linking

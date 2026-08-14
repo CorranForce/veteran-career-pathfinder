@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Streamdown } from "streamdown";
 import { StructuredData } from "@/components/StructuredData";
 import { PostSEO } from "@/components/PostSEO";
+import { PageBreadcrumbs, buildBreadcrumbTrail } from "@/components/PageBreadcrumbs";
 
 /** Estimate read time from content length (~200 wpm) */
 function estimateReadTime(content: string): string {
@@ -110,6 +111,9 @@ export default function BlogPost() {
       {/* Article Header */}
       <section className="py-16 bg-gradient-to-br from-background via-secondary/20 to-background">
         <div className="container mx-auto max-w-4xl">
+          <div className="mb-6">
+            <PageBreadcrumbs items={buildBreadcrumbTrail(post.title, { label: "Blog", href: "/blog" })} />
+          </div>
           <h1 className="text-5xl font-bold mb-6">{post.title}</h1>
           <p className="text-xl text-muted-foreground mb-6">{post.excerpt}</p>
 
