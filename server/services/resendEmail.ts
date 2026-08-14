@@ -2,6 +2,64 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const DEFAULT_APP_URL = "https://transition-pathfinder.manus.space";
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+export function buildPurchaseConfirmationEmail(
+  name: string,
+  productName: string,
+  amount: number,
+  appUrl = process.env.FRONTEND_URL || DEFAULT_APP_URL
+) {
+  const baseUrl = appUrl.replace(/\/$/, "");
+  const safeName = escapeHtml(name);
+  const safeProductName = escapeHtml(productName);
+  const formattedAmount = amount.toFixed(2);
+
+  return {
+    subject: `Your Pathfinder access is ready — ${productName}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:24px;color:#1f2937;">
+        <div style="background:#ffffff;border-radius:12px;padding:32px;box-shadow:0 2px 8px rgba(15,23,42,0.08);">
+          <h1 style="color:#12365a;font-size:26px;margin:0 0 12px;">Your Pathfinder access is ready</h1>
+          <p style="font-size:16px;line-height:1.6;margin:0 0 18px;">Hi ${safeName}, thank you for investing in your civilian career transition. Your <strong>${safeProductName}</strong> purchase is confirmed, and your Premium resources are now available.</p>
+
+          <div style="background:#eff6ff;border-radius:8px;padding:16px 20px;margin:22px 0;">
+            <p style="margin:0 0 8px;font-weight:bold;color:#12365a;">Order confirmation</p>
+            <p style="margin:4px 0;"><strong>Package:</strong> ${safeProductName}</p>
+            <p style="margin:4px 0;"><strong>Amount paid:</strong> $${formattedAmount}</p>
+            <p style="margin:4px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
+
+          <h2 style="font-size:19px;color:#12365a;margin:26px 0 12px;">Your next steps</h2>
+          <ol style="padding-left:22px;line-height:1.75;margin:0 0 22px;">
+            <li><strong>Open your Pathfinder tools.</strong> Start with your personalized career transition workspace.</li>
+            <li><strong>Download your Premium resources.</strong> Access the full prompt and veteran-focused templates whenever you need them.</li>
+            <li><strong>Translate your experience.</strong> Use the MOS Translator to identify civilian paths, skill gaps, and salary ranges.</li>
+          </ol>
+
+          <a href="${baseUrl}/tools" style="display:block;background:#12365a;color:#ffffff;text-align:center;padding:14px 24px;text-decoration:none;border-radius:8px;font-size:16px;font-weight:bold;margin:20px 0 12px;">Open My Pathfinder Tools</a>
+          <p style="font-size:14px;line-height:1.6;margin:0;text-align:center;">
+            <a href="${baseUrl}/downloads" style="color:#0f4c81;">View Premium downloads</a>
+            &nbsp;·&nbsp;
+            <a href="${baseUrl}/mos-translator" style="color:#0f4c81;">Use the MOS Translator</a>
+          </p>
+
+          <p style="color:#6b7280;font-size:14px;line-height:1.6;margin:28px 0 0;">If you have questions about your purchase or first steps, reply to this email and we will be glad to help.</p>
+        </div>
+      </div>
+    `,
+  };
+}
+
 /**
  * Send welcome email to new users
  */
@@ -62,37 +120,12 @@ export async function sendPurchaseConfirmationEmail(
   amount: number
 ): Promise<boolean> {
   try {
+    const email = buildPurchaseConfirmationEmail(name, productName, amount);
     const { data, error } = await resend.emails.send({
       from: 'Pathfinder <orders@resend.dev>', // Use your verified domain
       to: [to],
-      subject: `Purchase Confirmation - ${productName}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #1e40af;">Thank You for Your Purchase!</h1>
-          
-          <p>Hi ${name},</p>
-          
-          <p>Your payment of $${amount.toFixed(2)} for <strong>${productName}</strong> has been processed successfully.</p>
-          
-          <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0;">Order Details</h3>
-            <p><strong>Product:</strong> ${productName}</p>
-            <p><strong>Amount:</strong> $${amount.toFixed(2)}</p>
-            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-          </div>
-          
-          <p>You can now access all premium features in your dashboard.</p>
-          
-          <a href="${process.env.VITE_FRONTEND_FORGE_API_URL || 'https://pathfinder.manus.space'}/dashboard" 
-             style="display: inline-block; background-color: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0;">
-            Access Your Content
-          </a>
-          
-          <p style="color: #666; font-size: 14px; margin-top: 30px;">
-            If you have any questions about your purchase, please reply to this email.
-          </p>
-        </div>
-      `,
+      subject: email.subject,
+      html: email.html,
     });
 
     if (error) {

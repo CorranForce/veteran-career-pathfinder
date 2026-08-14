@@ -1898,3 +1898,7 @@
 ## Referral Management Dashboard
 
 - [x] Add a platform-owner referral management panel with conversion and reward controls
+
+## Purchase Confirmation Email
+
+- [x] Improve the Premium purchase confirmation email with clear first-use steps and direct resource links
