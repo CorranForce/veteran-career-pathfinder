@@ -1894,3 +1894,7 @@
 ## Exit-Intent Capture Dashboard
 
 - [x] Add exit-intent capture analytics and recent-leads view to the Platform Owner Dashboard
+
+## Referral Management Dashboard
+
+- [x] Add a platform-owner referral management panel with conversion and reward controls

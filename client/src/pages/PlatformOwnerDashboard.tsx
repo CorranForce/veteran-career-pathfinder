@@ -62,6 +62,7 @@ import {
   ArrowDownRight,
   Minus,
   Mail,
+  Gift,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -421,14 +422,19 @@ export default function PlatformOwnerDashboard() {
 
         {/* Product Management */}
         <div className="mb-8 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold">Product Management</h2>
               <p className="text-sm text-muted-foreground">Manage products, pricing, and Stripe integration</p>
             </div>
-            <Button onClick={() => setLocation("/admin/products")}>
-              <Package className="h-4 w-4 mr-2" /> Manage Products
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => setLocation("/admin/referrals")}>
+                <Gift className="h-4 w-4 mr-2" /> Manage Referrals
+              </Button>
+              <Button onClick={() => setLocation("/admin/products")}>
+                <Package className="h-4 w-4 mr-2" /> Manage Products
+              </Button>
+            </div>
           </div>
           <StripeHealthCard />
         </div>

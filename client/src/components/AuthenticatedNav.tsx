@@ -61,6 +61,11 @@ export function AuthenticatedNav() {
       label: "Admin", 
       icon: Settings 
     });
+    navItems.push({
+      href: "/admin/referrals",
+      label: "Referrals",
+      icon: Gift,
+    });
   }
 
   // Show upgrade CTA only for free-tier users

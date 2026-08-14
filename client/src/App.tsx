@@ -34,6 +34,7 @@ import Unsubscribe from "./pages/Unsubscribe";
 import SubscriptionPreferences from "./pages/SubscriptionPreferences";
 import MOSTranslator from "./pages/MOSTranslator";
 import Referrals from "./pages/Referrals";
+import AdminReferrals from "./pages/AdminReferrals";
 import { WelcomeModal } from "./components/WelcomeModal";
 import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
@@ -88,6 +89,7 @@ function Router() {
       <Route path={"/admin/analytics"} component={AdminDashboard} />
       <Route path={"/admin/templates"} component={AdminTemplates} />
       <Route path={"/admin/products"} component={ProductManagementPage} />
+      <Route path={"/admin/referrals"} component={AdminReferrals} />
       <Route path={"/templates"} component={ResumeTemplates} />
       <Route path={"/blog"} component={Blog} />
       <Route path={"/blog/:slug"} component={BlogPost} />
