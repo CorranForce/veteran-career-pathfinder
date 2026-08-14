@@ -60,7 +60,7 @@
 - [x] Create /blog route and layout
 - [x] Write first blog post: "Army 25U to IT Career: Complete Guide"
 - [x] Write second post: "AI Tools Every Veteran Should Use for Job Search"
-- [ ] Write third post: "Caesar's Strategy Applied to Career Transitions" (content only — no dev work needed)
+- [x] Write third post: "Caesar's Strategy Applied to Career Transitions" (content only — no dev work needed)
 - [x] Implement blog post SEO optimization (PostSEO component, og:*, twitter:card, canonical)
 - [x] Add social sharing buttons (LinkedIn, X/Twitter, Copy Link on BlogPost page)
 
