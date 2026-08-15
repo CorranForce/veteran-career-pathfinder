@@ -74,6 +74,9 @@ function Router() {
       <Route path={"/forgot-password"} component={ForgotPassword} />
       <Route path={"/reset-password"} component={ResetPassword} />
       <Route path={"/verify-email"} component={VerifyEmail} />
+      <Route path={"/account"}>
+        <Redirect to="/account-settings" />
+      </Route>
       <Route path={"/account-settings"} component={AccountSettings} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/success"} component={Success} />

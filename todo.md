@@ -1914,3 +1914,7 @@
 ## Image Accessibility and SEO
 
 - [x] Audit and improve meaningful image alternative text across public pages
+
+## Account Route Reliability
+
+- [x] Fix the deployed /account route returning a 404 response
