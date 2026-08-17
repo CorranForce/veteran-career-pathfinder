@@ -1918,3 +1918,7 @@
 ## Account Route Reliability
 
 - [x] Fix the deployed /account route returning a 404 response
+
+## Profile Picture Management
+
+- [x] Add profile-picture upload and replacement controls to Account Settings

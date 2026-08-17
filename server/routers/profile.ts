@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
+import { decodeProfileImageData } from "../profileImageValidation";
 import {
   getUserProfile,
   createOrUpdateUserProfile,
@@ -224,9 +225,7 @@ export const profileRouter = router({
       const db = dbInstance as any;
       const { storagePut } = await import("../storage");
 
-      // Convert base64 to buffer
-      const base64Data = input.imageData.replace(/^data:image\/\w+;base64,/, "");
-      const buffer = Buffer.from(base64Data, "base64");
+      const buffer = decodeProfileImageData(input.imageData, input.mimeType);
 
       // Generate unique filename
       const timestamp = Date.now();

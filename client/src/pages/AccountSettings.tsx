@@ -9,10 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert, Bell, CreditCard, Crown, Loader2, ArrowUpRight, AlertTriangle } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, AlertCircle, Mail, ShieldAlert, Bell, CreditCard, Crown, Loader2, ArrowUpRight, AlertTriangle, Camera } from "lucide-react";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 export default function AccountSettings() {
@@ -29,8 +30,10 @@ export default function AccountSettings() {
   // Name update state
   const [name, setName] = useState("");
   const [nameChanged, setNameChanged] = useState(false);
+  const [uploadingPicture, setUploadingPicture] = useState(false);
 
   const settingsQuery = trpc.accountSettings.getSettings.useQuery();
+  const personalInfoQuery = trpc.profile.getPersonalInfo.useQuery();
   const connectedAccountsQuery = trpc.accountSettings.getConnectedAccounts.useQuery();
   const subscriptionQuery = trpc.payment.getSubscriptionStatus.useQuery();
 
@@ -74,6 +77,18 @@ export default function AccountSettings() {
     },
   });
 
+  const uploadProfilePictureMutation = trpc.profile.uploadProfilePicture.useMutation({
+    onSuccess: async () => {
+      await personalInfoQuery.refetch();
+      setUploadingPicture(false);
+      toast.success("Profile picture updated");
+    },
+    onError: (error) => {
+      setUploadingPicture(false);
+      toast.error(error.message || "Unable to update profile picture");
+    },
+  });
+
   // Initialize name from settings
   useEffect(() => {
     if (settingsQuery.data?.name) {
@@ -107,6 +122,33 @@ export default function AccountSettings() {
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateNameMutation.mutate({ name });
+  };
+
+  const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Use a PNG, JPEG, GIF, or WebP image");
+      return;
+    }
+    if (file.size === 0 || file.size > 5 * 1024 * 1024) {
+      toast.error("Profile pictures must be between 1 byte and 5MB");
+      return;
+    }
+
+    setUploadingPicture(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      uploadProfilePictureMutation.mutate({ imageData: reader.result as string, mimeType: file.type });
+    };
+    reader.onerror = () => {
+      setUploadingPicture(false);
+      toast.error("The selected image could not be read");
+    };
+    reader.readAsDataURL(file);
   };
 
   if (loading || settingsQuery.isLoading) {
@@ -153,6 +195,41 @@ export default function AccountSettings() {
           <CardDescription>Update your personal information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <Avatar className="h-20 w-20 border">
+                <AvatarImage src={personalInfoQuery.data?.profilePicture || undefined} alt={`${name || "User"} profile picture`} />
+                <AvatarFallback className="text-xl">
+                  {(name || user.name || "User").split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="space-y-1">
+                <Label htmlFor="account-profile-picture" className="text-base">Profile picture</Label>
+                <p className="text-sm text-muted-foreground">Square images work best. PNG, JPEG, GIF, or WebP up to 5MB.</p>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="account-profile-picture" className="cursor-pointer">
+                <Button type="button" variant="outline" disabled={uploadingPicture} asChild>
+                  <span>
+                    {uploadingPicture ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
+                    {uploadingPicture ? "Uploading..." : personalInfoQuery.data?.profilePicture ? "Replace photo" : "Upload photo"}
+                  </span>
+                </Button>
+              </Label>
+              <Input
+                id="account-profile-picture"
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                className="sr-only"
+                onChange={handleProfilePictureUpload}
+                disabled={uploadingPicture}
+              />
+            </div>
+          </div>
+
+          <Separator />
+
           <form onSubmit={handleNameSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
